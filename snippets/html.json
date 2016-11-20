@@ -1,0 +1,267 @@
+{
+
+	 // Place your snippets for HTML here. Each snippet is defined under a snippet name and has a prefix, body and 
+	 // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	 // $1, $2 for tab stops, ${id} and ${id:label} and ${1:label} for variables. Variables with the same id are connected.
+	 // Example:
+	"javascript_include_tag":{
+		"prefix": "javascript",
+		"body": [
+			"<%= javascript_include_tag \"$1\" %>"
+		],
+		"description": "rails javascript_include_tag"
+	},
+	"stylesheet_link_tag":{
+		"prefix": "stylesheet",
+		"body": [
+			"<%= stylesheet_link_tag \"${filename}\" ,media:\"${all}\" rel=\"stylesheet\" %>"
+		],
+		"description": "rails stylesheet_link_tag"
+	},
+	
+	"link_to":{
+		"prefix": "link_to",
+		"body": [
+			"<%= link_to  \"${text}\", ${model} %>"
+		],
+		"description": "rails link_to"
+	},
+	"image_tag":{
+		"prefix": "image_tag",
+		"body": [
+			"<%= image_tag  \"${filename_with_extension}\" %>"
+		],
+		"description": "rails image_tag"
+	},
+	"video_tag":{
+		"prefix": "video_tag",
+		"body": [
+			"<%= image_tag  \"${filename_with_extension}\" %>"
+		],
+		"description": "rails video_tag"
+	},
+	"render":{
+		"prefix": "render",
+		"body": [
+			"<%= render  \"${path}\" %>"
+		],
+		"description": "rails render"
+	},
+	"partial":{
+		"prefix": "partial",
+		"body": [
+			"<%= render partial: \"${path}\" %>"
+		],
+		"description": "rails render partial"
+	},
+	"audio_tag":{
+		"prefix": "audio_tag",
+		"body": [
+			"<%= image_tag  \"${filename_with_extension}\" %>"
+		],
+		"description": "rails audio_tag"
+	},
+	"auto_discovery_link_tag":{
+		"prefix": "auto_discovery",
+		"body": [
+			"<%= auto_discovery_link_tag (${:rss or :atom},{action: \"${action}\"},{title:  \"${title}\"}) %>"
+		],
+		"description": "rails auto_discovery_link_tag"
+	},
+	"button_to":{
+		"prefix": "button_to",
+		"body": [
+			"<%= button_to  \"${text}\", ${model} %>"
+		],
+		"description": "rails button_to"
+	},
+	"check_box_tag":{
+		"prefix": "check_box",
+		"body": [
+			"<%= check_box_tag (:${id_name}) %>"
+		],
+		"description": "rails check_box_tag"
+	},
+	"text_field_tag":{
+		"prefix": "text_field",
+		"body": [
+			"<%= text_field_tag (:${id_name}) %>"
+		],
+		"description": "rails text_field_tag"
+	},
+	"label_tag":{
+		"prefix": "label_tag",
+		"body": [
+			"<%= label_tag (:${for}, \"${text}\") %>"
+		],
+		"description": "rails label_tag"
+	},
+	"radio_button_tag":{
+		"prefix": "radio_button",
+		"body": [
+			"<%= radio_button_tag (:${name}, \"${value}\") %>"
+		],
+		"description": "rails radio_button_tag,id will be ${name}_${value}"
+	},
+	"text_area_tag":{
+		"prefix": "text_area",
+		"body": [
+			"<%= text_area_tag (:${id_name}, \"${content}\"), size: \"${colsxrols}\" %>"
+		],
+		"description": "rails text_area_tag"
+	},
+	"password_field_tag":{
+		"prefix": "password_field",
+		"body": [
+			"<%= password_field_tag (:${id_name}) %>"
+		],
+		"description": "rails password_field_tag"
+	},
+	"search_field":{
+		"prefix": "search_field",
+		"body": [
+			"<%= search_field (:${id_name}) %>"
+		],
+		"description": "rails search_field"
+	},
+	"telephone_field":{
+		"prefix": "telephone_field",
+		"body": [
+			"<%= telephone_field (:${id_name}) %>"
+		],
+		"description": "rails telephone_field"
+	},
+	"date_field":{
+		"prefix": "date_field",
+		"body": [
+			"<%= date_field (:${id_name}) %>"
+		],
+		"description": "rails date_field"
+	},
+	"datetime_local_field":{
+		"prefix": "datetime_local_field",
+		"body": [
+			"<%= datetime_local_field (:${id_name}) %>"
+		],
+		"description": "rails datetime_local_field"
+	},
+	"month_field":{
+		"prefix": "month_field",
+		"body": [
+			"<%= month_field (:${id_name}) %>"
+		],
+		"description": "rails month_field"
+	},
+	"week_field":{
+		"prefix": "week_field",
+		"body": [
+			"<%= week_field (:${id_name}) %>"
+		],
+		"description": "rails datetime_local_field"
+	},
+	"url_field":{
+		"prefix": "url_field",
+		"body": [
+			"<%= url_field (:${id_name}) %>"
+		],
+		"description": "rails url_field"
+	},
+	"email_field":{
+		"prefix": "email_field",
+		"body": [
+			"<%= email_field (:${id_name}) %>"
+		],
+		"description": "rails email_field"
+	},
+	"color_field":{
+		"prefix": "color_field",
+		"body": [
+			"<%= color_field (:${id_name}) %>"
+		],
+		"description": "rails color_field"
+	},
+	"time_field":{
+		"prefix": "time_field",
+		"body": [
+			"<%= time_field (:${id_name}) %>"
+		],
+		"description": "rails time_field"
+	},
+	"number_field":{
+		"prefix": "number_field",
+		"body": [
+			"<%= number_field (:${id_name}, in: ${1.0..20.0}, step: ${0.5}) %>"
+		],
+		"description": "rails number_field"
+	},
+	"range_field":{
+		"prefix": "range_field",
+		"body": [
+			"<%= range_field (:${id_name}, in: ${1..100}) %>"
+		],
+		"description": "rails range_field"
+	},
+	"select_tag":{
+		"prefix": "select_tag",
+		"body": [
+			"<%= select_tag (:${id_name}, options_for_select(${options})) %>"
+		],
+		"description": "rails select_tag,options example:[['Lisbon', 1], ['Madrid', 2], ...], 2"
+	},
+	"options_for_select":{
+		"prefix": "options_for_select",
+		"body": [
+			"<%= options_for_select(${options})) %>"
+		],
+		"description": "rails options_for_select,options example:[['Lisbon', 1], ['Madrid', 2], ...], 2"
+	},
+	"time_zone_select":{
+		"prefix": "time_zone_select",
+		"body": [
+			"<%= time_zone_select (:${id_name}) %>"
+		],
+		"description": "rails time_zone_select"
+	},
+	"hidden_field_tag":{
+		"prefix": "hidden_field",
+		"body": [
+			"<%= hidden_field_tag (:${id_name}, \"${value}\") %>"
+		],
+		"description": "rails hidden_field_tag"
+	},
+	"content_for":{
+		"prefix": "content_for",
+		"body": [
+			"<% content_for :$1 do %>",
+			"$2",
+			"<% end %>"
+		],
+		"description": "rails content_for"
+	},
+	"content_for?":{
+		"prefix": "content_for?",
+		"body": [
+			" <%= content_for?(:$1) ? yield(:$1) : $2%>"
+		],
+		"description": "rails content_for?"
+	},
+	
+	"form_for":{
+		"prefix": "form_for",
+		"body": [
+			"<%= form_for( ${variable} , remote: ${true}) do |f| %> %>",
+			"$2",
+			"<% end %>"
+		],
+		"description": "rails form_for"
+	},
+	"form_tag":{
+		"prefix": "form_tag",
+		"body": [
+			"<%= form_tag( '${path}' , remote: ${true}) do |f| %> %>",
+			"$2",
+			"<% end %>"
+		],
+		"description": "rails form_tag"
+	}
+}
