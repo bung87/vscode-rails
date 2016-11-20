@@ -1,7 +1,7 @@
 {
     "name": "rails",
     "displayName": "rails",
-    "description": "",
+    "description": "Ruby on Rails \"Asset Tag Helpers\" and \"Form Helpers snippets.",
     "version": "0.0.3",
     "publisher": "bung87",
     "icon": "rails.png",
