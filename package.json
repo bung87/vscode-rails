@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Tag Helpers\" and \"Form Helpers snippets.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -41,6 +41,10 @@
             {
                 "language": "css",
                 "path": "./snippets/css.json"
+            },
+             {
+                "language": "scss",
+                "path": "./snippets/scss.json"
             }
         ],
         "languages": [
@@ -69,6 +73,12 @@
                 ],
                 "extensions": [
                     ".css.erb"
+                ]
+            },
+            {
+                "id": "scss",
+                "extensions": [
+                    ".scss"
                 ]
             }
         ]

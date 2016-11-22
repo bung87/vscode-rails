@@ -1,0 +1,35 @@
+{
+
+	 // Place your snippets for HTML here. Each snippet is defined under a snippet name and has a prefix, body and 
+	 // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	 // $1, $2 for tab stops, ${id} and ${id:label} and ${1:label} for variables. Variables with the same id are connected.
+	 // Example:
+	"image-url":{
+		"prefix": "image-url",
+		"body": [
+			"image-url(\"$1\") "
+		],
+		"description": "rails image-url"
+	},
+	"image-path":{
+		"prefix": "image-path",
+		"body": [
+			"image-path(\"$1\") "
+		],
+		"description": "rails image-path"
+	},
+    "asset-url":{
+		"prefix": "asset-url",
+		"body": [
+			"asset-url(\"$1\") "
+		],
+		"description": "rails asset-url"
+	},
+    "asset-path":{
+		"prefix": "asset-path",
+		"body": [
+			"asset-path(\"$1\") "
+		],
+		"description": "rails asset-path"
+	}
+}
