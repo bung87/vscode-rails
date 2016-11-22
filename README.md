@@ -1,6 +1,6 @@
-# rails README
+# rails  
 
-Rails "Asset Tag Helpers" and "Form Helpers snippets.
+Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
 
 ## Features
 
