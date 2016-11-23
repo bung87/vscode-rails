@@ -18,6 +18,20 @@
 		],
 		"description": "rails asset_path"
 	},
+	"raw":{
+		"prefix": "raw",
+		"body": [
+			"<%= raw $1 %>"
+		],
+		"description": "rails raw"
+	},
+	"sanitize":{
+		"prefix": "sanitize",
+		"body": [
+			"<%= sanitize $1 %>"
+		],
+		"description": "rails sanitize"
+	},
 	"javascript_include_tag":{
 		"prefix": "javascript",
 		"body": [
