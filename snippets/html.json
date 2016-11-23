@@ -32,13 +32,6 @@
 		],
 		"description": "rails sanitize"
 	},
-	"javascript_include_tag":{
-		"prefix": "javascript",
-		"body": [
-			"<%= javascript_include_tag \"$1\" %>"
-		],
-		"description": "rails javascript_include_tag"
-	},
 	"link_to":{
 		"prefix": "link_to",
 		"body": [
