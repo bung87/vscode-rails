@@ -1,4 +1,10 @@
 {
+	 "ruby-expression":{
+		 "prefix":"<%",
+		 "body":[
+			 "<%$1 %>"],
+		 "description": "ruby expression"
+	 },
     "escape_javascript":{
 		"prefix": "escape_j",
 		"body": [

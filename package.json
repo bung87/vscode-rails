@@ -2,16 +2,16 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
         "vscode": "^1.5.0"
     },
     "galleryBanner": {
-		"color": "#c52f24",
-		"theme": "dark"
-	},
+        "color": "#c52f24",
+        "theme": "dark"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/bung87/vscode-rails.git"
@@ -46,7 +46,7 @@
                 "language": "css",
                 "path": "./snippets/css.json"
             },
-             {
+            {
                 "language": "scss",
                 "path": "./snippets/scss.json"
             }
