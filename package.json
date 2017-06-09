@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -33,25 +33,25 @@
         ".erb"
     ],
     "activationEvents": [
-		"onCommand:editor.printReferences"
-	],
+        "onCommand:editor.printReferences"
+    ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
-			{
-				"command": "editor.printReferences",
-				"title": "Show All References"
-			}
-		],
-		"menus": {
-			"editor/context": [
-				{
-					"command": "editor.printReferences",
-					"when": "editorHasReferenceProvider",
-					"group": "navigation@1.31"
-				}
-			]
-		},
+            {
+                "command": "editor.printReferences",
+                "title": "Show All References"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "editor.printReferences",
+                    "when": "editorHasReferenceProvider",
+                    "group": "navigation@1.31"
+                }
+            ]
+        },
         "snippets": [
             {
                 "language": "javascript",
@@ -69,21 +69,19 @@
                 "language": "scss",
                 "path": "./snippets/scss.json"
             },
-             {
+            {
                 "language": "ruby",
                 "path": "./snippets/ruby.json"
             }
         ],
         "languages": [
-             
             {
-                "id": "html",
+                "id": "html.erb",
                 "aliases": [
                     "html.erb"
                 ],
-                "extensions": [
-                    ".html.erb"
-                ]
+                "configuration": "./erb.configuration.json",
+                "extensions": [".html.erb", ".rhtml", ".rhtm"]
             },
             {
                 "id": "javascript",
@@ -109,8 +107,15 @@
                     ".scss"
                 ]
             }
+        ],
+        "grammars": [
+            {
+                "language": "html.erb",
+                "scopeName": "text.html.erb",
+                "path": "./syntaxes/erb.tmLanguage"
+            }
+        ]
         
-		]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
