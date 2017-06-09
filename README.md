@@ -14,7 +14,11 @@ This extension is not fully implemented form_helpers of rails edge version ,excl
 
 ## Release Notes
 
-### 1.0.0
+### 0.2.0
+
+Taken grammers from [https://github.com/craigmaslowski/vscode-erb](https://github.com/craigmaslowski/vscode-erb)
+
+### 0.1.0
 
 Initial release of vscode-rails
 

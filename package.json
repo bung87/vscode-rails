@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -81,7 +81,11 @@
                     "html.erb"
                 ],
                 "configuration": "./erb.configuration.json",
-                "extensions": [".html.erb", ".rhtml", ".rhtm"]
+                "extensions": [
+                    ".html.erb",
+                    ".rhtml",
+                    ".rhtm"
+                ]
             },
             {
                 "id": "javascript",
@@ -115,7 +119,6 @@
                 "path": "./syntaxes/erb.tmLanguage"
             }
         ]
-        
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
