@@ -12,6 +12,16 @@
 		],
 		"description": "rails escape_javascript"
 	},
+	"begin":{
+		"prefix": "=begin",
+		"body": [
+			"<%\n=begin %>",
+
+			"$1",
+			"<%\n=end %>"
+		],
+		"description": "rails comment"
+	},
     "j":{
 		"prefix": "jrender",
 		"body": [

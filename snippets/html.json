@@ -264,7 +264,16 @@
 		],
 		"description": "rails content_for?"
 	},
-	
+	"begin":{
+		"prefix": "=begin",
+		"body": [
+			"<%\n=begin %>",
+
+			"$1",
+			"<%\n=end %>"
+		],
+		"description": "rails comment"
+	},
 	"form_for":{
 		"prefix": "form_for",
 		"body": [
