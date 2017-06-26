@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
