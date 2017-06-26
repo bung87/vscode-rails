@@ -76,11 +76,10 @@
         ],
         "languages": [
             {
-                "id": "html.erb",
+                "id": "html",
                 "aliases": [
                     "html.erb"
                 ],
-                "configuration": "./erb.configuration.json",
                 "extensions": [
                     ".html.erb",
                     ".rhtml",
@@ -114,7 +113,7 @@
         ],
         "grammars": [
             {
-                "language": "html.erb",
+                "language": "html",
                 "scopeName": "text.html.erb",
                 "path": "./syntaxes/erb.tmLanguage"
             }
