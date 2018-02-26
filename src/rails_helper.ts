@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { dirname, join, basename } from 'path';
+import { dirname, join,sep, basename } from 'path';
 
 var inflection = require('inflection');
 
@@ -15,6 +15,13 @@ enum FileType {
     Rspec,
     Test
 }
+const REL_CONTROLLERS = join("app","controllers");
+const REL_MODELS =  join("app","models");
+const REL_VIEWS =  join("app","views");
+const REL_LAYOUTS = join("app","layouts");
+const REL_HELPERS = join("app","helpers");
+const REL_JAVASCRIPTS = join("app","assets","javascripts");
+const REL_STYLESHEETS = join("app","assets","stylesheets");
 
 export class RailsHelper {
     private fileName: string;
@@ -22,36 +29,36 @@ export class RailsHelper {
     private fileType: FileType;
     private filePatten: string;
     private relativeFileName;
+    private line: string;
 
-    public constructor(file_path: string, file_name: string ,relativeFileName) {
+    public constructor(relativeFileName:string,line:string) {
         this.relativeFileName = relativeFileName;
-        this.fileName = file_name;
-        this.filePath = join(file_path, "/");
+        this.fileName = basename(relativeFileName);
+        this.filePath = dirname(relativeFileName);
+        this.line = line;
         this.dectFileType();
     }
 
-/*
-    private paths = [
-        "app/controllers",
-        "app/models",
-        "app/views",
-        "app/views/layouts",
-        "app/helpers",
-        "app/assets/javascripts",
-        "app/assets/stylesheets",
-    ];
-*/
-
     private patterns = [
-        "app/controllers/PTN*",
-        "app/models/SINGULARIZE*",
-        "app/views/PTN/**",
-        "app/views/layouts/PTN*",
-        "app/helpers/PTN*",
-        "app/assets/javascripts/PTN*",
-        "app/assets/javascripts/PTN/**",
-        "app/assets/stylesheets/PTN*",
-        "app/assets/stylesheets/PTN/**",
+        join(REL_CONTROLLERS,"PTN","*"),
+        join(REL_CONTROLLERS,"PTN*"),
+        join(REL_MODELS,"SINGULARIZE","*"),
+        join(REL_MODELS,"SINGULARIZE*"),
+
+        join(REL_VIEWS,"PTN","*"),
+        join(REL_VIEWS,"PTN*"),
+
+        join(REL_LAYOUTS,"PTN","*"),
+        join(REL_LAYOUTS,"PTN*"),
+
+        join(REL_HELPERS,"PTN","*"),
+        join(REL_HELPERS,"PTN*"),
+
+        join(REL_JAVASCRIPTS,"PTN","*"),
+        join(REL_JAVASCRIPTS,"PTN*"),
+
+        join(REL_STYLESHEETS,"PTN","*"),
+        join(REL_STYLESHEETS,"PTN*"),
     ]
 
     public searchPaths() {
@@ -66,29 +73,36 @@ export class RailsHelper {
     private dectFileType() {
         this.filePatten = null;
 
-        if (this.filePath.indexOf("app/controllers/") >= 0) {
+        if (this.filePath.indexOf(REL_CONTROLLERS) >= 0) {
             this.fileType = FileType.Controller
-            this.filePatten = this.fileName.replace(/_controller\.rb$/, "");
-        } else if (this.filePath.indexOf("app/models/") >= 0) {
+            let prefix = this.filePath.substring(REL_CONTROLLERS.length + 1)
+            this.filePatten = join(prefix ,this.fileName.replace(/_controller\.rb$/, ""));
+        } else if (this.filePath.indexOf(REL_MODELS) >= 0) {
             this.fileType = FileType.Model
-            this.filePatten = this.fileName.replace(/\.rb$/, "");
+            let prefix = this.filePath.substring(REL_MODELS.length + 1)
+            this.filePatten = join(prefix,this.fileName.replace(/\.rb$/, ""));
             //DONE pluralize
             this.filePatten = inflection.pluralize(this.filePatten.toString())
-        } else if (this.filePath.indexOf("app/views/layouts/") >= 0) {
+        } else if (this.filePath.indexOf(REL_LAYOUTS) >= 0) {
             this.fileType = FileType.Layout
-            this.filePatten = this.fileName.replace(/\..*?\..*?$/, "");
-        } else if (this.filePath.indexOf("app/views/") >= 0) {
+            let prefix = this.filePath.substring(REL_LAYOUTS.length + 1)
+            this.filePatten = join(prefix,this.fileName.replace(/\..*?\..*?$/, ""));
+        } else if (this.filePath.indexOf(REL_VIEWS) >= 0) {
             this.fileType = FileType.View
-            this.filePatten = this.filePath.replace("app/views/", '').replace(/\/$/, '');
-        } else if (this.filePath.indexOf("app/helpers/") >= 0) {
+            let prefix = this.filePath.substring(REL_VIEWS.length + 1)
+            this.filePatten = prefix;
+        } else if (this.filePath.indexOf(REL_HELPERS) >= 0) {
             this.fileType = FileType.Helper
-            this.filePatten = this.fileName.replace(/_helper\.rb$/, "");
-        } else if (this.filePath.indexOf("app/assets/javascripts/") >= 0) {
+            let prefix = this.filePath.substring(REL_HELPERS.length + 1)
+            this.filePatten = join(prefix,this.fileName.replace(/_helper\.rb$/, ""));
+        } else if (this.filePath.indexOf(REL_JAVASCRIPTS) >= 0) {
             this.fileType = FileType.Javascript
-            this.filePatten = this.fileName.replace(/\.js$/, "").replace(/\..*?\..*?$/, "");
-        } else if (this.filePath.indexOf("app/assets/stylesheets/") >= 0) {
+            let prefix = this.filePath.substring(REL_JAVASCRIPTS.length + 1)
+            this.filePatten = join(prefix,this.fileName.replace(/\.js$/, "").replace(/\..*?\..*?$/, ""));
+        } else if (this.filePath.indexOf(REL_STYLESHEETS) >= 0) {
             this.fileType = FileType.StyleSheet
-            this.filePatten = this.fileName.replace(/\.css$/, "").replace(/\..*?\..*?$/, "");
+            let prefix = this.filePath.substring(REL_STYLESHEETS.length + 1)
+            this.filePatten = join(prefix,this.fileName.replace(/\.css$/, "").replace(/\..*?\..*?$/, ""));
         } else if (this.filePath.indexOf("/spec/") >= 0) {
             this.fileType = FileType.Rspec
             //TODO
@@ -108,8 +122,6 @@ export class RailsHelper {
         vscode.workspace.findFiles(cur.toString(),null).then((res) => {
             res.forEach(i => {
                 var fn = vscode.workspace.asRelativePath(i);
-                //var pic = { label: fn, detail: "c: ${fn}" };
-                console.log(fn,_self.relativeFileName)
                 if(_self.relativeFileName !== fn)
                 _self.items.push(fn);
             });

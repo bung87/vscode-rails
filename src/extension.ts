@@ -25,10 +25,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         var relativeFileName = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
-        var fileName = basename(relativeFileName);
-        var filePath = dirname(relativeFileName);
+      
+        var line = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text
 
-        var rh = new RailsHelper(filePath, fileName ,relativeFileName);
+        var rh = new RailsHelper(relativeFileName, line);
         rh.showFileList();
     });
 
