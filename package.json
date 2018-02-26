@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -33,25 +33,22 @@
         ".erb"
     ],
     "activationEvents": [
-        "onCommand:editor.printReferences"
+        "onCommand:rails-nav"
     ],
-    "main": "./out/extension",
+    "main": "./out/src/extension",
     "contributes": {
         "commands": [
             {
-                "command": "editor.printReferences",
-                "title": "Show All References"
+                "command": "rails-nav",
+                "title": "Rails Nav"
             }
         ],
-        "menus": {
-            "editor/context": [
-                {
-                    "command": "editor.printReferences",
-                    "when": "editorHasReferenceProvider",
-                    "group": "navigation@1.31"
-                }
-            ]
-        },
+        "keybindings": [
+            {
+                "command": "rails-nav",
+                "key": "Alt+."
+            }
+        ],
         "snippets": [
             {
                 "language": "javascript",
@@ -130,5 +127,8 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "inflection": "^1.10.0"
     }
 }
