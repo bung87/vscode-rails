@@ -22,6 +22,8 @@ const REL_LAYOUTS = join("app","layouts");
 const REL_HELPERS = join("app","helpers");
 const REL_JAVASCRIPTS = join("app","assets","javascripts");
 const REL_STYLESHEETS = join("app","assets","stylesheets");
+const REL_SPEC = "spec"
+const REL_TEST = "test"
 
 export class RailsHelper {
     private fileName: string;
@@ -29,7 +31,8 @@ export class RailsHelper {
     private fileType: FileType;
     private filePatten: string;
     private relativeFileName;
-    private line: string;
+    private line: string;//@TODO detect by current line
+    private targetFile:string;
 
     public constructor(relativeFileName:string,line:string) {
         this.relativeFileName = relativeFileName;
@@ -45,6 +48,9 @@ export class RailsHelper {
         join(REL_MODELS,"SINGULARIZE","*"),
         join(REL_MODELS,"SINGULARIZE*"),
 
+        join(REL_MODELS,"BASENAME_SINGULARIZE","*"),
+        join(REL_MODELS,"BASENAME_SINGULARIZE*"),
+
         join(REL_VIEWS,"PTN","*"),
         join(REL_VIEWS,"PTN*"),
 
@@ -58,13 +64,14 @@ export class RailsHelper {
         join(REL_JAVASCRIPTS,"PTN*"),
 
         join(REL_STYLESHEETS,"PTN","*"),
-        join(REL_STYLESHEETS,"PTN*"),
+        join(REL_STYLESHEETS,"PTN*")
     ]
 
     public searchPaths() {
         var res = [];
         this.patterns.forEach(e => {
             var p = e.replace("PTN", this.filePatten.toString());
+            p = p.replace("BASENAME_SINGULARIZE", inflection.singularize( basename(this.filePatten.toString()) ));
             p = p.replace("SINGULARIZE", inflection.singularize(this.filePatten.toString()));
             res.push(p);
         });
@@ -72,45 +79,45 @@ export class RailsHelper {
     }
     private dectFileType() {
         this.filePatten = null;
-
-        if (this.filePath.indexOf(REL_CONTROLLERS) >= 0) {
+        this.targetFile = null;
+        if (this.filePath.indexOf(REL_CONTROLLERS + sep) >= 0) {
             this.fileType = FileType.Controller
             let prefix = this.filePath.substring(REL_CONTROLLERS.length + 1)
             this.filePatten = join(prefix ,this.fileName.replace(/_controller\.rb$/, ""));
-        } else if (this.filePath.indexOf(REL_MODELS) >= 0) {
+        } else if (this.filePath.indexOf(REL_MODELS + sep) >= 0) {
             this.fileType = FileType.Model
             let prefix = this.filePath.substring(REL_MODELS.length + 1)
             this.filePatten = join(prefix,this.fileName.replace(/\.rb$/, ""));
             //DONE pluralize
             this.filePatten = inflection.pluralize(this.filePatten.toString())
-        } else if (this.filePath.indexOf(REL_LAYOUTS) >= 0) {
+        } else if (this.filePath.indexOf(REL_LAYOUTS + sep) >= 0) {
             this.fileType = FileType.Layout
             let prefix = this.filePath.substring(REL_LAYOUTS.length + 1)
             this.filePatten = join(prefix,this.fileName.replace(/\..*?\..*?$/, ""));
-        } else if (this.filePath.indexOf(REL_VIEWS) >= 0) {
+        } else if (this.filePath.indexOf(REL_VIEWS + sep) >= 0) {
             this.fileType = FileType.View
             let prefix = this.filePath.substring(REL_VIEWS.length + 1)
             this.filePatten = prefix;
-        } else if (this.filePath.indexOf(REL_HELPERS) >= 0) {
+        } else if (this.filePath.indexOf(REL_HELPERS + sep) >= 0) {
             this.fileType = FileType.Helper
             let prefix = this.filePath.substring(REL_HELPERS.length + 1)
             this.filePatten = join(prefix,this.fileName.replace(/_helper\.rb$/, ""));
-        } else if (this.filePath.indexOf(REL_JAVASCRIPTS) >= 0) {
+        } else if (this.filePath.indexOf(REL_JAVASCRIPTS + sep) >= 0) {
             this.fileType = FileType.Javascript
             let prefix = this.filePath.substring(REL_JAVASCRIPTS.length + 1)
             this.filePatten = join(prefix,this.fileName.replace(/\.js$/, "").replace(/\..*?\..*?$/, ""));
-        } else if (this.filePath.indexOf(REL_STYLESHEETS) >= 0) {
+        } else if (this.filePath.indexOf(REL_STYLESHEETS + sep) >= 0) {
             this.fileType = FileType.StyleSheet
             let prefix = this.filePath.substring(REL_STYLESHEETS.length + 1)
             this.filePatten = join(prefix,this.fileName.replace(/\.css$/, "").replace(/\..*?\..*?$/, ""));
-        } else if (this.filePath.indexOf("/spec/") >= 0) {
+        } else if (this.filePath.indexOf(REL_SPEC + sep) >= 0) {
             this.fileType = FileType.Rspec
-            //TODO
-            this.filePatten = null;
-        } else if (this.filePath.indexOf("/test/") >= 0) {
+            let prefix = this.filePath.substring(REL_SPEC.length + 1)
+            this.targetFile =  join("app",prefix,this.fileName.replace("_spec.rb",".rb"));
+        } else if (this.filePath.indexOf(REL_TEST + sep) >= 0) {
             this.fileType = FileType.Test
-            //TODO
-            this.filePatten = null;
+            let prefix = this.filePath.substring(REL_TEST.length + 1)
+            this.filePatten = join("app",prefix,this.fileName.replace("_test.rb",".rb"));
         }
     }
 
@@ -150,6 +157,8 @@ export class RailsHelper {
         if (this.filePatten != null) {
             var paths = this.searchPaths().slice();
             this.generateList(paths)
+        }else if(this.targetFile != null){
+            this.generateList([this.targetFile]);
         }
     }
 }

@@ -19,7 +19,11 @@ Navigation between related files.
 This extension is not fully implemented form_helpers of rails edge version ,exclude "select" families,"fields_for".
 [Form Helpers](http://edgeguides.rubyonrails.org/form_helpers.html)
 
-## Release Notes
+## Release Notes  
+
+### 0.4.0  
+
+improving file search and complete spec and test file type.  
 
 ### 0.3.0
 
