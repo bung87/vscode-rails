@@ -1,6 +1,9 @@
 # rails  
 
-Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
+* Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
+* .erb syntax highlights.
+* Navigation between related files through command.
+* "Go to Definition"
 
 ## Features
 
