@@ -2,9 +2,13 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { dirname, join, basename } from 'path';
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import {RailsHelper}  from './rails_helper';
+import { RailsDefinitionProvider } from '../server/railsDeclaration';
 
+const RAILS_MODE: vscode.DocumentFilter = { language: 'ruby', scheme: 'file' };
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -32,7 +36,32 @@ export function activate(context: vscode.ExtensionContext) {
         rh.showFileList();
     });
 
+    // The server is implemented in node
+	let serverModule = context.asAbsolutePath(path.join('server', 'server.ts'));
+	// The debug options for the server
+	let debugOptions = { execArgv: ["--nolazy", "--debug=6009"] };
+
+	// If the extension is launched in debug mode then the debug server options are used
+	// Otherwise the run options are used
+	let serverOptions: ServerOptions = {
+		run : { module: serverModule, transport: TransportKind.ipc },
+		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
+	}
+
+	// Options to control the language client
+	let clientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{scheme: 'file', language: 'ruby'}],
+		synchronize: {
+			// Synchronize the setting section 'lspSample' to the server
+			configurationSection: 'lspSample',
+			// Notify the server about file changes to '.clientrc files contain in the workspace
+			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+		}
+	}
+
     context.subscriptions.push(disposable);
+    context.subscriptions.push(vscode.languages.registerDefinitionProvider(RAILS_MODE, new RailsDefinitionProvider()));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {
