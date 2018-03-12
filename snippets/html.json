@@ -1,9 +1,4 @@
 {
-
-	 // Place your snippets for HTML here. Each snippet is defined under a snippet name and has a prefix, body and 
-	 // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
-	 // $1, $2 for tab stops, ${id} and ${id:label} and ${1:label} for variables. Variables with the same id are connected.
-	 // Example:
 	  "ruby-expression":{
 		 "prefix":"<%",
 		 "body":[
@@ -16,6 +11,27 @@
 			"<%= javascript_include_tag \"$1\" %>"
 		],
 		"description": "rails javascript_include_tag"
+	},
+	"javascript_pack_tag":{
+		"prefix": "javascript_pack",
+		"body": [
+			"<%= javascript_pack_tag \"$1\" %>"
+		],
+		"description": "rails webpacker javascript_pack_tag"
+	},
+	"stylesheet_pack_tag":{
+		"prefix": "stylesheet_pack",
+		"body": [
+			"<%= stylesheet_pack_tag \"$1\" %>"
+		],
+		"description": "rails webpacker stylesheet_pack_tag"
+	},
+	"asset_pack_path":{
+		"prefix": "asset_pack",
+		"body": [
+			"<%= asset_pack_path '$1' %>"
+		],
+		"description": "rails webpacker asset_pack_path"
 	},
 	"asset_path":{
 		"prefix": "asset_path",
