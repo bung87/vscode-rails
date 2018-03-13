@@ -73,6 +73,9 @@ export class RailsHelper {
         switch (fileType) {
             case FileType.Controller:
                 this.filePatten = join(prefix, this.fileName.replace(/_controller\.rb$/, ""));
+                if(this.line && /^def\s+/.test(this.line)){
+                    this.filePatten = join(this.filePatten,this.line.replace(/^def\s+/,""))
+                }
                 break;
             case FileType.Model:
                 let filePatten = join(prefix, this.fileName.replace(/\.rb$/, ""));
@@ -104,7 +107,7 @@ export class RailsHelper {
     }
 
     public items = [];
-    private generateList(arr: Array<String>) {
+    public generateList(arr: Array<String>) {
         var cur = arr.pop();
 
         var _self = this;

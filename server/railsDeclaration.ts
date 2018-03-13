@@ -5,16 +5,20 @@ import cp = require('child_process');
 import path = require('path');
 import fs = require('fs');
 import { dectFileType } from "../src/utils";
+import {RailsHelper} from "../src/rails_helper";
 import {
 	FileType, FileTypeRelPath,
 	REL_CONTROLLERS,
+	REL_CONTROLLERS_CONCERNS,
 	REL_MODELS,
+	REL_MODELS_CONCERNS,
 	REL_VIEWS,
 	REL_LAYOUTS,
 	REL_HELPERS,
 	REL_JAVASCRIPTS,
 	REL_STYLESHEETS
 } from "../src/constants";
+import inflection = require('inflection');
 
 const missingToolMsg = 'Missing tool: ';
 
@@ -47,7 +51,7 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
 
 export function definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig: vscode.WorkspaceConfiguration, includeDocs: boolean, token: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
 	let wordRange = document.getWordRangeAtPosition(position);
-	let lineText = document.lineAt(position.line).text;
+	let lineText = document.lineAt(position.line).text.trim();
 	let word = wordRange ? document.getText(wordRange) : '';
 	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
@@ -59,67 +63,102 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let offset = byteOffsetAt(document, position);
 	let fileType = dectFileType(document.fileName)
 	let definitionInformation: RailsDefinitionInformation;
-	let filePath,exclude;
-	if (fileType === FileType.Controller && /^class\s+[^<]+<\s+/.test(lineText.trim())) {
-		// exclude = REL_CONTROLLERS
-		let prefixPos = wordRange.start.translate(0, -2)
-		let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start))
-		let name,parent = lineText.split("<")[1].trim();
-		if (parent == "ActionController::Base") {
-			//@todo provide rails online doc link
+	let filePath, exclude;
+	if (fileType === FileType.Controller) {
+		if (/^class\s+[^<]+<\s+/.test(lineText)) {
+			// exclude = REL_CONTROLLERS
+			let prefixPos = wordRange.start.translate(0, -2)
+			let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start))
+			let name, parent = lineText.split("<")[1];
+			if (parent == "ActionController::Base") {
+				//@todo provide rails online doc link
+				return Promise.reject(missingToolMsg + 'godef');
+			}
+			switch (prefix.trim()) {
+				case "::":
+					let seq = parent.split("::");
+					word = seq[seq.length - 1]
+					name = word.substring(0, word.indexOf("Controller")).toLowerCase();
+					filePath = path.join(vscode.workspace.rootPath, "app", "controllers", seq.slice(0, -1).join(path.sep), name + "_controller.rb");
+					definitionInformation = {
+						file: filePath,
+						line: 0,
+						column: 0,
+						// declarationlines: lines.splice(1),
+						// toolUsed: 'godef',
+						doc: null,
+						name: null
+					};
+					//@todo search gem path
+					break;
+
+				case "<":
+					name = word.substring(0, word.indexOf("Controller")).toLowerCase();
+					filePath = path.join(path.dirname(document.fileName), name + "_controller.rb");
+					definitionInformation = {
+						file: filePath,
+						line: 0,
+						column: 0,
+						// declarationlines: lines.splice(1),
+						// toolUsed: 'godef',
+						doc: null,
+						name: null
+					};
+					break;
+
+			}
+		}else if(/^def\s+/.test(lineText)){
+			let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
+      			rh = new RailsHelper(relativeFileName, lineText);
+			rh.showFileList();
 			return Promise.reject(missingToolMsg + 'godef');
-		}
-		switch (prefix.trim()) {
-			case "::":
-				let seq = parent.split("::");
-				word = seq[seq.length - 1]
-				name = word.substring(0, word.indexOf("Controller")).toLowerCase();
-				filePath = path.join(vscode.workspace.rootPath, "app", "controllers", seq.slice(0, -1).join(path.sep), name + "_controller.rb");
-				definitionInformation = {
-					file: filePath,
-					line: 0,
-					column: 0,
-					// declarationlines: lines.splice(1),
-					// toolUsed: 'godef',
-					doc: null,
-					name: null
-				};
-				//@todo search gem path
-				break;
-				
-			case "<":
-				name = word.substring(0, word.indexOf("Controller")).toLowerCase();
-				filePath = path.join(path.dirname(document.fileName), name + "_controller.rb");
-				definitionInformation = {
-					file: filePath,
-					line: 0,
-					column: 0,
-					// declarationlines: lines.splice(1),
-					// toolUsed: 'godef',
-					doc: null,
-					name: null
-				};
-				break;
-				
+		}else if(/^include\s+Concerns::/.test(lineText)){
+			let concern = lineText.replace(/^include\s+Concerns::/,""),
+			seq = concern.split("::").map(inflection.underscore),
+			sub = seq.slice(0,-1).join(path.sep),
+			name = seq[seq.length-1];
+			filePath = path.join(REL_CONTROLLERS_CONCERNS,name + ".rb");
+			definitionInformation = {
+				file: filePath,
+				line: 0,
+				column: 0,
+				// declarationlines: lines.splice(1),
+				// toolUsed: 'godef',
+				doc: null,
+				name: null
+			};
+		}else if(/^[A-Z]/.test(word)){
+			let name = inflection.underscore(word)
+			filePath = path.join(REL_MODELS, "**",name + ".rb")
+			;
+			definitionInformation = {
+				file: filePath,
+				line: 0,
+				column: 0,
+				// declarationlines: lines.splice(1),
+				// toolUsed: 'godef',
+				doc: null,
+				name: null
+			};
 		}
 	}
 	
-	if(definitionInformation  && filePath ){
+	if (definitionInformation && filePath) {
 		let promise = new Promise<RailsDefinitionInformation>(
 			(resolve, reject) => {
-				vscode.workspace.findFiles(vscode.workspace.asRelativePath(filePath), exclude).then(
-					() => { resolve(definitionInformation) },
-					() => { reject(missingToolMsg+filePath)}
+				vscode.workspace.findFiles(filePath, exclude,1).then(
+					(uris:vscode.Uri[]) => { definitionInformation.file =uris[0].fsPath;resolve(definitionInformation) },
+					() => { reject(missingToolMsg + filePath) }
 				)
 			}
 		);
 
 		return promise;
-	}else{
+	} else {
 		return Promise.reject(missingToolMsg + 'godef');
 	}
 
-	
+
 
 }
 

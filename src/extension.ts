@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         var relativeFileName = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
       
-        var line = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text
+        var line = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.trim()
 
         var rh = new RailsHelper(relativeFileName, line);
         rh.showFileList();
