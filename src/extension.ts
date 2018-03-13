@@ -4,7 +4,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { dirname, join, basename } from 'path';
-import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
+import {  LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import {RailsHelper}  from './rails_helper';
 import { RailsDefinitionProvider } from '../server/railsDeclaration';
 
