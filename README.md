@@ -24,6 +24,10 @@ This extension is not fully implemented form_helpers of rails edge version ,excl
 
 ## Release Notes  
 
+### 0.5.0  
+
+controller‘s concerns views models definition
+
 ### 0.4.0  
 
 improving file search and complete spec and test file type.  

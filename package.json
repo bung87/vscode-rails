@@ -130,9 +130,12 @@
         "@types/mocha": "^2.2.32"
     },
     "dependencies": {
+        "inflection": "^1.10.0",
+        "inherits": "^2.0.3",
+        "minimist": "0.0.8",
+        "npm": "^5.7.1",
         "vscode": "^1.1.13",
         "vscode-languageclient": "^4.0.0",
-        "vscode-languageserver": "^4.0.0",
-        "inflection": "^1.10.0"
+        "vscode-languageserver": "^4.0.0"
     }
 }
