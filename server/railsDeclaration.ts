@@ -53,7 +53,10 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
 	let word = wordRange ? document.getText(wordRange) : '';
-	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/)) {
+	let suffixPos = wordRange.end.translate(0, 2)
+	let suffix = document.getText(new vscode.Range(wordRange.end,suffixPos ));
+	console.log(suffix)
+	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/) || suffix=="::") {
 		return Promise.resolve(null);
 	}
 	if (!goConfig) {
@@ -112,12 +115,12 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 				rh = new RailsHelper(relativeFileName, lineText);
 			rh.showFileList();
 			return Promise.reject(missingToolMsg + 'godef');
-		} else if (/^include\s+Concerns::/.test(lineText)) {
-			let concern = lineText.replace(/^include\s+Concerns::/, ""),
-				seq = concern.split("::").map(inflection.underscore),
+		} else if (/^include\s+/.test(lineText)) {
+			let concern = lineText.replace(/^include\s+/, ""),
+				seq = concern.split("::").map(inflection.underscore).filter( (v)=> v!=""),
 				sub = seq.slice(0, -1).join(path.sep),
 				name = seq[seq.length - 1];
-			filePath = path.join(REL_CONTROLLERS_CONCERNS, name + ".rb");
+			filePath = path.join(REL_CONTROLLERS_CONCERNS,sub, name + ".rb");
 			definitionInformation = {
 				file: filePath,
 				line: 0,
