@@ -5,7 +5,7 @@ import cp = require('child_process');
 import path = require('path');
 import fs = require('fs');
 import { dectFileType } from "../src/utils";
-import {RailsHelper} from "../src/rails_helper";
+import { RailsHelper } from "../src/rails_helper";
 import {
 	FileType, FileTypeRelPath,
 	REL_CONTROLLERS,
@@ -107,17 +107,17 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 					break;
 
 			}
-		}else if(/^def\s+/.test(lineText)){
+		} else if (/^def\s+/.test(lineText)) {
 			let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
-      			rh = new RailsHelper(relativeFileName, lineText);
+				rh = new RailsHelper(relativeFileName, lineText);
 			rh.showFileList();
 			return Promise.reject(missingToolMsg + 'godef');
-		}else if(/^include\s+Concerns::/.test(lineText)){
-			let concern = lineText.replace(/^include\s+Concerns::/,""),
-			seq = concern.split("::").map(inflection.underscore),
-			sub = seq.slice(0,-1).join(path.sep),
-			name = seq[seq.length-1];
-			filePath = path.join(REL_CONTROLLERS_CONCERNS,name + ".rb");
+		} else if (/^include\s+Concerns::/.test(lineText)) {
+			let concern = lineText.replace(/^include\s+Concerns::/, ""),
+				seq = concern.split("::").map(inflection.underscore),
+				sub = seq.slice(0, -1).join(path.sep),
+				name = seq[seq.length - 1];
+			filePath = path.join(REL_CONTROLLERS_CONCERNS, name + ".rb");
 			definitionInformation = {
 				file: filePath,
 				line: 0,
@@ -127,10 +127,10 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 				doc: null,
 				name: null
 			};
-		}else if(/^[A-Z]/.test(word)){
+		} else if (/^[A-Z]/.test(word)) {
 			let name = inflection.underscore(word)
-			filePath = path.join(REL_MODELS, "**",name + ".rb")
-			;
+			filePath = path.join(REL_MODELS, "**", name + ".rb")
+				;
 			definitionInformation = {
 				file: filePath,
 				line: 0,
@@ -142,12 +142,16 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 			};
 		}
 	}
-	
+
 	if (definitionInformation && filePath) {
 		let promise = new Promise<RailsDefinitionInformation>(
 			(resolve, reject) => {
-				vscode.workspace.findFiles(filePath, exclude,1).then(
-					(uris:vscode.Uri[]) => { definitionInformation.file =uris[0].fsPath;resolve(definitionInformation) },
+				vscode.workspace.findFiles(vscode.workspace.asRelativePath(filePath), exclude, 1).then(
+					(uris: vscode.Uri[]) => {
+						if (!uris.length) {
+							reject(missingToolMsg + filePath)
+						} else { definitionInformation.file = uris[0].fsPath; resolve(definitionInformation) }
+					},
 					() => { reject(missingToolMsg + filePath) }
 				)
 			}
