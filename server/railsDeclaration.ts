@@ -53,10 +53,11 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
 	let word = wordRange ? document.getText(wordRange) : '';
+	let prefixPos = wordRange.start.translate(0, -2)
+	let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start))
 	let suffixPos = wordRange.end.translate(0, 2)
-	let suffix = document.getText(new vscode.Range(wordRange.end,suffixPos ));
-	console.log(suffix)
-	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/) || suffix=="::") {
+	let suffix = document.getText(new vscode.Range(wordRange.end, suffixPos));
+	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/) || suffix == "::") {
 		return Promise.resolve(null);
 	}
 	if (!goConfig) {
@@ -70,8 +71,7 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	if (fileType === FileType.Controller) {
 		if (/^class\s+[^<]+<\s+/.test(lineText)) {
 			// exclude = REL_CONTROLLERS
-			let prefixPos = wordRange.start.translate(0, -2)
-			let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start))
+
 			let name, parent = lineText.split("<")[1];
 			if (parent == "ActionController::Base") {
 				//@todo provide rails online doc link
@@ -117,10 +117,10 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 			return Promise.reject(missingToolMsg + 'godef');
 		} else if (/^include\s+/.test(lineText)) {
 			let concern = lineText.replace(/^include\s+/, ""),
-				seq = concern.split("::").map(inflection.underscore).filter( (v)=> v!=""),
+				seq = concern.split("::").map(inflection.underscore).filter((v) => v != ""),
 				sub = seq.slice(0, -1).join(path.sep),
 				name = seq[seq.length - 1];
-			filePath = path.join(REL_CONTROLLERS_CONCERNS,sub, name + ".rb");
+			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
 			definitionInformation = {
 				file: filePath,
 				line: 0,
@@ -130,8 +130,37 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 				doc: null,
 				name: null
 			};
+		} else if (/^[A-Z]/.test(word) && prefix.trim() == "::") {
+			let arr = lineText.split("=").map(s => s.trim());
+			let token = arr[arr.length - 1];
+			let symbol = token.substring(0, token.lastIndexOf(word) + word.length)
+			let seq = symbol.split("::").map(inflection.underscore).filter((v) => v != ""),
+				sub = seq.slice(0, -1).join(path.sep),
+				name = seq[seq.length - 1];
+			filePath = path.join("lib", sub, name + ".rb");
+
+			let uri = vscode.Uri.file(path.join(vscode.workspace.rootPath, filePath));
+
+			return vscode.workspace.openTextDocument(uri).then(
+				(document) => {
+					let line = document.getText().split("\n").findIndex((line) => new RegExp("class\\s+" + word).test(line.trim()));
+
+					definitionInformation = {
+						file: filePath,
+						line: line,
+						column: 0,
+						// declarationlines: lines.splice(1),
+						// toolUsed: 'godef',
+						doc: null,
+						name: null
+					};
+					return Promise.resolve(definitionInformation)
+				},
+				() => { return Promise.reject(missingToolMsg + filePath); }
+			)
 		} else if (/^[A-Z]/.test(word)) {
-			let name = inflection.underscore(word)
+			let
+				name = inflection.underscore(word);
 			filePath = path.join(REL_MODELS, "**", name + ".rb")
 				;
 			definitionInformation = {
@@ -140,6 +169,16 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 				column: 0,
 				// declarationlines: lines.splice(1),
 				// toolUsed: 'godef',
+				doc: null,
+				name: null
+			};
+		} else if (/_params$/.test(word)) {
+			filePath = document.fileName;
+			let line = document.getText().split("\n").findIndex((line) => new RegExp("def\\s+" + word).test(line.trim()))
+			definitionInformation = {
+				file: filePath,
+				line: line,
+				column: 0,
 				doc: null,
 				name: null
 			};
