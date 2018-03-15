@@ -24,7 +24,7 @@ const missingToolMsg = 'Missing tool: ';
 
 export interface RailsDefinitionInformation {
 	file: string;
-	line?: number;
+	line: number;
 	column?: number;
 	doc?: string;
 	// declarationlines: string[];
@@ -44,38 +44,27 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
 	return doubleQuotesCnt % 2 === 1;
 }
 
-export function controllerDefinitionLocation(document: vscode.TextDocument,word:string,lineText:string,prefix:string):Thenable<RailsDefinitionInformation>{
-	let definitionInformation: RailsDefinitionInformation;
+export function controllerDefinitionLocation(document: vscode.TextDocument, word: string, lineText: string, prefix: string): Thenable<RailsDefinitionInformation> {
+	let definitionInformation: RailsDefinitionInformation = {
+		file:null,
+		line:0
+	};
 	if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineText)) {
 		// exclude = REL_CONTROLLERS
 
-		let [, parent] = lineText.split("<")[1], name,filePath;;
-		if (parent == "ActionController::Base") {
+		let [, parentController] = lineText.split("<");
+		parentController = parentController.trim()
+		if (parentController == "ActionController::Base") {
 			//@todo provide rails online doc link
 			return Promise.reject(missingToolMsg + 'godef');
 		}
-		switch (prefix) {
-			
-			case "::":
-				let seq = parent.split("::"),
-					controllerName = seq[seq.length - 1];
-				name = controllerName.substring(0, controllerName.indexOf("Controller")).toLowerCase(),
-				filePath = path.join(vscode.workspace.rootPath, "app", "controllers", seq.slice(0, -1).join(path.sep), name + "_controller.rb");
-				definitionInformation = {
-					file: filePath
-				};
-				//@todo search gem path
-				break;
-
-			case "<":
-				name = word.substring(0, word.indexOf("Controller")).toLowerCase(),
-				filePath = path.join(path.dirname(document.fileName), name + "_controller.rb");
-				definitionInformation = {
-					file: filePath
-				};
-				break;
-
-		}
+		let 
+			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length+1)),
+			seq = parentController.split("::").map(inflection.underscore).filter((v) => v != ""),
+			sub = prefix == "<" ? sameModuleControllerSub :seq.slice(0, -1).join(path.sep),
+			name = seq[seq.length - 1],
+			filePath = path.join(REL_CONTROLLERS, sub, name + ".rb");
+		definitionInformation.file = filePath;
 	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineText) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
 			rh = new RailsHelper(relativeFileName, lineText);
@@ -83,21 +72,21 @@ export function controllerDefinitionLocation(document: vscode.TextDocument,word:
 		return Promise.reject(missingToolMsg + 'godef');
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineText)) {
 		let concern = lineText.replace(PATTERNS.INCLUDE_DECLARATION, ""),
-			seq = concern.split("::").map(inflection.underscore).filter((v) => v != ""),
+			seq = concern.split("::").map(inflection.underscore);
+			if (seq[0]=="concerns") delete seq[0]
+		let
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
-		filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
-		definitionInformation = {
-			file: filePath
-		};
-	} else if (PATTERNS.CAPITALIZED.test(word) && prefix == "::") {
+			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
+		definitionInformation.file = filePath;
+	} else if (PATTERNS.CAPITALIZED.test(word) && prefix == "::") {//lib or model combination
 		let arr = lineText.split("=").map(s => s.trim());
 		let token = arr[arr.length - 1];
 		let symbol = token.substring(0, token.lastIndexOf(word) + word.length)
 		let seq = symbol.split("::").map(inflection.underscore).filter((v) => v != ""),
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
-		filePath = path.join("lib", sub, name + ".rb");
+			filePath = path.join("lib", sub, name + ".rb");
 		let uri = vscode.Uri.file(path.join(vscode.workspace.rootPath, filePath));
 		return vscode.workspace.openTextDocument(uri).then(
 			(document) => {
@@ -116,48 +105,55 @@ export function controllerDefinitionLocation(document: vscode.TextDocument,word:
 			name = inflection.underscore(word),
 			filePath = path.join(REL_MODELS, "**", name + ".rb")
 			;
-		definitionInformation = {
-			file: filePath
-		};
+		definitionInformation.file = filePath;
 	} else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let filePath = document.fileName,
-		    line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
-		definitionInformation = {
-			file: filePath,
-			line: line
-		};
+			line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
+		definitionInformation.file = filePath;
+		definitionInformation.line = line;
+	}else if(PATTERNS.LAYOUT_DECLARATION.test(lineText)){
+		let layoutPath = PATTERNS.LAYOUT_MATCH.exec(lineText)[2];
+		definitionInformation.file = path.join(REL_LAYOUTS,layoutPath+"*");
+	}else if(PATTERNS.RENDER_DECLARATION.test(lineText)){
+		let 
+			match = PATTERNS.RENDER_MATCH.exec(lineText),
+			viewPath = match[2],
+			sameSub = match[1].charAt(0) == ":",
+			sub = sameSub ? vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length+1).replace("_controller.rb","") :"";
+		definitionInformation.file = path.join(REL_VIEWS,sub, viewPath+"*")
 	}
 	if (definitionInformation) {
 		let promise = new Promise<RailsDefinitionInformation>(
-			definitionResolver(document,definitionInformation)
+			definitionResolver(document, definitionInformation)
 		);
 
 		return promise;
 	} else {
 		return Promise.reject(missingToolMsg + 'godef');
 	}
-	
+
 }
 
 var FileTypeHandlers = new Map([
-	[FileType.Controller,controllerDefinitionLocation]
+	[FileType.Controller, controllerDefinitionLocation]
 ]);
 
-export function definitionResolver(document,definitionInformation,exclude=null,maxNum=null)  {
-	return (resolve, reject) => {vscode.workspace.findFiles(vscode.workspace.asRelativePath(definitionInformation.file), exclude, 1).then(
-		(uris: vscode.Uri[]) => {
-			if (!uris.length) {
-				reject(missingToolMsg + definitionInformation.file)
-			} else if(uris.length ==1) { definitionInformation.file = uris[0].fsPath; resolve(definitionInformation) }
-			else{
-				let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
-					rh = new RailsHelper(relativeFileName,null);
-				rh.showQuickPick(uris.map( uri => vscode.workspace.asRelativePath((uri.path) )));
-			}
-		},
-		() => { reject(missingToolMsg + definitionInformation.file) }
-	)
-}
+export function definitionResolver(document, definitionInformation, exclude = null, maxNum = null) {
+	return (resolve, reject) => {
+		vscode.workspace.findFiles(vscode.workspace.asRelativePath(definitionInformation.file), exclude, 1).then(
+			(uris: vscode.Uri[]) => {
+				if (!uris.length) {
+					reject(missingToolMsg + definitionInformation.file)
+				} else if (uris.length == 1) { definitionInformation.file = uris[0].fsPath; resolve(definitionInformation) }
+				else {
+					let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
+						rh = new RailsHelper(relativeFileName, null);
+					rh.showQuickPick(uris.map(uri => vscode.workspace.asRelativePath((uri.path))));
+				}
+			},
+			() => { reject(missingToolMsg + definitionInformation.file) }
+		)
+	}
 }
 
 export function definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig: vscode.WorkspaceConfiguration, includeDocs: boolean, token: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
@@ -176,9 +172,9 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	}
 	let toolForDocs = goConfig['docsTool'] || 'godoc';
 	let fileType = dectFileType(document.fileName)
-	
+
 	let exclude;
-	return FileTypeHandlers.get(FileType.Controller)(document,word,lineText,prefix);
+	return FileTypeHandlers.get(FileType.Controller)(document, word, lineText, prefix);
 }
 
 export class RailsDefinitionProvider implements vscode.DefinitionProvider {

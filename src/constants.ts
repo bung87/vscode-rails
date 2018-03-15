@@ -2,7 +2,7 @@ import { dirname, join,sep, basename } from 'path';
 export const REL_CONTROLLERS = join("app","controllers");
 export const REL_MODELS =  join("app","models");
 export const REL_VIEWS =  join("app","views");
-export const REL_LAYOUTS = join("app","layouts");
+export const REL_LAYOUTS = join("app","views","layouts");
 export const REL_HELPERS = join("app","helpers");
 export const REL_JAVASCRIPTS = join("app","assets","javascripts");
 export const REL_STYLESHEETS = join("app","assets","stylesheets");
@@ -43,5 +43,9 @@ export const PATTERNS = {
     FUNCTION_DECLARATON:/^def\s+/,
     INCLUDE_DECLARATION:/^include\s+/,
     CAPITALIZED:/^[A-Z]/,
-    PARAMS_DECLARATION:/_params$/
+    PARAMS_DECLARATION:/_params$/,
+    LAYOUT_DECLARATION:/^layout\s+/,
+    LAYOUT_MATCH:/^layout\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
+    RENDER_DECLARATION:/^render\s+/,
+    RENDER_MATCH:/^render\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
 }
