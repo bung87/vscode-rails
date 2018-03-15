@@ -37,3 +37,11 @@ export var FileTypeRelPath = new Map([
     [FileType.Rspec,REL_SPEC],
     [FileType.Test,REL_TEST],
 ]);
+
+export const PATTERNS = {
+    CLASS_INHERIT_DECLARATION : /^class\s+[^<]+<\s+/,
+    FUNCTION_DECLARATON:/^def\s+/,
+    INCLUDE_DECLARATION:/^include\s+/,
+    CAPITALIZED:/^[A-Z]/,
+    PARAMS_DECLARATION:/_params$/
+}
