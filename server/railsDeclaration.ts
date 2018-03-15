@@ -79,27 +79,57 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 			name = seq[seq.length - 1],
 			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
 		definitionInformation.file = filePath;
-	} else if (PATTERNS.CAPITALIZED.test(word) && prefix == "::") {//lib or model combination
-		let arr = lineText.split("=").map(s => s.trim());
-		let token = arr[arr.length - 1];
-		let symbol = token.substring(0, token.lastIndexOf(word) + word.length)
+	} else if (PATTERNS.CAPITALIZED.test(word) ) {//lib or model combination
+		// let arr = lineText.split("=").map(s => s.trim());
+		// let token = arr[arr.length - 1];
+		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?"+word+")").exec(lineText)[1];//token.substring(0, token.indexOf(word) + word.length)
 		let seq = symbol.split("::").map(inflection.underscore).filter((v) => v != ""),
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
-			filePath = path.join("lib", sub, name + ".rb");
-		let uri = vscode.Uri.file(path.join(vscode.workspace.rootPath, filePath));
-		return vscode.workspace.openTextDocument(uri).then(
-			(document) => {
-				let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+" + word).test(line.trim()));
-
-				definitionInformation = {
-					file: document.uri.fsPath,
-					line: line
-				};
-				return Promise.resolve(definitionInformation)
+			filePath = path.join(REL_MODELS,"**", sub, name + ".rb");
+		console.log(symbol)
+		let findInLib = vscode.workspace.findFiles(path.join("lib", sub, name + ".rb"), null, 1).then(
+			(uris: vscode.Uri[]) => {
+				console.log(444,uris)
+				return vscode.workspace.openTextDocument(uris[0]).then(
+					(document) => {
+						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
+		
+						definitionInformation = {
+							file: document.uri.fsPath,
+							line: Math.max(line,0)
+						};
+						return Promise.resolve(definitionInformation)
+					},
+					() => { return Promise.reject(missingToolMsg + filePath); }
+				)
 			},
 			() => { return Promise.reject(missingToolMsg + filePath); }
+		);
+		return vscode.workspace.findFiles(filePath, null, 1).then(
+			(uris: vscode.Uri[]) => {
+				if (!uris.length){
+					return findInLib
+				}
+				return vscode.workspace.openTextDocument(uris[0]).then(
+					(document) => {
+						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
+		
+						definitionInformation = {
+							file: document.uri.fsPath,
+							line: Math.max(line,0)
+						};
+						return Promise.resolve(definitionInformation)
+					},
+					() => { return Promise.reject(missingToolMsg + filePath); }
+				)
+			},
+			() => { 
+				console.log(333,path.join("lib", sub, name + ".rb"))
+				return findInLib
+			}
 		)
+		
 	} else if (PATTERNS.CAPITALIZED.test(word)) {
 		let
 			name = inflection.underscore(word),
@@ -140,7 +170,7 @@ var FileTypeHandlers = new Map([
 
 export function definitionResolver(document, definitionInformation, exclude = null, maxNum = null) {
 	return (resolve, reject) => {
-		vscode.workspace.findFiles(vscode.workspace.asRelativePath(definitionInformation.file), exclude, 1).then(
+		vscode.workspace.findFiles(vscode.workspace.asRelativePath(definitionInformation.file)).then(
 			(uris: vscode.Uri[]) => {
 				if (!uris.length) {
 					reject(missingToolMsg + definitionInformation.file)
@@ -188,6 +218,7 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
 		return definitionLocation(document, position, this.goConfig, false, token).then(definitionInfo => {
 			if (definitionInfo == null || definitionInfo.file == null) return null;
 			let definitionResource = vscode.Uri.file(definitionInfo.file);
+			console.log(111,definitionResource)
 			let pos = new vscode.Position(definitionInfo.line, definitionInfo.column);
 			return new vscode.Location(definitionResource, pos);
 		}, err => {
