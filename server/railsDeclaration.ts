@@ -20,7 +20,8 @@ import {
 } from "../src/constants";
 import inflection = require('inflection');
 
-const missingToolMsg = 'Missing tool: ';
+const missingFilelMsg = 'Missing file: ';
+const couldNotOpenMsg = 'Could Not Open file: ';
 
 export interface RailsDefinitionInformation {
 	file: string;
@@ -44,7 +45,11 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
 	return doubleQuotesCnt % 2 === 1;
 }
 
-export function controllerDefinitionLocation(document: vscode.TextDocument, word: string, lineText: string, prefix: string): Thenable<RailsDefinitionInformation> {
+function wordsToPath(s){
+	return inflection.underscore(s.replace(/[A-Z]{2,}(?![a-z])/,(s) => { return inflection.titleize(s)}))
+}
+
+export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineText: string, prefix: string): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file:null,
 		line:0
@@ -54,25 +59,30 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 
 		let [, parentController] = lineText.split("<");
 		parentController = parentController.trim()
-		if (parentController == "ActionController::Base") {
-			//@todo provide rails online doc link
-			return Promise.reject(missingToolMsg + 'godef');
-		}
+		// if (parentController == "ActionController::Base") {
+		// 	//@todo provide rails online doc link
+		// 	return Promise.reject(missingToolMsg + 'godef');
+		// }
 		let 
 			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length+1)),
-			seq = parentController.split("::").map(inflection.underscore).filter((v) => v != ""),
+			seq = parentController.split("::").map(wordsToPath).filter((v) => v != ""),
 			sub = prefix == "<" ? sameModuleControllerSub :seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
 			filePath = path.join(REL_CONTROLLERS, sub, name + ".rb");
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineText) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
-		let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
-			rh = new RailsHelper(relativeFileName, lineText);
-		rh.showFileList();
-		return Promise.reject(missingToolMsg + 'godef');
+		let 
+			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1)),
+			filePath = path.join(REL_VIEWS,sameModuleControllerSub, path.basename(document.fileName).replace(/_controller\.rb$/, ""),word+"*"),
+			upperText = document.getText(new vscode.Range( new vscode.Position(0,0), position)),
+			isPrivateMethod = /\s*private/.test(upperText);
+		if(isPrivateMethod){
+			return Promise.resolve(null);
+		}
+		definitionInformation.file = filePath;
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineText)) {
 		let concern = lineText.replace(PATTERNS.INCLUDE_DECLARATION, ""),
-			seq = concern.split("::").map(inflection.underscore);
+			seq = concern.split("::").map(wordsToPath);
 			if (seq[0]=="concerns") delete seq[0]
 		let
 			sub = seq.slice(0, -1).join(path.sep),
@@ -80,15 +90,19 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.CAPITALIZED.test(word) ) {//lib or model combination
-		// let arr = lineText.split("=").map(s => s.trim());
-		// let token = arr[arr.length - 1];
-		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?"+word+")").exec(lineText)[1];//token.substring(0, token.indexOf(word) + word.length)
-		let seq = symbol.split("::").map(inflection.underscore).filter((v) => v != ""),
+		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?"+word+")").exec(lineText)[1];
+		let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
-			filePath = path.join(REL_MODELS,"**", sub, name + ".rb");
-		let findInLib = vscode.workspace.findFiles(path.join("lib", sub, name + ".rb"), null, 1).then(
+			filePathInModels = path.join(REL_MODELS,"**", sub,name + ".rb"),
+			filePathInLib = path.join("lib", sub, name + ".rb"),
+			fileModulePathInLib = path.join("lib", name + ".rb");
+		let findFileModuleInLib = vscode.workspace.findFiles(fileModulePathInLib, null, 1).then(
 			(uris: vscode.Uri[]) => {
+
+				if(!uris.length){
+					return Promise.reject(missingFilelMsg + findFileModuleInLib); 
+				}
 				return vscode.workspace.openTextDocument(uris[0]).then(
 					(document) => {
 						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
@@ -99,12 +113,32 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 						};
 						return Promise.resolve(definitionInformation)
 					},
-					() => { return Promise.reject(missingToolMsg + filePath); }
+					() => { return Promise.reject(couldNotOpenMsg + fileModulePathInLib); }
 				)
 			},
-			() => { return Promise.reject(missingToolMsg + filePath); }
+			() => { return Promise.reject(missingFilelMsg + filePathInLib); }
 		);
-		return vscode.workspace.findFiles(filePath, null, 1).then(
+		let findInLib = vscode.workspace.findFiles(filePathInLib, null, 1).then(
+			(uris: vscode.Uri[]) => {
+				if(!uris.length){
+					return findFileModuleInLib
+				}
+				return vscode.workspace.openTextDocument(uris[0]).then(
+					(document) => {
+						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
+		
+						definitionInformation = {
+							file: document.uri.fsPath,
+							line: Math.max(line,0)
+						};
+						return Promise.resolve(definitionInformation)
+					},
+					() => { return Promise.reject(couldNotOpenMsg + filePathInLib); }
+				)
+			},
+			() => { return findFileModuleInLib }
+		);
+		return vscode.workspace.findFiles(filePathInModels, null, 1).then(
 			(uris: vscode.Uri[]) => {
 				if (!uris.length){
 					return findInLib
@@ -119,7 +153,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 						};
 						return Promise.resolve(definitionInformation)
 					},
-					() => { return Promise.reject(missingToolMsg + filePath); }
+					() => { return Promise.reject(couldNotOpenMsg + filePathInModels); }
 				)
 			},
 			() => { 
@@ -127,13 +161,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 			}
 		)
 		
-	} else if (PATTERNS.CAPITALIZED.test(word)) {
-		let
-			name = inflection.underscore(word),
-			filePath = path.join(REL_MODELS, "**", name + ".rb")
-			;
-		definitionInformation.file = filePath;
-	} else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
+	}  else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let filePath = document.fileName,
 			line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
 		definitionInformation.file = filePath;
@@ -145,8 +173,8 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 		let 
 			match = PATTERNS.RENDER_MATCH.exec(lineText),
 			viewPath = match[2],
-			sameSub = match[1].charAt(0) == ":",
-			sub = sameSub ? vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length+1).replace("_controller.rb","") :"";
+			// sameSub = match[1].charAt(0) == ":",
+			sub = vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length+1).replace("_controller.rb","");
 		definitionInformation.file = path.join(REL_VIEWS,sub, viewPath+"*")
 	}
 	if (definitionInformation) {
@@ -156,7 +184,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 
 		return promise;
 	} else {
-		return Promise.reject(missingToolMsg + 'godef');
+		return Promise.reject(missingFilelMsg + 'godef');
 	}
 
 }
@@ -170,7 +198,7 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 		vscode.workspace.findFiles(vscode.workspace.asRelativePath(definitionInformation.file)).then(
 			(uris: vscode.Uri[]) => {
 				if (!uris.length) {
-					reject(missingToolMsg + definitionInformation.file)
+					reject(missingFilelMsg + definitionInformation.file)
 				} else if (uris.length == 1) { definitionInformation.file = uris[0].fsPath; resolve(definitionInformation) }
 				else {
 					let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
@@ -178,7 +206,7 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 					rh.showQuickPick(uris.map(uri => vscode.workspace.asRelativePath((uri.path))));
 				}
 			},
-			() => { reject(missingToolMsg + definitionInformation.file) }
+			() => { reject(missingFilelMsg + definitionInformation.file) }
 		)
 	}
 }
@@ -191,17 +219,16 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start)).trim()
 	let suffixPos = wordRange.end.translate(0, 2)
 	let suffix = document.getText(new vscode.Range(wordRange.end, suffixPos)).trim();
-	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/) || suffix == "::") {
+	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}
 	if (!goConfig) {
 		goConfig = vscode.workspace.getConfiguration('rails');
 	}
-	let toolForDocs = goConfig['docsTool'] || 'godoc';
 	let fileType = dectFileType(document.fileName)
 
 	let exclude;
-	return FileTypeHandlers.get(FileType.Controller)(document, word, lineText, prefix);
+	return FileTypeHandlers.get(FileType.Controller)(document,position, word, lineText, prefix);
 }
 
 export class RailsDefinitionProvider implements vscode.DefinitionProvider {
@@ -221,7 +248,7 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
 			if (err) {
 				// Prompt for missing tool is located here so that the
 				// prompts dont show up on hover or signature help
-				if (typeof err === 'string' && err.startsWith(missingToolMsg)) {
+				if (typeof err === 'string' && err.startsWith(missingFilelMsg)) {
 					// promptForMissingTool(err.substr(missingToolMsg.length));
 				} else {
 					return Promise.reject(err);
