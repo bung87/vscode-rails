@@ -87,10 +87,8 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
 			filePath = path.join(REL_MODELS,"**", sub, name + ".rb");
-		console.log(symbol)
 		let findInLib = vscode.workspace.findFiles(path.join("lib", sub, name + ".rb"), null, 1).then(
 			(uris: vscode.Uri[]) => {
-				console.log(444,uris)
 				return vscode.workspace.openTextDocument(uris[0]).then(
 					(document) => {
 						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
@@ -125,7 +123,6 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, word
 				)
 			},
 			() => { 
-				console.log(333,path.join("lib", sub, name + ".rb"))
 				return findInLib
 			}
 		)
@@ -218,7 +215,6 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
 		return definitionLocation(document, position, this.goConfig, false, token).then(definitionInfo => {
 			if (definitionInfo == null || definitionInfo.file == null) return null;
 			let definitionResource = vscode.Uri.file(definitionInfo.file);
-			console.log(111,definitionResource)
 			let pos = new vscode.Position(definitionInfo.line, definitionInfo.column);
 			return new vscode.Location(definitionResource, pos);
 		}, err => {
