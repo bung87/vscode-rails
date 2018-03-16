@@ -1,8 +1,8 @@
 {
     "name": "rails",
     "displayName": "rails",
-    "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets.",
-    "version": "0.5.2",
+    "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets. .erb syntax highlights,related files Navigation,Go to Definition",
+    "version": "0.5.3",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
