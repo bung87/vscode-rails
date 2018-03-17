@@ -19,6 +19,13 @@
 		],
 		"description": "rails webpacker javascript_pack_tag"
 	},
+	"stylesheet_link_tag":{
+		"prefix": "stylesheet",
+		"body": [
+			"<%= stylesheet_link_tag \"$1\" %>"
+		],
+		"description": "rails  stylesheet_link_tag"
+	},
 	"stylesheet_pack_tag":{
 		"prefix": "stylesheet_pack",
 		"body": [

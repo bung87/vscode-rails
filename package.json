@@ -52,20 +52,20 @@
         ],
         "snippets": [
             {
-                "language": "javascript",
-                "path": "./snippets/javascript.json"
+                "language": "js.erb",
+                "path": "./snippets/js.erb.json"
             },
             {
-                "language": "html",
-                "path": "./snippets/html.json"
+                "language": "html.erb",
+                "path": "./snippets/html.erb.json"
             },
             {
-                "language": "css",
-                "path": "./snippets/css.json"
+                "language": "css.erb",
+                "path": "./snippets/css.erb.json"
             },
             {
-                "language": "scss",
-                "path": "./snippets/scss.json"
+                "language": "scss.erb",
+                "path": "./snippets/scss.erb.json"
             },
             {
                 "language": "ruby",
@@ -74,7 +74,7 @@
         ],
         "languages": [
             {
-                "id": "html",
+                "id": "html.erb",
                 "aliases": [
                     "html.erb"
                 ],
@@ -85,7 +85,7 @@
                 ]
             },
             {
-                "id": "javascript",
+                "id": "js.erb",
                 "aliases": [
                     "js.erb"
                 ],
@@ -94,7 +94,7 @@
                 ]
             },
             {
-                "id": "css",
+                "id": "css.erb",
                 "aliases": [
                     "css.erb"
                 ],
@@ -103,17 +103,32 @@
                 ]
             },
             {
-                "id": "scss",
+                "id": "scss.erb",
                 "extensions": [
-                    ".scss"
+                    ".scss.erb"
                 ]
             }
         ],
         "grammars": [
             {
-                "language": "html",
+                "language": "html.erb",
                 "scopeName": "text.html.erb",
-                "path": "./syntaxes/erb.tmLanguage"
+                "path": "./syntaxes/html.erb.tmLanguage"
+            },
+            {
+                "language": "js.erb",
+                "scopeName": "source.js.erb",
+                "path": "./syntaxes/js.erb.tmLanguage"
+            },
+            {
+                "language": "scss.erb",
+                "scopeName": "source.scss",
+                "path": "./syntaxes/scss.tmLanguage"
+            },
+            {
+                "language": "css.erb",
+                "scopeName": "source.scss",
+                "path": "./syntaxes/scss.tmLanguage"
             }
         ]
     },
