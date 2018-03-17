@@ -33,18 +33,6 @@ export interface RailsDefinitionInformation {
 	// toolUsed: string;
 }
 
-export function isPositionInString(document: vscode.TextDocument, position: vscode.Position): boolean {
-	let lineText = document.lineAt(position.line).text;
-	let lineTillCurrentPosition = lineText.substr(0, position.character);
-
-	// Count the number of double quotes in the line till current position. Ignore escaped double quotes
-	let doubleQuotesCnt = (lineTillCurrentPosition.match(/\"/g) || []).length;
-	let escapedDoubleQuotesCnt = (lineTillCurrentPosition.match(/\\\"/g) || []).length;
-
-	doubleQuotesCnt -= escapedDoubleQuotesCnt;
-	return doubleQuotesCnt % 2 === 1;
-}
-
 function wordsToPath(s){
 	return inflection.underscore(s.replace(/[A-Z]{2,}(?![a-z])/,(s) => { return inflection.titleize(s)}))
 }
@@ -219,7 +207,7 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start)).trim()
 	let suffixPos = wordRange.end.translate(0, 2)
 	let suffix = document.getText(new vscode.Range(wordRange.end, suffixPos)).trim();
-	if (!wordRange || lineText.startsWith('//') || isPositionInString(document, position) || word.match(/^\d+.?\d+$/)) {
+	if (!wordRange || lineText.startsWith('//')  || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}
 	if (!goConfig) {
