@@ -8,7 +8,7 @@
     "escape_javascript":{
 		"prefix": "escape_j",
 		"body": [
-			"<%= escape_javascript (${content}) %>"
+			"<%= escape_javascript (${1:content}) %>"
 		],
 		"description": "rails escape_javascript"
 	},
@@ -16,7 +16,6 @@
 		"prefix": "=begin",
 		"body": [
 			"<%\n=begin %>",
-
 			"$1",
 			"<%\n=end %>"
 		],
@@ -25,8 +24,8 @@
     "j":{
 		"prefix": "jrender",
 		"body": [
-			"<%= j( render :partial => '${partial_path}' ) %>"
+			"<%= j( render :partial => '${1:partial_path}' ) %>"
 		],
-		"description": "rails <%= j( render :partial => '${partial_path}' ) %>"
+		"description": "rails <%= j( render :partial => '${1:partial_path}' ) %>"
 	}
 }
