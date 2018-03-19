@@ -37,6 +37,77 @@ function wordsToPath(s) {
 	return inflection.underscore(s.replace(/[A-Z]{2,}(?![a-z])/, (s) => { return inflection.titleize(s) }))
 }
 
+export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
+	let concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ""),
+		seq = concern.split("::").map(wordsToPath);
+	if (seq[0] == "concerns") delete seq[0]
+	let
+		sub = seq.slice(0, -1).join(path.sep),
+		name = seq[seq.length - 1],
+		fileType = FileTypeRelPath.get(fileT),
+		filePath = path.join(fileType, sub, name + ".rb");
+	return filePath
+}
+
+export function findClassInDocumentCallback(name,document) {
+	let
+		line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim())),
+		definitionInformation = {
+			file: document.uri.fsPath,
+			line: Math.max(line, 0)
+		};
+	return Promise.resolve(definitionInformation)
+}
+
+export function getLibOrModelFilePath(lineStartToWord, word) {
+	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
+	let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
+		sub = seq.slice(0, -1).join(path.sep),
+		name = seq[seq.length - 1],
+		filePathInModels = path.join(REL_MODELS, "**", sub, name + ".rb"),
+		filePathInLib = path.join("lib", sub, name + ".rb"),
+		fileModulePathInLib = path.join("lib", name + ".rb");
+	let findFileModuleInLib = vscode.workspace.findFiles(fileModulePathInLib, null, 1).then(
+		(uris: vscode.Uri[]) => {
+
+			if (!uris.length) {
+				return Promise.reject(missingFilelMsg + findFileModuleInLib);
+			}
+			return vscode.workspace.openTextDocument(uris[0]).then(
+				findClassInDocumentCallback.bind(null,name),
+				() => { return Promise.reject(couldNotOpenMsg + fileModulePathInLib); }
+			)
+		},
+		() => { return Promise.reject(missingFilelMsg + filePathInLib); }
+	);
+	let findInLib = vscode.workspace.findFiles(filePathInLib, null, 1).then(
+		(uris: vscode.Uri[]) => {
+			if (!uris.length) {
+				return findFileModuleInLib
+			}
+			return vscode.workspace.openTextDocument(uris[0]).then(
+				findClassInDocumentCallback.bind(null,name),
+				() => { return Promise.reject(couldNotOpenMsg + filePathInLib); }
+			)
+		},
+		() => { return findFileModuleInLib }
+	);
+	return vscode.workspace.findFiles(filePathInModels, null, 1).then(
+		(uris: vscode.Uri[]) => {
+			if (!uris.length) {
+				return findInLib
+			}
+			return vscode.workspace.openTextDocument(uris[0]).then(
+				findClassInDocumentCallback.bind(null,name),
+				() => { return Promise.reject(couldNotOpenMsg + filePathInModels); }
+			)
+		},
+		() => {
+			return findInLib
+		}
+	)
+}
+
 export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
@@ -61,86 +132,9 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 		}
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
-		let concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ""),
-			seq = concern.split("::").map(wordsToPath);
-		if (seq[0] == "concerns") delete seq[0]
-		let
-			sub = seq.slice(0, -1).join(path.sep),
-			name = seq[seq.length - 1],
-			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
-		definitionInformation.file = filePath;
+		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.Controller);
 	} else if (PATTERNS.CAPITALIZED.test(word)) {//lib or model combination
-		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
-		let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
-			sub = seq.slice(0, -1).join(path.sep),
-			name = seq[seq.length - 1],
-			filePathInModels = path.join(REL_MODELS, "**", sub, name + ".rb"),
-			filePathInLib = path.join("lib", sub, name + ".rb"),
-			fileModulePathInLib = path.join("lib", name + ".rb");
-		let findFileModuleInLib = vscode.workspace.findFiles(fileModulePathInLib, null, 1).then(
-			(uris: vscode.Uri[]) => {
-
-				if (!uris.length) {
-					return Promise.reject(missingFilelMsg + findFileModuleInLib);
-				}
-				return vscode.workspace.openTextDocument(uris[0]).then(
-					(document) => {
-						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
-
-						definitionInformation = {
-							file: document.uri.fsPath,
-							line: Math.max(line, 0)
-						};
-						return Promise.resolve(definitionInformation)
-					},
-					() => { return Promise.reject(couldNotOpenMsg + fileModulePathInLib); }
-				)
-			},
-			() => { return Promise.reject(missingFilelMsg + filePathInLib); }
-		);
-		let findInLib = vscode.workspace.findFiles(filePathInLib, null, 1).then(
-			(uris: vscode.Uri[]) => {
-				if (!uris.length) {
-					return findFileModuleInLib
-				}
-				return vscode.workspace.openTextDocument(uris[0]).then(
-					(document) => {
-						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
-
-						definitionInformation = {
-							file: document.uri.fsPath,
-							line: Math.max(line, 0)
-						};
-						return Promise.resolve(definitionInformation)
-					},
-					() => { return Promise.reject(couldNotOpenMsg + filePathInLib); }
-				)
-			},
-			() => { return findFileModuleInLib }
-		);
-		return vscode.workspace.findFiles(filePathInModels, null, 1).then(
-			(uris: vscode.Uri[]) => {
-				if (!uris.length) {
-					return findInLib
-				}
-				return vscode.workspace.openTextDocument(uris[0]).then(
-					(document) => {
-						let line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim()));
-
-						definitionInformation = {
-							file: document.uri.fsPath,
-							line: Math.max(line, 0)
-						};
-						return Promise.resolve(definitionInformation)
-					},
-					() => { return Promise.reject(couldNotOpenMsg + filePathInModels); }
-				)
-			},
-			() => {
-				return findInLib
-			}
-		)
-
+		return getLibOrModelFilePath(lineStartToWord,word)
 	} else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let filePath = document.fileName,
 			line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
@@ -175,9 +169,9 @@ export function getSymbolPath(relpath: string, line: string, fileType: FileType)
 		currentClass = currentClassRaw.trim(),
 		parentClass = parentClassRaw.trim(),
 		relPath = FileTypeRelPath.get(fileType);
-		if (currentClass.includes("::") && !parentClass.includes("::")){
-			return path.join(relPath,  wordsToPath(parentClass) + ".rb");
-		}
+	if (currentClass.includes("::") && !parentClass.includes("::")) {
+		return path.join(relPath, wordsToPath(parentClass) + ".rb");
+	}
 	let parent = parentClass.trim(),
 		sameModuleSub = path.dirname(relpath.substring(relPath.length + 1)),
 		seq = parent.split("::").map(wordsToPath).filter((v) => v != ""),
@@ -189,7 +183,7 @@ export function getSymbolPath(relpath: string, line: string, fileType: FileType)
 
 export function getParentControllerFilePathByDocument(entryDocument: vscode.TextDocument, line: string) {
 	let
-		
+
 		relPath = vscode.workspace.asRelativePath(entryDocument.fileName),
 		filePath = getSymbolPath(relPath, line, FileType.Controller)
 	return filePath
@@ -239,7 +233,7 @@ export function findFunctionOrClassByClassNameInFile(fileAbsPath, reg): RailsDef
 		[definitionInformation, classDeclaration] = getFunctionOrClassInfoInFile(fileAbsPath2, reg);
 		lineIndex = definitionInformation.line
 	}
-	if(-1!==lineIndex ){
+	if (-1 !== lineIndex) {
 		return definitionInformation;
 	}
 }
@@ -266,7 +260,7 @@ export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocumen
 			beforeRange = new vscode.Range(new vscode.Position(0, 0), position),
 			beforeText = entryDocument.getText(beforeRange),
 			beforeLines = beforeText.split("\n");
-		let 
+		let
 			line = beforeLines.find((line) => new RegExp("^class\\s+.*" + clasName).test(line.trim())),
 			filePath = getParentControllerFilePathByDocument(entryDocument, line),
 			fileAbsPath = path.join(vscode.workspace.rootPath, filePath);
@@ -291,7 +285,11 @@ export function modelDefinitionLocation(document: vscode.TextDocument, position:
 	if (reg.test(lineStartToWord)) {
 		let name = inflection.singularize(word);
 		definitionInformation.file = path.join(REL_MODELS, "**", name + ".rb");
-	}
+	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
+		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.ModelConcerns);
+	}else if (PATTERNS.CAPITALIZED.test(word)) {
+		return getLibOrModelFilePath(lineStartToWord,word)
+	} 
 	let promise = new Promise<RailsDefinitionInformation>(
 		definitionResolver(document, definitionInformation)
 	);
