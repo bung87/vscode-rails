@@ -42,7 +42,7 @@ export const PATTERNS = {
     CLASS_INHERIT_DECLARATION : /^class\s+[^<]+<\s+/,
     FUNCTION_DECLARATON:/^def\s+/,
     INCLUDE_DECLARATION:/^include\s+/,
-    CAPITALIZED:/^[A-Z]/,
+    CAPITALIZED:/^[A-Z](?=[a-z])/,
     PARAMS_DECLARATION:/_params$/,
     LAYOUT_DECLARATION:/^layout\s+/,
     LAYOUT_MATCH:/^layout\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
