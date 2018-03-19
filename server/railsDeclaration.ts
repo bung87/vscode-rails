@@ -37,28 +37,23 @@ function wordsToPath(s) {
 	return inflection.underscore(s.replace(/[A-Z]{2,}(?![a-z])/, (s) => { return inflection.titleize(s) }))
 }
 
-export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineText: string, prefix: string): Thenable<RailsDefinitionInformation> {
+export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
 		line: 0
 	};
-	if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineText)) {
+	if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineStartToWord)) {
 		// exclude = REL_CONTROLLERS
 
-		let [, parentController] = lineText.split("<");
+		let [, parentController] = lineStartToWord.split("<");
 		parentController = parentController.trim()
 		// if (parentController == "ActionController::Base") {
 		// 	//@todo provide rails online doc link
 		// 	return Promise.reject(missingToolMsg + 'godef');
 		// }
-		let
-			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1)),
-			seq = parentController.split("::").map(wordsToPath).filter((v) => v != ""),
-			sub = prefix == "<" ? sameModuleControllerSub : seq.slice(0, -1).join(path.sep),
-			name = seq[seq.length - 1],
-			filePath = path.join(REL_CONTROLLERS, sub, name + ".rb");
+		let filePath = getParentControllerFilePathByDocument(document, parentController);
 		definitionInformation.file = filePath;
-	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineText) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
+	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineStartToWord) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let
 			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1)),
 			filePath = path.join(REL_VIEWS, sameModuleControllerSub, path.basename(document.fileName).replace(/_controller\.rb$/, ""), word + "*"),
@@ -68,8 +63,8 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 			return Promise.resolve(null);
 		}
 		definitionInformation.file = filePath;
-	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineText)) {
-		let concern = lineText.replace(PATTERNS.INCLUDE_DECLARATION, ""),
+	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
+		let concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ""),
 			seq = concern.split("::").map(wordsToPath);
 		if (seq[0] == "concerns") delete seq[0]
 		let
@@ -78,7 +73,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 			filePath = path.join(REL_CONTROLLERS_CONCERNS, sub, name + ".rb");
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.CAPITALIZED.test(word)) {//lib or model combination
-		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineText)[1];
+		let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
 		let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
 			sub = seq.slice(0, -1).join(path.sep),
 			name = seq[seq.length - 1],
@@ -154,36 +149,79 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 			line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
 		definitionInformation.file = filePath;
 		definitionInformation.line = line;
-	} else if (PATTERNS.LAYOUT_DECLARATION.test(lineText)) {
-		let layoutPath = PATTERNS.LAYOUT_MATCH.exec(lineText)[2];
+	} else if (PATTERNS.LAYOUT_DECLARATION.test(lineStartToWord)) {
+		let layoutPath = PATTERNS.LAYOUT_MATCH.exec(lineStartToWord)[2];
 		definitionInformation.file = path.join(REL_LAYOUTS, layoutPath + "*");
-	} else if (PATTERNS.RENDER_DECLARATION.test(lineText)) {
+	} else if (PATTERNS.RENDER_DECLARATION.test(lineStartToWord)) {
 		let
-			match = PATTERNS.RENDER_MATCH.exec(lineText),
+			match = PATTERNS.RENDER_MATCH.exec(lineStartToWord),
 			viewPath = match[2],
 			// sameSub = match[1].charAt(0) == ":",
 			sub = vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
 		definitionInformation.file = path.join(REL_VIEWS, sub, viewPath + "*")
+	} else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
+		let
+			fileNameWithoutSuffix = path.parse(document.fileName).name,
+			controllerName = inflection.camelize(fileNameWithoutSuffix);
+		return findFunctionOrClassByClassName(document, position, word, controllerName);
 	}
 	let promise = new Promise<RailsDefinitionInformation>(
 		definitionResolver(document, definitionInformation)
 	);
-
 	return promise;
 }
 
-export function modelDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineText: string, prefix: string): Thenable<RailsDefinitionInformation> {
+export function getParentControllerFilePathByDocument(entryDocument: vscode.TextDocument, parentController: string) {
+	let
+		sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(entryDocument.fileName).substring(REL_CONTROLLERS.length + 1)),
+		seq = parentController.split("::").map(wordsToPath).filter((v) => v != ""),
+		sub = !parentController.includes("::") ? sameModuleControllerSub : seq.slice(0, -1).join(path.sep),
+		name = seq[seq.length - 1],
+		filePath = path.join(REL_CONTROLLERS, sub, name + ".rb");
+	return filePath
+}
+
+export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocument, position: vscode.Position, funcOrClass: string, clasName: string): Promise<RailsDefinitionInformation> {
+
+	let
+		definitionInformation: RailsDefinitionInformation = {
+			file: null,
+			line: 0,
+			column: 0
+		},
+		lines = entryDocument.getText().split("\n"),
+		regPrefix = /[a-z0-9_]/.test(funcOrClass) ? "^def\\s+" : "^class\\s+",
+		reg = new RegExp(regPrefix + funcOrClass),
+		lineIndex = lines.findIndex((line) => reg.test(line.trim()));
+	if (-1 !== lineIndex) {
+		// same file
+		definitionInformation.file = entryDocument.uri.fsPath;
+		definitionInformation.line = lineIndex;
+		definitionInformation.column = lines[lineIndex].length
+		return Promise.resolve(definitionInformation);
+	} else {
+		let
+			beforeRange = new vscode.Range(new vscode.Position(0, 0), position),
+			beforeText = entryDocument.getText(beforeRange),
+			beforeLines = beforeText.split("\n");
+		//@todo search with parents
+		let line = beforeLines.find((line) => new RegExp("^class\\s+.*" + clasName).test(line.trim())),
+			[, parentController] = line.split("<");
+		parentController = parentController.trim();
+		let filePath = getParentControllerFilePathByDocument(entryDocument, parentController);
+	}
+}
+
+export function modelDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
 		line: 0
 	};
-	let 
-		wordRange = document.getWordRangeAtPosition(position),
-		before = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)),
-		reg = new RegExp("(^has_one|^has_many|^has_and_belongs_to_many|^belongs_to)\\s+:"+word);
-	if(reg.compile().test(before)){
+	let
+		reg = new RegExp("(^has_one|^has_many|^has_and_belongs_to_many|^belongs_to)\\s+:" + word);
+	if (reg.test(lineStartToWord)) {
 		let name = inflection.singularize(word);
-		definitionInformation.file  = path.join(REL_MODELS, "**",  name + ".rb");
+		definitionInformation.file = path.join(REL_MODELS, "**", name + ".rb");
 	}
 	let promise = new Promise<RailsDefinitionInformation>(
 		definitionResolver(document, definitionInformation)
@@ -217,11 +255,8 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 export function definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig: vscode.WorkspaceConfiguration, includeDocs: boolean, token: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
+	let lineStartToWord = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim();
 	let word = wordRange ? document.getText(wordRange) : '';
-	let prefixPos = wordRange.start.translate(0, -2)
-	let prefix = document.getText(new vscode.Range(prefixPos, wordRange.start)).trim()
-	let suffixPos = wordRange.end.translate(0, 2)
-	let suffix = document.getText(new vscode.Range(wordRange.end, suffixPos)).trim();
 	if (!wordRange || lineText.startsWith('//') || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}
@@ -230,7 +265,7 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	}
 	let fileType = dectFileType(document.fileName)
 	let exclude;
-	return FileTypeHandlers.get(fileType)(document, position, word, lineText, prefix);
+	return FileTypeHandlers.get(fileType)(document, position, word, lineStartToWord);
 }
 
 export class RailsDefinitionProvider implements vscode.DefinitionProvider {
