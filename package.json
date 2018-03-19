@@ -148,6 +148,7 @@
         "inflection": "^1.12.0",
         "inherits": "^2.0.3",
         "minimist": "0.0.8",
+        "n-readlines": "^0.2.8",
         "npm": "^5.7.1",
         "vscode": "^1.1.13",
         "vscode-languageclient": "^4.0.0",

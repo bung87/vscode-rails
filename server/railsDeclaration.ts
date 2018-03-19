@@ -44,14 +44,11 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 	};
 	if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineStartToWord)) {
 		// exclude = REL_CONTROLLERS
-
-		let [, parentController] = lineStartToWord.split("<");
-		parentController = parentController.trim()
 		// if (parentController == "ActionController::Base") {
 		// 	//@todo provide rails online doc link
 		// 	return Promise.reject(missingToolMsg + 'godef');
 		// }
-		let filePath = getParentControllerFilePathByDocument(document, parentController);
+		let filePath = getParentControllerFilePathByDocument(document, lineStartToWord);
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineStartToWord) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let
@@ -171,16 +168,81 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 	return promise;
 }
 
-export function getParentControllerFilePathByDocument(entryDocument: vscode.TextDocument, parentController: string) {
+export function getSymbolPath(relpath: string, line: string, fileType: FileType) {
+
 	let
-		sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(entryDocument.fileName).substring(REL_CONTROLLERS.length + 1)),
-		seq = parentController.split("::").map(wordsToPath).filter((v) => v != ""),
-		sub = !parentController.includes("::") ? sameModuleControllerSub : seq.slice(0, -1).join(path.sep),
+		[currentClassRaw, parentClassRaw] = line.split("<"),
+		currentClass = currentClassRaw.trim(),
+		parentClass = parentClassRaw.trim(),
+		relPath = FileTypeRelPath.get(fileType);
+		if (currentClass.includes("::") && !parentClass.includes("::")){
+			return path.join(relPath,  wordsToPath(parentClass) + ".rb");
+		}
+	let parent = parentClass.trim(),
+		sameModuleSub = path.dirname(relpath.substring(relPath.length + 1)),
+		seq = parent.split("::").map(wordsToPath).filter((v) => v != ""),
+		sub = !parent.includes("::") ? sameModuleSub : seq.slice(0, -1).join(path.sep),
 		name = seq[seq.length - 1],
-		filePath = path.join(REL_CONTROLLERS, sub, name + ".rb");
+		filePath = path.join(relPath, sub, name + ".rb");
 	return filePath
 }
 
+export function getParentControllerFilePathByDocument(entryDocument: vscode.TextDocument, line: string) {
+	let
+		
+		relPath = vscode.workspace.asRelativePath(entryDocument.fileName),
+		filePath = getSymbolPath(relPath, line, FileType.Controller)
+	return filePath
+}
+
+export function getFunctionOrClassInfoInFile(fileAbsPath, reg): [RailsDefinitionInformation, string] {
+	let
+		definitionInformation: RailsDefinitionInformation = {
+			file: null,
+			line: 0,
+			column: 0
+		};
+	var lineByLine = require('n-readlines');
+	var liner = new lineByLine(fileAbsPath),
+		line,
+		lineNumber = 0,
+		classDeclaration,
+		lineIndex = -1;
+	while (line = liner.next()) {
+		let lineText = line.toString('utf8').trim();
+		if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineText)) {
+			classDeclaration = lineText;
+		}
+		if (reg.test(lineText)) {
+			lineIndex = lineNumber
+			definitionInformation.file = fileAbsPath
+			definitionInformation.line = lineIndex;
+			definitionInformation.column = lineText.length
+			break;
+		}
+		lineNumber++;
+	}
+	return [definitionInformation, classDeclaration];
+}
+export function findFunctionOrClassByClassNameInFile(fileAbsPath, reg): RailsDefinitionInformation {
+	//@todo find in included moduels
+	var
+		[definitionInformation, classDeclaration] = getFunctionOrClassInfoInFile(fileAbsPath, reg),
+		lineIndex = definitionInformation.line
+	while (-1 === lineIndex) {
+		let
+			[, symbol] = classDeclaration.split("<"),
+			parentController = symbol.trim(),
+			filePath = getSymbolPath(vscode.workspace.asRelativePath(fileAbsPath), parentController, FileType.Controller),
+			fileAbsPath2 = path.join(vscode.workspace.rootPath, filePath);
+
+		[definitionInformation, classDeclaration] = getFunctionOrClassInfoInFile(fileAbsPath2, reg);
+		lineIndex = definitionInformation.line
+	}
+	if(-1!==lineIndex ){
+		return definitionInformation;
+	}
+}
 export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocument, position: vscode.Position, funcOrClass: string, clasName: string): Promise<RailsDefinitionInformation> {
 
 	let
@@ -204,11 +266,18 @@ export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocumen
 			beforeRange = new vscode.Range(new vscode.Position(0, 0), position),
 			beforeText = entryDocument.getText(beforeRange),
 			beforeLines = beforeText.split("\n");
-		//@todo search with parents
-		let line = beforeLines.find((line) => new RegExp("^class\\s+.*" + clasName).test(line.trim())),
-			[, parentController] = line.split("<");
-		parentController = parentController.trim();
-		let filePath = getParentControllerFilePathByDocument(entryDocument, parentController);
+		let 
+			line = beforeLines.find((line) => new RegExp("^class\\s+.*" + clasName).test(line.trim())),
+			filePath = getParentControllerFilePathByDocument(entryDocument, line),
+			fileAbsPath = path.join(vscode.workspace.rootPath, filePath);
+		return new Promise<RailsDefinitionInformation>(
+			(resolve, reject) => {
+				let definitionInformation = findFunctionOrClassByClassNameInFile(fileAbsPath, reg)
+				resolve(definitionInformation)
+			}
+		)
+
+
 	}
 }
 
