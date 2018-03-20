@@ -46,6 +46,7 @@ export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
 		name = seq[seq.length - 1],
 		fileType = FileTypeRelPath.get(fileT),
 		filePath = path.join(fileType, sub, name + ".rb");
+		console.log(filePath)
 	return filePath
 }
 
@@ -132,7 +133,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 		}
 		definitionInformation.file = filePath;
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
-		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.Controller);
+		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.ControllerConcerns);
 	} else if (PATTERNS.CAPITALIZED.test(word)) {//lib or model combination
 		return getLibOrModelFilePath(lineStartToWord,word)
 	} else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
@@ -151,6 +152,11 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 			sub = vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
 		definitionInformation.file = path.join(REL_VIEWS, sub, viewPath + "*")
 	} else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
+		let
+			fileNameWithoutSuffix = path.parse(document.fileName).name,
+			controllerName = inflection.camelize(fileNameWithoutSuffix);
+		return findFunctionOrClassByClassName(document, position, word, controllerName);
+	}else if(PATTERNS.HELPER_METHODS.test(lineStartToWord)){
 		let
 			fileNameWithoutSuffix = path.parse(document.fileName).name,
 			controllerName = inflection.camelize(fileNameWithoutSuffix);
