@@ -66,31 +66,24 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 		name = seq[seq.length - 1],
 		filePathInModels = path.join(REL_MODELS, "**", sub, name + ".rb"),
 		filePathInLib = path.join("lib", sub, name + ".rb"),
-		fileModulePathInLib = path.join("lib", name + ".rb");
-	let findFileModuleInLib = vscode.workspace.findFiles(fileModulePathInLib, null, 1).then(
-		(uris: vscode.Uri[]) => {
-
-			if (!uris.length) {
-				return Promise.reject(missingFilelMsg + findFileModuleInLib);
-			}
-			return vscode.workspace.openTextDocument(uris[0]).then(
-				findClassInDocumentCallback.bind(null, name),
-				() => { return Promise.reject(couldNotOpenMsg + fileModulePathInLib); }
-			)
-		},
-		() => { return Promise.reject(missingFilelMsg + filePathInLib); }
-	);
+		fileModulePathInLib = path.join("lib", name + ".rb"),
+		thePath = path.join(vscode.workspace.rootPath, "lib", sub + ".rb"),
+		demodulized = inflection.demodulize(symbol),
+		funcOrClass = demodulized.indexOf(".") != -1 ? demodulized.split(".")[1] : demodulized,
+		regPrefix = PATTERNS.CAPITALIZED.test(funcOrClass) ? "class\\s+" : "def\\s+",
+		reg = new RegExp(regPrefix + funcOrClass);
+	;
 	let findInLib = vscode.workspace.findFiles(filePathInLib, null, 1).then(
 		(uris: vscode.Uri[]) => {
 			if (!uris.length) {
-				return findFileModuleInLib
+				return Promise.resolve(findFunctionOrClassByClassNameInFile(thePath, reg))
 			}
 			return vscode.workspace.openTextDocument(uris[0]).then(
 				findClassInDocumentCallback.bind(null, name),
 				() => { return Promise.reject(couldNotOpenMsg + filePathInLib); }
 			)
 		},
-		() => { return findFileModuleInLib }
+		() => { return Promise.resolve(findFunctionOrClassByClassNameInFile(thePath, reg)) }
 	);
 	return vscode.workspace.findFiles(filePathInModels, null, 1).then(
 		(uris: vscode.Uri[]) => {
@@ -264,7 +257,7 @@ export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocumen
 			column: 0
 		},
 		lines = entryDocument.getText().split("\n"),
-		regPrefix = /[a-z0-9_]/.test(funcOrClass) ? "^def\\s+" : "^class\\s+",
+		regPrefix = PATTERNS.CAPITALIZED.test(funcOrClass) ? "class\\s+" : "def\\s+",
 		reg = new RegExp(regPrefix + funcOrClass),
 		lineIndex = lines.findIndex((line) => reg.test(line.trim()));
 	if (-1 !== lineIndex) {
