@@ -29,10 +29,10 @@ List sort by priority.
 
 - [ ] avoid ruby's std lib go to definition.
 - [ ] avoid rails's go to definition.
-- [ ] controller's filters、actions and helpers go to definition.
-- [ ] model's go to definition.
+- [x] controller's filters、actions and helpers go to definition.
+- [x] model's go to definition.
 - [ ] file path suggestion in controller and views etc.
-- [ ] controller's go to definition seaching with parents.
+- [x] controller's go to definition seaching with parents.
 - [ ] seaching definition in gems.
 
 ## Contribution

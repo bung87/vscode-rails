@@ -49,7 +49,7 @@ export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
 	return filePath
 }
 
-export function findClassInDocumentCallback(name,document) {
+export function findClassInDocumentCallback(name, document) {
 	let
 		line = document.getText().split("\n").findIndex((line) => new RegExp("^class\\s+.*" + name).test(line.trim())),
 		definitionInformation = {
@@ -74,7 +74,7 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 				return Promise.reject(missingFilelMsg + findFileModuleInLib);
 			}
 			return vscode.workspace.openTextDocument(uris[0]).then(
-				findClassInDocumentCallback.bind(null,name),
+				findClassInDocumentCallback.bind(null, name),
 				() => { return Promise.reject(couldNotOpenMsg + fileModulePathInLib); }
 			)
 		},
@@ -86,7 +86,7 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 				return findFileModuleInLib
 			}
 			return vscode.workspace.openTextDocument(uris[0]).then(
-				findClassInDocumentCallback.bind(null,name),
+				findClassInDocumentCallback.bind(null, name),
 				() => { return Promise.reject(couldNotOpenMsg + filePathInLib); }
 			)
 		},
@@ -98,7 +98,7 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 				return findInLib
 			}
 			return vscode.workspace.openTextDocument(uris[0]).then(
-				findClassInDocumentCallback.bind(null,name),
+				findClassInDocumentCallback.bind(null, name),
 				() => { return Promise.reject(couldNotOpenMsg + filePathInModels); }
 			)
 		},
@@ -106,6 +106,17 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 			return findInLib
 		}
 	)
+}
+
+export function findLocationByWord(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string) {
+	if (PATTERNS.CAPITALIZED.test(word)) {
+		return getLibOrModelFilePath(lineStartToWord, word)
+	} else {
+		let
+			fileNameWithoutSuffix = path.parse(document.fileName).name,
+			controllerName = inflection.camelize(fileNameWithoutSuffix);
+		return findFunctionOrClassByClassName(document, position, word, controllerName);
+	}
 }
 
 export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
@@ -134,7 +145,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
 		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.ControllerConcerns);
 	} else if (PATTERNS.CAPITALIZED.test(word)) {//lib or model combination
-		return getLibOrModelFilePath(lineStartToWord,word)
+		return getLibOrModelFilePath(lineStartToWord, word)
 	} else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let filePath = document.fileName,
 			line = document.getText().split("\n").findIndex((line) => new RegExp("^def\\s+" + word).test(line.trim()))
@@ -154,12 +165,14 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 			fileNameWithoutSuffix = path.parse(document.fileName).name,
 			controllerName = inflection.camelize(fileNameWithoutSuffix);
 		return findFunctionOrClassByClassName(document, position, word, controllerName);
-	}else if(PATTERNS.HELPER_METHODS.test(lineStartToWord)){
+	} else if (PATTERNS.HELPER_METHODS.test(lineStartToWord)) {
 		//@todo find in app/helpers
 		let
 			fileNameWithoutSuffix = path.parse(document.fileName).name,
 			controllerName = inflection.camelize(fileNameWithoutSuffix);
 		return findFunctionOrClassByClassName(document, position, word, controllerName);
+	} else {
+		return findLocationByWord(document, position, word, lineStartToWord)
 	}
 	let promise = new Promise<RailsDefinitionInformation>(
 		definitionResolver(document, definitionInformation)
@@ -292,9 +305,11 @@ export function modelDefinitionLocation(document: vscode.TextDocument, position:
 		definitionInformation.file = path.join(REL_MODELS, "**", name + ".rb");
 	} else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
 		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.ModelConcerns);
-	}else if (PATTERNS.CAPITALIZED.test(word)) {
-		return getLibOrModelFilePath(lineStartToWord,word)
-	} 
+	} else if (PATTERNS.CAPITALIZED.test(word)) {
+		return getLibOrModelFilePath(lineStartToWord, word)
+	} else {
+		return findLocationByWord(document, position, word, lineStartToWord)
+	}
 	let promise = new Promise<RailsDefinitionInformation>(
 		definitionResolver(document, definitionInformation)
 	);
@@ -303,7 +318,8 @@ export function modelDefinitionLocation(document: vscode.TextDocument, position:
 }
 var FileTypeHandlers = new Map([
 	[FileType.Controller, controllerDefinitionLocation],
-	[FileType.Model, modelDefinitionLocation]
+	[FileType.Model, modelDefinitionLocation],
+	[FileType.Unkown, findLocationByWord]
 ]);
 
 export function definitionResolver(document, definitionInformation, exclude = null, maxNum = null) {
