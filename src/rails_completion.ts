@@ -24,7 +24,7 @@ export function modelQueryInterface(): vscode.CompletionItem[] {
     });
     return suggestions
 }
-function getCols(fileAbsPath, position: vscode.Position, triggerCharacter: TriggerCharacter): vscode.CompletionItem[] {
+function getCols(fileAbsPath, position: vscode.Position, triggerCharacter: TriggerCharacter, prefix?: string): vscode.CompletionItem[] {
     var liner = new lineByLine(fileAbsPath),
         cols = [],
         line,
@@ -35,8 +35,9 @@ function getCols(fileAbsPath, position: vscode.Position, triggerCharacter: Trigg
 
         if (/^#\s+([a-z0-9_]+)/.test(lineText)) {
             let col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
-            let item = new vscode.CompletionItem(col);
-            item.insertText = col;
+            let name = prefix ? prefix + col : col;
+            let item = new vscode.CompletionItem(name);
+            item.insertText = name;
             item.kind = vscode.CompletionItemKind.Field;
             // @todo? move cusor next to quote eg. Client.where('locked' => true) :id=>
             cols.push(item)
@@ -141,6 +142,9 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                         suggestions.push(...modelQueryInterface());
                         let methods = getMethods(info.file);
                         suggestions.push(...methods);
+                        let cols = getCols(info.file, position, triggerCharacter, "find_by_");
+                        console.log(cols)
+                        suggestions.push(...cols);
                         break;
                 }
             } else if (triggerCharacter == TriggerCharacter.colon || triggerCharacter == TriggerCharacter.quote) {
