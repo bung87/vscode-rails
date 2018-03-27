@@ -58,7 +58,7 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
             }
 
             try{
-                let info =  await definitionLocation(document, position);
+                let info =  await definitionLocation(document, position2);
                 let fileType = dectFileType(info.file)
     
                 switch(fileType){

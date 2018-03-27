@@ -340,10 +340,8 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 export  function  definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig?: vscode.WorkspaceConfiguration, includeDocs?: boolean, token?: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
-	let position2 = new vscode.Position(position.line, position.character - 1);
-	let wordAtPosition = document.getWordRangeAtPosition(position2);
-	let lineStartToWord = wordRange ? document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim(): document.getText(wordAtPosition);
-	let word = wordRange ? document.getText(wordRange) : lineStartToWord;
+	let lineStartToWord = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim();
+	let word = document.getText(wordRange);
 	if (lineText.startsWith('//') || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}
