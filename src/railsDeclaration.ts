@@ -337,12 +337,14 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 	}
 }
 
-export function definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig: vscode.WorkspaceConfiguration, includeDocs: boolean, token: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
+export  function  definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig?: vscode.WorkspaceConfiguration, includeDocs?: boolean, token?: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
-	let lineStartToWord = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim();
-	let word = wordRange ? document.getText(wordRange) : '';
-	if (!wordRange || lineText.startsWith('//') || word.match(/^\d+.?\d+$/)) {
+	let position2 = new vscode.Position(position.line, position.character - 1);
+	let wordAtPosition = document.getWordRangeAtPosition(position2);
+	let lineStartToWord = wordRange ? document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim(): document.getText(wordAtPosition);
+	let word = wordRange ? document.getText(wordRange) : lineStartToWord;
+	if (lineText.startsWith('//') || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}
 	if (!goConfig) {
@@ -361,7 +363,7 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
 	}
 
 	public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location> {
-		return definitionLocation(document, position, this.goConfig, false, token).then(definitionInfo => {
+		return  definitionLocation(document, position, this.goConfig, false, token).then(definitionInfo => {
 			if (definitionInfo == null || definitionInfo.file == null) return null;
 			let definitionResource = vscode.Uri.file(definitionInfo.file);
 			let pos = new vscode.Position(definitionInfo.line, definitionInfo.column);
