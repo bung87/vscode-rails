@@ -19,6 +19,7 @@ import {
 	PATTERNS
 } from "../src/constants";
 import inflection = require('inflection');
+import lineByLine = require('n-readlines');
 
 const missingFilelMsg = 'Missing file: ';
 const couldNotOpenMsg = 'Could Not Open file: ';
@@ -27,11 +28,11 @@ const SYMBOL_END = "[^\\w]";
 export interface RailsDefinitionInformation {
 	file: string;
 	line: number;
+	fileType?: FileType;
 	column?: number;
 	doc?: string;
-	// declarationlines: string[];
 	name?: string;
-	// toolUsed: string;
+
 }
 
 function wordsToPath(s) {
@@ -61,7 +62,7 @@ export function findClassInDocumentCallback(name, document) {
 }
 
 export function getLibOrModelFilePath(lineStartToWord, word) {
-	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")" ).exec(lineStartToWord)[1];
+	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
 	let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
 		sub = seq.slice(0, -1).join(path.sep),
 		name = seq[seq.length - 1],
@@ -102,7 +103,7 @@ export function getLibOrModelFilePath(lineStartToWord, word) {
 	)
 }
 
-export function findLocationByWord(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string) {
+export function findLocationByWord(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string, ) {
 	if (PATTERNS.CAPITALIZED.test(word)) {
 		return getLibOrModelFilePath(lineStartToWord, word)
 	} else {
@@ -113,7 +114,7 @@ export function findLocationByWord(document: vscode.TextDocument, position: vsco
 	}
 }
 
-export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
+export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string, ): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
 		line: 0
@@ -208,10 +209,10 @@ export function getFunctionOrClassInfoInFile(fileAbsPath, reg): [RailsDefinition
 			line: 0,
 			column: 0
 		};
-	if(!fs.existsSync(fileAbsPath)){
-		return [definitionInformation,null]
+	if (!fs.existsSync(fileAbsPath)) {
+		return [definitionInformation, null]
 	}
-	var lineByLine = require('n-readlines');
+	
 	var liner = new lineByLine(fileAbsPath),
 		line,
 		lineNumber = 0,
@@ -290,7 +291,7 @@ export function findFunctionOrClassByClassName(entryDocument: vscode.TextDocumen
 	}
 }
 
-export function modelDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string): Thenable<RailsDefinitionInformation> {
+export function modelDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string, ): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
 		line: 0
@@ -337,7 +338,7 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 	}
 }
 
-export  function  definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig?: vscode.WorkspaceConfiguration, includeDocs?: boolean, token?: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
+export function definitionLocation(document: vscode.TextDocument, position: vscode.Position, goConfig?: vscode.WorkspaceConfiguration, token?: vscode.CancellationToken): Thenable<RailsDefinitionInformation> {
 	let wordRange = document.getWordRangeAtPosition(position);
 	let lineText = document.lineAt(position.line).text.trim();
 	let lineStartToWord = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim();
@@ -361,7 +362,7 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
 	}
 
 	public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location> {
-		return  definitionLocation(document, position, this.goConfig, false, token).then(definitionInfo => {
+		return definitionLocation(document, position, this.goConfig, token).then(definitionInfo => {
 			if (definitionInfo == null || definitionInfo.file == null) return null;
 			let definitionResource = vscode.Uri.file(definitionInfo.file);
 			let pos = new vscode.Position(definitionInfo.line, definitionInfo.column);
