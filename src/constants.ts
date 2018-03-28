@@ -51,5 +51,5 @@ export const PATTERNS = {
     MODEL_RELATIONS:/^has_one|^has_many|^has_and_belongs_to_many|^belongs_to/,
     CONTROLLER_FILTERS:/^(skip_|prepend_)?(before|after|around)_(action|filter)/,
     HELPER_METHODS:/^helper_method/,
-    CLASS_STATIC_METHOD_CALL: /(([A-Z][A-Za-z]+)\.[^\(]+\()/
+    CLASS_STATIC_METHOD_CALL: /(([A-Z][A-Za-z]+)\.[^\)]*)/
 }

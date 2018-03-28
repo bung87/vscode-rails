@@ -15,7 +15,7 @@ export enum TriggerCharacter {
 
 export function modelQueryInterface(): vscode.CompletionItem[] {
     var suggestions: vscode.CompletionItem[] = [];
-    let query_methods = ["find_by", "first", "last", "take", "find", "find_each", "find_in_batches", "create_with", "distinct", "eager_load", "extending", "from", "group", "having", "includes", "joins", "left_outer_joins", "limit", "lock", "none", "offset", "order", "preload", "readonly", "references", "reorder", "reverse_order", "select", "where"];
+    let query_methods = ["find_by", "first", "last", "take", "find", "find_each", "find_in_batches", "create_with", "distinct", "eager_load", "extending", "from", "group", "having", "includes", "joins", "left_outer_joins", "limit", "lock", "none", "offset", "order", "preload", "readonly", "references", "reorder", "reverse_order", "select", "where", "all"];
     query_methods.forEach((value) => {
         let item = new vscode.CompletionItem(value);
         item.insertText = value;
@@ -116,7 +116,9 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
             // }
 
             // get current word
-            let position2 = new vscode.Position(position.line, position.character - 1);
+            // let position2 = new vscode.Position(position.line, position.character - 1);
+            let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(lineTillCurrentPosition);
+            let position2 = new vscode.Position(position.line, lineText.indexOf(id));
             let wordAtPosition = document.getWordRangeAtPosition(position2);
             let word = document.getText(wordAtPosition);
             let currentWord = '';
@@ -143,7 +145,6 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                         let methods = getMethods(info.file);
                         suggestions.push(...methods);
                         let cols = getCols(info.file, position, triggerCharacter, "find_by_");
-                        console.log(cols)
                         suggestions.push(...cols);
                         break;
                 }
@@ -154,7 +155,6 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                     let info, fileType;
                     try {
                         info = await definitionLocation(document, position2);
-                        console.log(info)
                         fileType = dectFileType(info.file)
                     } catch (e) {
                         console.error(e)
