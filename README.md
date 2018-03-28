@@ -4,6 +4,7 @@
 * .erb syntax highlights.
 * Navigation between related files through command.
 * Go to Definition.
+* Model's field suggestion
 
 ## Features
 
@@ -41,6 +42,14 @@ List sort by priority.
 This extension made by mine free time,contributions are welcome!
 
 ## Release Notes  
+
+### 0.5.5
+
+Support active record query suggestion.
+
+### 0.5.4
+
+Resolving unkown type of file and unkown pattern
 
 ### 0.5.3
 
