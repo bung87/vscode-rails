@@ -18,6 +18,7 @@ import {
 	REL_STYLESHEETS,
 	PATTERNS
 } from "../src/constants";
+import {RAILS} from "./rails";
 import inflection = require('inflection');
 import lineByLine = require('n-readlines');
 
@@ -62,6 +63,7 @@ export function findClassInDocumentCallback(name, document) {
 }
 
 export function getLibOrModelFilePath(lineStartToWord, word) {
+	
 	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
 	let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
 		sub = seq.slice(0, -1).join(path.sep),
@@ -348,6 +350,11 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	}
 	if (!goConfig) {
 		goConfig = vscode.workspace.getConfiguration('rails');
+	}
+	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
+	if(RAILS.has(symbol)){
+		console.log("rails symbols")
+		return  Promise.resolve(null);
 	}
 	let fileType = dectFileType(document.fileName)
 	let exclude;

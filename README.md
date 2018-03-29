@@ -29,7 +29,7 @@ This extension is not fully implemented form_helpers of rails edge version ,excl
 List sort by priority.
 
 - [ ] avoid ruby's std lib go to definition.
-- [ ] avoid rails's go to definition.
+- [x] avoid rails's go to definition.
 - [x] controller's filters、actions and helpers go to definition.
 - [x] model's go to definition.
 - [x] model's field suggestion.
@@ -42,6 +42,10 @@ List sort by priority.
 This extension made by mine free time,contributions are welcome!
 
 ## Release Notes  
+
+### 0.5.6  
+
+avoid rails's go to definition.
 
 ### 0.5.5
 

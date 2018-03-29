@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets. .erb syntax highlights,related files Navigation,Go to Definition",
-    "version": "0.5.5",
+    "version": "0.5.6",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -138,11 +138,12 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
-        "typescript": "^2.0.3",
-        "mocha": "^2.3.3",
-        "vscode": "^1.1.13",
+        "@types/mocha": "^2.2.32",
         "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
+        "glob": "^7.1.2",
+        "mocha": "^2.3.3",
+        "typescript": "^2.0.3",
+        "vscode": "^1.1.13"
     },
     "dependencies": {
         "inflection": "^1.12.0",
