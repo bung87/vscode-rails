@@ -5,6 +5,8 @@ import cp = require('child_process');
 import path = require('path');
 import { isPositionInString, dectFileType } from "./utils";
 import { definitionLocation } from './railsDeclaration';
+import minimatch = require("minimatch")
+var Minimatch = require("minimatch").Minimatch
 import {
     FileType, PATTERNS,
     REL_CONTROLLERS,
@@ -179,10 +181,11 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                             suggestions.push(...cols);
                             break;
                     }
-                } else if (PATTERNS.RENDER_DECLARATION.test(lineTillCurrentPosition.trim()) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineTillCurrentPosition.trim())) {
+                } else if (PATTERNS.RENDER_DECLARATION.test(lineTillCurrentPosition.trim()) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineTillCurrentPosition.trim()) || PATTERNS.LAYOUT_DECLARATION.test(lineTillCurrentPosition.trim())) {
                     let
                         matches = lineTillCurrentPosition.match(/([a-z]+)/g),
                         id = matches.pop();
+                    console.log("render type:" + id)
                     switch (id) {
                         case "partial":
                             var relativeFileName = vscode.workspace.asRelativePath(document.fileName),
@@ -190,7 +193,7 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                             var paths = rh.searchPaths().filter((v: string) => {
                                 return v.startsWith(REL_LAYOUTS) === false && v.startsWith(REL_VIEWS) === true
                             });
-
+                            console.log(paths)
                             var items = await rh.generateList(paths).then(list => {
                                 let partials = list.map(v => path.parse(v).name.split(".")[0]).filter(v => {
                                     return v.startsWith("_")
@@ -205,9 +208,9 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                                 return items;
 
                             });
-                            resolve(items);
+                            suggestions.push(...items);
                             break;
-                        case "template":
+                        case "template":// @todo if it is base application controller or helper suggest all views
                             var relativeFileName = vscode.workspace.asRelativePath(document.fileName),
                                 rh = new RailsHelper(relativeFileName, null);
                             var paths = rh.searchPaths().filter((v: string) => {
@@ -215,7 +218,7 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                             });
 
                             var items = await rh.generateList(paths).then(list => {
-                                let templates = list.map(v => v.substring(REL_VIEWS.length).split(".")[0]).filter(v => {
+                                let templates = list.map(v => path.basename(v.substring(REL_VIEWS.length + 1).split(".")[0])).filter(v => {
                                     return path.basename(v).startsWith("_") === false
                                 });
                                 let items = templates.map((v: string) => {
@@ -228,7 +231,36 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                                 return items;
 
                             });
-                            resolve(items);
+                            suggestions.push(...items);
+                            if (TriggerCharacter.quote == triggerCharacter) {
+                                var views = await vscode.workspace.findFiles(path.join(REL_VIEWS, "**"), REL_LAYOUTS).then((res) => {
+                                    return res.filter(v => {
+                                        let p = vscode.workspace.asRelativePath(v);
+                                        return paths.some(v2 => { return !minimatch(p, v2) }) || path.basename(p).startsWith("_")
+                                    }).map(i => {
+                                        let
+                                            name = vscode.workspace.asRelativePath(i).substring(REL_VIEWS.length + 1).split(".")[0],
+                                            item = new vscode.CompletionItem(name);
+                                        item.insertText = triggerCharacter == TriggerCharacter.colon ? " '" + name + "'" : name;
+                                        item.kind = vscode.CompletionItemKind.File;
+                                        return item;
+                                    })
+                                });
+                                suggestions.push(...views)
+                            }
+                            break;
+                        case "layout":
+                            var views = await vscode.workspace.findFiles(path.join(REL_LAYOUTS, "**"), null).then((res) => {
+                                return res.map(i => {
+                                    let
+                                        name = vscode.workspace.asRelativePath(i).substring(REL_LAYOUTS.length + 1).split(".")[0],
+                                        item = new vscode.CompletionItem(name);
+                                    item.insertText = triggerCharacter == TriggerCharacter.colon ? " '" + name + "'" : name;
+                                    item.kind = vscode.CompletionItemKind.File;
+                                    return item;
+                                })
+                            });
+                            suggestions.push(...views)
                             break;
 
                     }

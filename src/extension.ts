@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('rails-nav', railsNavigation));
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(RAILS_MODE, new RailsDefinitionProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(RAILS_MODE, new RailsCompletionItemProvider(), '.', '\"',":","'"));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider( { scheme: 'file' }, new RailsCompletionItemProvider(), '.', '\"',":","'"));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {

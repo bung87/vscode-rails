@@ -69,7 +69,6 @@ export class RailsHelper {
         this.targetFile = null;
         let fileType = utils.dectFileType(filePath),
             prefix = filePath.substring(FileTypeRelPath.get(fileType).length + 1);
-
         switch (fileType) {
             case FileType.Controller:
                 this.filePatten = join(prefix, this.fileName.replace(/_controller\.rb$/, ""));
@@ -88,7 +87,7 @@ export class RailsHelper {
                 this.filePatten = prefix;
                 break;
             case FileType.Helper:
-                this.filePatten = join(prefix, this.fileName.replace(/_helper\.rb$/, ""));
+                this.filePatten = prefix == "" && this.fileName == "application_helper.rb" ? "" :join(prefix, this.fileName.replace(/_helper\.rb$/, ""));
                 break;
             case FileType.Javascript:
                 this.filePatten = join(prefix, this.fileName.replace(/\.js$/, "").replace(/\..*?\..*?$/, ""));

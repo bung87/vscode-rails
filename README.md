@@ -33,7 +33,7 @@ List sort by priority.
 - [x] controller's filters、actions and helpers go to definition.
 - [x] model's go to definition.
 - [x] model's field suggestion.
-- [ ] file path suggestion in controller and views etc.
+- [x] file path suggestion in controller and views etc.
 - [x] controller's go to definition seaching with parents.
 - [ ] seaching definition in gems.
 

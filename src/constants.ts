@@ -46,7 +46,7 @@ export const PATTERNS = {
     PARAMS_DECLARATION:/_params$/,
     LAYOUT_DECLARATION:/^layout\s+/,
     LAYOUT_MATCH:/^layout\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
-    RENDER_DECLARATION:/^render\s+/,
+    RENDER_DECLARATION:/render\s+/,
     RENDER_TO_STRING_DECLARATION:/render_to_string[\(\s]/,
     RENDER_MATCH:/^render\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
     MODEL_RELATIONS:/^has_one|^has_many|^has_and_belongs_to_many|^belongs_to/,
