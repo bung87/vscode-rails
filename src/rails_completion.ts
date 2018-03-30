@@ -2,10 +2,21 @@
 
 import vscode = require('vscode');
 import cp = require('child_process');
+import path = require('path');
 import { isPositionInString, dectFileType } from "./utils";
 import { definitionLocation } from './railsDeclaration';
-import { FileType, PATTERNS } from "./constants"
+import {
+    FileType, PATTERNS,
+    REL_CONTROLLERS,
+    REL_MODELS,
+    REL_VIEWS,
+    REL_LAYOUTS,
+    REL_HELPERS,
+    REL_JAVASCRIPTS,
+    REL_STYLESHEETS
+} from "./constants"
 import lineByLine = require('n-readlines');
+import { RailsHelper } from "../src/rails_helper";
 
 export enum TriggerCharacter {
     dot,
@@ -91,6 +102,7 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
             let filename = document.fileName;
             let lineText = document.lineAt(position.line).text;
             let lineTillCurrentPosition = lineText.substr(0, position.character);
+            console.log(lineTillCurrentPosition)
             let character = lineTillCurrentPosition[lineTillCurrentPosition.length - 1]
             // let autocompleteUnimportedPackages = config['autocompleteUnimportedPackages'] === true && !lineText.match(/^(\s)*(import|package)(\s)+/);
             if (lineText.match(/^\s*\/\//)) {
@@ -108,17 +120,18 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                 case ":":
                     triggerCharacter = TriggerCharacter.colon;
             }
-
-
+            console.log(triggerCharacter)
             // let inString = isPositionInString(document, position);
             // if (!inString && lineTillCurrentPosition.endsWith('\"')) {
             //     return resolve([]);
             // }
 
             // get current word
-            // let position2 = new vscode.Position(position.line, position.character - 1);
-            let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(lineTillCurrentPosition);
-            let position2 = new vscode.Position(position.line, lineText.indexOf(id));
+            let position2 = new vscode.Position(position.line, position.character - 1);
+            if (PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
+                let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(lineTillCurrentPosition);
+                position2 = new vscode.Position(position.line, lineText.indexOf(id));
+            }
             let wordAtPosition = document.getWordRangeAtPosition(position2);
             let word = document.getText(wordAtPosition);
             let currentWord = '';
@@ -140,7 +153,7 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                     reject(e)
                 }
                 switch (fileType) {
-                    case FileType.Model:
+                    case FileType.Model: // model static methods
                         suggestions.push(...modelQueryInterface());
                         let methods = getMethods(info.file);
                         suggestions.push(...methods);
@@ -161,11 +174,65 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
                         reject(e)
                     }
                     switch (fileType) {
-                        case FileType.Model:
+                        case FileType.Model: // model field suggestion
                             let cols = getCols(info.file, position, triggerCharacter);
                             suggestions.push(...cols);
                             break;
                     }
+                } else if (PATTERNS.RENDER_DECLARATION.test(lineTillCurrentPosition.trim()) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineTillCurrentPosition.trim())) {
+                    let
+                        matches = lineTillCurrentPosition.match(/([a-z]+)/g),
+                        id = matches.pop();
+                    switch (id) {
+                        case "partial":
+                            var relativeFileName = vscode.workspace.asRelativePath(document.fileName),
+                                rh = new RailsHelper(relativeFileName, null);
+                            var paths = rh.searchPaths().filter((v: string) => {
+                                return v.startsWith(REL_LAYOUTS) === false && v.startsWith(REL_VIEWS) === true
+                            });
+
+                            var items = await rh.generateList(paths).then(list => {
+                                let partials = list.map(v => path.parse(v).name.split(".")[0]).filter(v => {
+                                    return v.startsWith("_")
+                                });
+                                let items = partials.map((v: string) => {
+                                    let name = v.substring(1);
+                                    let item = new vscode.CompletionItem(name);
+                                    item.insertText = triggerCharacter == TriggerCharacter.colon ? " '" + name + "'" : name;
+                                    item.kind = vscode.CompletionItemKind.File;
+                                    return item;
+                                })
+                                return items;
+
+                            });
+                            resolve(items);
+                            break;
+                        case "template":
+                            var relativeFileName = vscode.workspace.asRelativePath(document.fileName),
+                                rh = new RailsHelper(relativeFileName, null);
+                            var paths = rh.searchPaths().filter((v: string) => {
+                                return v.startsWith(REL_LAYOUTS) === false && v.startsWith(REL_VIEWS) === true
+                            });
+
+                            var items = await rh.generateList(paths).then(list => {
+                                let templates = list.map(v => v.substring(REL_VIEWS.length).split(".")[0]).filter(v => {
+                                    return path.basename(v).startsWith("_") === false
+                                });
+                                let items = templates.map((v: string) => {
+                                    let name = v;
+                                    let item = new vscode.CompletionItem(name);
+                                    item.insertText = triggerCharacter == TriggerCharacter.colon ? " '" + name + "'" : name;
+                                    item.kind = vscode.CompletionItemKind.File;
+                                    return item;
+                                })
+                                return items;
+
+                            });
+                            resolve(items);
+                            break;
+
+                    }
+
                 }
             }
 

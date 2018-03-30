@@ -54,7 +54,7 @@ export class RailsHelper {
         join(REL_STYLESHEETS, "PTN*")
     ]
 
-    private searchPaths() {
+    public searchPaths() {
         var res = [];
         this.patterns.forEach(e => {
             var p = e.replace("PTN", this.filePatten.toString());
@@ -73,8 +73,8 @@ export class RailsHelper {
         switch (fileType) {
             case FileType.Controller:
                 this.filePatten = join(prefix, this.fileName.replace(/_controller\.rb$/, ""));
-                if(this.line && /^def\s+/.test(this.line)){
-                    this.filePatten = join(this.filePatten,this.line.replace(/^def\s+/,""))
+                if (this.line && /^def\s+/.test(this.line)) {
+                    this.filePatten = join(this.filePatten, this.line.replace(/^def\s+/, ""))
                 }
                 break;
             case FileType.Model:
@@ -106,25 +106,17 @@ export class RailsHelper {
 
     }
 
-    public items = [];
     public generateList(arr: Array<String>) {
-        var cur = arr.pop();
-
-        var _self = this;
-        vscode.workspace.findFiles(cur.toString(), null).then((res) => {
-            res.forEach(i => {
-                var fn = vscode.workspace.asRelativePath(i);
-                if (_self.relativeFileName !== fn)
-                    _self.items.push(fn);
+        var ap = arr.map((cur) => {
+            return vscode.workspace.findFiles(cur.toString(), null).then((res) => {
+                return res.map(i => {
+                    return vscode.workspace.asRelativePath(i);
+                }).filter(v => this.relativeFileName !== v);
             });
-            if (arr.length > 0) {
-                _self.generateList(arr);
-            } else {
-
-                this.showQuickPick(_self.items);
-            }
+        })
+        return Promise.all(ap).then(lists => {
+            return utils.flatten(lists)
         });
-
     }
 
     public showQuickPick(items: any) {
@@ -141,9 +133,14 @@ export class RailsHelper {
     public showFileList() {
         if (this.filePatten != null) {
             var paths = this.searchPaths().slice();
-            this.generateList(paths)
+            this.generateList(paths).then(v => {
+                this.showQuickPick(v)
+            });
+
         } else if (this.targetFile != null) {
-            this.generateList([this.targetFile]);
+            this.generateList([this.targetFile]).then(v => {
+                this.showQuickPick(v)
+            });
         }
     }
 }
