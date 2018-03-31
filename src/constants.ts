@@ -48,7 +48,7 @@ export const PATTERNS = {
     LAYOUT_MATCH:/^layout\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
     RENDER_DECLARATION:/render\s+/,
     RENDER_TO_STRING_DECLARATION:/render_to_string[\(\s]/,
-    RENDER_MATCH:/^render\s+(['":]?([A-Za-z\/0-9_]+)['"]?)/,
+    RENDER_MATCH:/["']([A-Za-z\/0-9_]+)/,
     MODEL_RELATIONS:/^has_one|^has_many|^has_and_belongs_to_many|^belongs_to/,
     CONTROLLER_FILTERS:/^(skip_|prepend_)?(before|after|around)_(action|filter)/,
     HELPER_METHODS:/^helper_method/,

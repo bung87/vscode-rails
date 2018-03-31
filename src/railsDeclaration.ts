@@ -18,7 +18,7 @@ import {
 	REL_STYLESHEETS,
 	PATTERNS
 } from "../src/constants";
-import {RAILS} from "./rails";
+import { RAILS } from "./rails";
 import inflection = require('inflection');
 import lineByLine = require('n-readlines');
 
@@ -63,7 +63,7 @@ export function findClassInDocumentCallback(name, document) {
 }
 
 export function getLibOrModelFilePath(lineStartToWord, word) {
-	
+
 	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
 	let seq = symbol.split("::").map(wordsToPath).filter((v) => v != ""),
 		sub = seq.slice(0, -1).join(path.sep),
@@ -116,6 +116,22 @@ export function findLocationByWord(document: vscode.TextDocument, position: vsco
 	}
 }
 
+export function findViews(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string) {
+	let
+		filePath,
+		match = lineStartToWord.match(PATTERNS.RENDER_MATCH),
+		id = match[1],
+		preWord = lineStartToWord.substring(0, lineStartToWord.lastIndexOf(id)).match(/[a-z]+/g).pop(),
+		viewPath = path.parse(id).dir + path.sep + "*" + path.parse(id).name + ".*",
+		sub = id.indexOf("/") !== -1 ? "" : vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
+	if (preWord === "layout") {
+		filePath = path.join(REL_LAYOUTS, viewPath )
+	} else {
+		filePath = path.join(REL_VIEWS, sub, viewPath )
+	}
+	return filePath
+}
+
 export function controllerDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string, ): Thenable<RailsDefinitionInformation> {
 	let definitionInformation: RailsDefinitionInformation = {
 		file: null,
@@ -151,12 +167,8 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 	} else if (PATTERNS.LAYOUT_DECLARATION.test(lineStartToWord)) {
 		let layoutPath = PATTERNS.LAYOUT_MATCH.exec(lineStartToWord)[2];
 		definitionInformation.file = path.join(REL_LAYOUTS, layoutPath + "*");
-	} else if (PATTERNS.RENDER_DECLARATION.test(lineStartToWord)) {
-		let
-			match = PATTERNS.RENDER_MATCH.exec(lineStartToWord),
-			viewPath = match[2],
-			sub = vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
-		definitionInformation.file = path.join(REL_VIEWS, sub, viewPath + "*")
+	} else if (PATTERNS.RENDER_DECLARATION.test(lineStartToWord) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)) {
+		definitionInformation.file = findViews(document, position, word, lineStartToWord)
 	} else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
 		let
 			fileNameWithoutSuffix = path.parse(document.fileName).name,
@@ -214,7 +226,7 @@ export function getFunctionOrClassInfoInFile(fileAbsPath, reg): [RailsDefinition
 	if (!fs.existsSync(fileAbsPath)) {
 		return [definitionInformation, null]
 	}
-	
+
 	var liner = new lineByLine(fileAbsPath),
 		line,
 		lineNumber = 0,
@@ -307,6 +319,8 @@ export function modelDefinitionLocation(document: vscode.TextDocument, position:
 		definitionInformation.file = getConcernsFilePath(lineStartToWord, FileType.ModelConcerns);
 	} else if (PATTERNS.CAPITALIZED.test(word)) {
 		return getLibOrModelFilePath(lineStartToWord, word)
+	} else if (PATTERNS.RENDER_DECLARATION.test(lineStartToWord) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)) {
+		definitionInformation.file = findViews(document, position, word, lineStartToWord)
 	} else {
 		return findLocationByWord(document, position, word, lineStartToWord)
 	}
@@ -333,6 +347,7 @@ export function definitionResolver(document, definitionInformation, exclude = nu
 					let relativeFileName = vscode.workspace.asRelativePath(document.fileName),
 						rh = new RailsHelper(relativeFileName, null);
 					rh.showQuickPick(uris.map(uri => vscode.workspace.asRelativePath((uri.path))));
+					resolve(null)
 				}
 			},
 			() => { reject(missingFilelMsg + definitionInformation.file) }
@@ -352,9 +367,9 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 		goConfig = vscode.workspace.getConfiguration('rails');
 	}
 	let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(lineStartToWord)[1];
-	if(RAILS.has(symbol)){
+	if (RAILS.has(symbol)) {
 		console.log("rails symbols")
-		return  Promise.resolve(null);
+		return Promise.resolve(null);
 	}
 	let fileType = dectFileType(document.fileName)
 	let exclude;
