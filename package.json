@@ -143,7 +143,7 @@
         "glob": "^7.1.2",
         "mocha": "^2.3.3",
         "typescript": "^2.0.3",
-        "vscode": "^1.1.13"
+        "vscode": "^1.1.18"
     },
     "dependencies": {
         "inflection": "^1.12.0",
@@ -151,7 +151,6 @@
         "minimatch": "^3.0.4",
         "minimist": "0.0.8",
         "n-readlines": "^0.2.8",
-        "npm": "^5.7.1",
-        "vscode": "^1.1.13"
+        "npm": "^5.7.1"
     }
 }
