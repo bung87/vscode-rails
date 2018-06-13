@@ -299,7 +299,7 @@
 	"form_for":{
 		"prefix": "form_for",
 		"body": [
-			"<%= form_for( ${1:variable} , remote: ${2:true}) do |f| %> %>",
+			"<%= form_for( ${1:variable} , remote: ${2:true}) do |f| %>",
 			"$2",
 			"<% end %>"
 		],
@@ -308,7 +308,7 @@
 	"form_tag":{
 		"prefix": "form_tag",
 		"body": [
-			"<%= form_tag( '${1:path}' , remote: ${2:true}) do |f| %> %>",
+			"<%= form_tag( '${1:path}' , remote: ${2:true}) do |f| %>",
 			"$2",
 			"<% end %>"
 		],

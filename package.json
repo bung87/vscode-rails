@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets. .erb syntax highlights,related files Navigation,Go to Definition",
-    "version": "0.5.7",
+    "version": "0.6.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
