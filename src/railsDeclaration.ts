@@ -21,20 +21,11 @@ import {
 import { RAILS } from "./rails";
 import inflection = require('inflection');
 import lineByLine = require('n-readlines');
+import {RailsDefinitionInformation} from "./interfaces";
 
 const missingFilelMsg = 'Missing file: ';
 const couldNotOpenMsg = 'Could Not Open file: ';
 const SYMBOL_END = "[^\\w]";
-
-export interface RailsDefinitionInformation {
-	file: string;
-	line: number;
-	fileType?: FileType;
-	column?: number;
-	doc?: string;
-	name?: string;
-
-}
 
 function wordsToPath(s) {
 	return inflection.underscore(s.replace(/[A-Z]{2,}(?![a-z])/, (s) => { return inflection.titleize(s) }))
@@ -148,7 +139,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 	} else if (PATTERNS.FUNCTION_DECLARATON.test(lineStartToWord) && !PATTERNS.PARAMS_DECLARATION.test(word)) {
 		let
 			sameModuleControllerSub = path.dirname(vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1)),
-			filePath = path.join(REL_VIEWS, sameModuleControllerSub, path.basename(document.fileName).replace(/_controller\.rb$/, ""), word + "*"),
+			filePath = path.join(REL_VIEWS, sameModuleControllerSub, path.basename(document.fileName).replace(/_controller\.rb$/, ""), word + ".*"),
 			upperText = document.getText(new vscode.Range(new vscode.Position(0, 0), position)),
 			isPrivateMethod = /\s*private/.test(upperText);
 		if (isPrivateMethod) {
@@ -166,7 +157,7 @@ export function controllerDefinitionLocation(document: vscode.TextDocument, posi
 		definitionInformation.line = line;
 	} else if (PATTERNS.LAYOUT_DECLARATION.test(lineStartToWord)) {
 		let layoutPath = PATTERNS.LAYOUT_MATCH.exec(lineStartToWord)[2];
-		definitionInformation.file = path.join(REL_LAYOUTS, layoutPath + "*");
+		definitionInformation.file = path.join(REL_LAYOUTS, layoutPath + ".*");
 	} else if (PATTERNS.RENDER_DECLARATION.test(lineStartToWord) || PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)) {
 		definitionInformation.file = findViews(document, position, word, lineStartToWord)
 	} else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
@@ -360,6 +351,7 @@ export function definitionLocation(document: vscode.TextDocument, position: vsco
 	let lineText = document.lineAt(position.line).text.trim();
 	let lineStartToWord = document.getText(new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)).trim();
 	let word = document.getText(wordRange);
+	console.log(word)
 	if (lineText.startsWith('//') || word.match(/^\d+.?\d+$/)) {
 		return Promise.resolve(null);
 	}

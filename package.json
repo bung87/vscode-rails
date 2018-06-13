@@ -22,7 +22,7 @@
         "url": "https://github.com/bung87/vscode-rails/issues"
     },
     "categories": [
-        "Languages",
+        "Programming Languages",
         "Snippets",
         "Other"
     ],
@@ -34,7 +34,8 @@
     ],
     "activationEvents": [
         "onCommand:rails-nav",
-        "onLanguage:ruby"
+        "onLanguage:ruby",
+        "workspaceContains:**/Gemfile"
     ],
     "main": "./out/src/extension",
     "contributes": {
