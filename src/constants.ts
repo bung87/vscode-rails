@@ -57,6 +57,6 @@ export const PATTERNS = {
 
 export const VIEWS_PATTERNS = {
     RENDER_PATTERN:/render\s+(["'])([^\1]+)\1/,
-    RENDER_FUNC_PATTERN:/(escape_javascript|j)?[\s\(]render([\s\(]:([a-z]+)\s*=>\s*)?(["'])([^\4]+)\4/，
+    RENDER_FUNC_PATTERN:/(escape_javascript|j)?[\s\(]render([\s\(]:([a-z]+)\s*=>\s*)?(["'])([^\4]+)\4/,
     RENDER_FUNC_PATTERN2:/(escape_javascript|j)?[\s\(]render([\s\(]([a-z]+):\s*)?(["'])([^\4]+)\4/
 }

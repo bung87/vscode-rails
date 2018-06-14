@@ -56,9 +56,13 @@ This extension made by mine free time,contributions are welcome!
 
 ## Release Notes  
 
+### 0.7.0
+
+rails helper go to definition and view path definition in views.  
+
 ### 0.5.7  
 
-Support view path suggestion and fix view path definition.
+Support view path definition in ruby files and fix view path definition.
 
 ### 0.5.6  
 
