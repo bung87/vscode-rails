@@ -62,6 +62,9 @@ exec('git clone git@github.com:rails/rails.git', function callback(error, stdout
             Promise.all(syms).then(function (symbols) {
                 var fla = flatten(symbols)
                 var uni = fla.filter((value, index, self) => self.indexOf(value) === index && /[A-Z]{2,}$/.test(value) === false)
+                uni = uni.filter( (value) => {
+                    ["ApplicationController"].indexOf(value) == -1;
+                })
                 var content = "// This file generated through rails_symbols.js,Do NOT modify it!\nexport const RAILS = new Set(" + JSON.stringify(uni) + ");";
                 fs.writeFile(path.join(__dirname, "src", "rails.ts"), content, function (err) {
                     if (err) {
