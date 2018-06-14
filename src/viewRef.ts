@@ -140,7 +140,7 @@ export function definitionLocation(
     return Promise.resolve(null);
   }
   let renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
-  let renderFuncMatched = lineText.match(VIEWS_PATTERNS.RENDER_FUNC_PATTERN);
+  let renderFuncMatched = lineText.match(VIEWS_PATTERNS.RENDER_FUNC_PATTERN) || lineText.match(VIEWS_PATTERNS.RENDER_FUNC_PATTERN2);
   if (renderMatched) {
     let _path = renderMatched[2];
     console.log(renderMatched);
