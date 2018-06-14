@@ -323,6 +323,7 @@ export function modelDefinitionLocation(document: vscode.TextDocument, position:
 }
 var FileTypeHandlers = new Map([
 	[FileType.Controller, controllerDefinitionLocation],
+	[FileType.Helper,controllerDefinitionLocation],
 	[FileType.Model, modelDefinitionLocation],
 	[FileType.Unkown, findLocationByWord]
 ]);
