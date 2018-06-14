@@ -111,7 +111,7 @@ export function findViews(document: vscode.TextDocument, position: vscode.Positi
 	let
 		filePath,
 		match = lineStartToWord.match(PATTERNS.RENDER_MATCH),
-		id = match[1],
+		id = match[match.length-1],
 		preWord = lineStartToWord.substring(0, lineStartToWord.lastIndexOf(id)).match(/[a-z]+/g).pop(),
 		viewPath = path.parse(id).dir + path.sep + "*" + path.parse(id).name + ".*",
 		sub = id.indexOf("/") !== -1 ? "" : vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
@@ -120,6 +120,7 @@ export function findViews(document: vscode.TextDocument, position: vscode.Positi
 	} else {
 		filePath = path.join(REL_VIEWS, sub, viewPath )
 	}
+	console.log(preWord,filePath,match)
 	return filePath
 }
 
