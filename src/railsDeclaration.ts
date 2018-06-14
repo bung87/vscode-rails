@@ -110,17 +110,25 @@ export function findLocationByWord(document: vscode.TextDocument, position: vsco
 export function findViews(document: vscode.TextDocument, position: vscode.Position, word: string, lineStartToWord: string) {
 	let
 		filePath,
-		match = lineStartToWord.match(PATTERNS.RENDER_MATCH),
-		id = match[match.length-1],
-		preWord = lineStartToWord.substring(0, lineStartToWord.lastIndexOf(id)).match(/[a-z]+/g).pop(),
-		viewPath = path.parse(id).dir + path.sep + "*" + path.parse(id).name + ".*",
+		lineText = document.lineAt(position.line).text.trim(),
+		match1 = lineStartToWord.match(PATTERNS.RENDER_MATCH),
+		match1id = match1[match1.length-1],
+		match2 = lineText.match(PATTERNS.RENDER_MATCH),
+		idIndex = match2.findIndex( v=> v.includes(match1id)),
+		id = match2[idIndex],
+		preWord = match2[idIndex-1];
+		console.log(match1,match2,id,preWord);
+		if(preWord == "render" && ["template","partial","layout","json"].indexOf(id) !==-1){
+			return null
+		}
+	let	viewPath = path.parse(id).dir + path.sep + "*" + path.parse(id).name + ".*",
 		sub = id.indexOf("/") !== -1 ? "" : vscode.workspace.asRelativePath(document.fileName).substring(REL_CONTROLLERS.length + 1).replace("_controller.rb", "");
 	if (preWord === "layout") {
 		filePath = path.join(REL_LAYOUTS, viewPath )
 	} else {
 		filePath = path.join(REL_VIEWS, sub, viewPath )
 	}
-	console.log(preWord,filePath,match)
+	console.log(preWord,filePath,match1id,id)
 	return filePath
 }
 
