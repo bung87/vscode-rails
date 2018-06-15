@@ -8,8 +8,8 @@ rp(url)
         var theVar = JSON.parse(js.replace("var search_data = ", ""));
         let index = theVar["index"]
         let longSearchIndex = index["longSearchIndex"]
-
-        var content = "// This file generated through rails_symbols.js,Do NOT modify it!\nexport const RAILS = new Set(" + JSON.stringify(longSearchIndex) + ");";
+        var uni = longSearchIndex.filter((value, index, self) => self.indexOf(value) === index && value !=="")
+        var content = "// This file generated through rails_symbols2.js,Do NOT modify it!\nexport const RAILS = new Set(" + JSON.stringify(uni) + ");";
         fs.writeFile(path.join(__dirname, "src", "rails.ts"), content, function (err) {
             if (err) {
                 return console.error(err);
