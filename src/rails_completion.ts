@@ -98,7 +98,6 @@ export class RailsCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     public provideCompletionItemsInternal(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, config: vscode.WorkspaceConfiguration): Promise<vscode.CompletionItem[]> {
-
         return new Promise<vscode.CompletionItem[]>(async (resolve, reject) => {
             var suggestions: vscode.CompletionItem[] = [];
             let filename = document.fileName;
