@@ -6,7 +6,7 @@
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
-        "vscode": "^1.19.3"
+        "vscode": "^1.23.0"
     },
     "galleryBanner": {
         "color": "#c52f24",
@@ -38,17 +38,34 @@
         "workspaceContains:**/Gemfile"
     ],
     "main": "./out/src/extension",
+    "enableProposedApi": true,
     "contributes": {
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "Rails:Document",
+                    "when": "editorHasSelection"
+                }
+            ]
+        },
         "commands": [
             {
-                "command": "rails-nav",
-                "title": "Rails Nav"
+                "command": "Rails:Navigation",
+                "title": "Rails:Navigation"
+            },
+            {
+                "command": "Rails:Document",
+                "title": "Rails:Document"
             }
         ],
         "keybindings": [
             {
-                "command": "rails-nav",
+                "command": "Rails:Navigation",
                 "key": "Alt+."
+            },
+            {
+                "command": "Rails:Document",
+                "key": "Alt+F1"
             }
         ],
         "snippets": [
@@ -140,18 +157,21 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.32",
-        "@types/node": "^6.0.40",
+        "@types/node": "^9.4.6",
         "glob": "^7.1.2",
         "mocha": "^2.3.3",
-        "typescript": "^2.0.3",
-        "vscode": "^1.1.18"
+        "typescript": "^2.8.3"
     },
     "dependencies": {
         "inflection": "^1.12.0",
         "inherits": "^2.0.3",
+        "is_js": "^0.9.0",
         "minimatch": "^3.0.4",
         "minimist": "0.0.8",
         "n-readlines": "^0.2.8",
-        "npm": "^5.7.1"
+        "npm": "^5.10.0",
+        "request": "^2.87.0",
+        "request-promise-native": "^1.0.5",
+        "vscode": "*"
     }
 }

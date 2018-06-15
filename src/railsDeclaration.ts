@@ -118,7 +118,7 @@ export function findViews(document: vscode.TextDocument, position: vscode.Positi
 		id = match2[idIndex],
 		preWord = match2[idIndex-1];
 		console.log(match1,match2,id,preWord);
-		if(preWord == "render" && ["template","partial","layout","json"].indexOf(id) !==-1){
+		if(preWord == "render" && ["template","partial","layout","json","html"].indexOf(id) !==-1){
 			return null
 		}
 	let	viewPath = path.parse(id).dir + path.sep + "*" + path.parse(id).name + ".*",

@@ -38,7 +38,7 @@ export function findViews(
   viewType: string = "partial"
 ) {
   let filePath,
-    isSameDirPartial = /^[a-zA-Z0-9_]+$/.test(_path),
+    isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
     isViewsRelativePath = _path.indexOf("/") !== -1,
     definitionInformation: RailsDefinitionInformation = {
       file: null,
