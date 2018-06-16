@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "rails",
     "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets. .erb syntax highlights,related files Navigation,Go to Definition",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -41,15 +41,12 @@
     "enableProposedApi": true,
     "contributes": {
         "menus": {
-            "commandPalette": [
-                {
-                    "command": "Rails:Document",
-                    "when": "editorHasSelection"
-                }
-            ]
+            "commandPalette": [{
+                "command": "Rails:Document",
+                "when": "editorHasSelection"
+            }]
         },
-        "commands": [
-            {
+        "commands": [{
                 "command": "Rails:Navigation",
                 "title": "Rails:Navigation"
             },
@@ -58,8 +55,7 @@
                 "title": "Rails:Document"
             }
         ],
-        "keybindings": [
-            {
+        "keybindings": [{
                 "command": "Rails:Navigation",
                 "key": "Alt+."
             },
@@ -68,8 +64,7 @@
                 "key": "Alt+F1"
             }
         ],
-        "snippets": [
-            {
+        "snippets": [{
                 "language": "js.erb",
                 "path": "./snippets/js.erb.json"
             },
@@ -90,8 +85,7 @@
                 "path": "./snippets/ruby.json"
             }
         ],
-        "languages": [
-            {
+        "languages": [{
                 "id": "html.erb",
                 "aliases": [
                     "html.erb"
@@ -127,8 +121,7 @@
                 ]
             }
         ],
-        "grammars": [
-            {
+        "grammars": [{
                 "language": "html.erb",
                 "scopeName": "text.html.erb",
                 "path": "./syntaxes/html.erb.tmLanguage"
