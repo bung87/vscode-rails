@@ -1,5 +1,7 @@
 # rails  
 
+[![Join the chat at https://gitter.im/vscode-rails/Lobby](https://badges.gitter.im/vscode-rails/Lobby.svg)](https://gitter.im/vscode-rails/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
 * .erb syntax highlights.
 * Navigation between related files through command.
