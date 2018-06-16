@@ -2,6 +2,8 @@
 
 [![Join the chat at https://gitter.im/vscode-rails/Lobby](https://badges.gitter.im/vscode-rails/Lobby.svg)](https://gitter.im/vscode-rails/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+Ruby on Rails support for Visual Studio Code
+
 ## Features
 
 - Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
@@ -23,13 +25,13 @@
 
 ### Navigation
 
-- Alt + . (Alt + dot)
-- Opt + . (Opt + dot Mac)
+- <kbd>Alt + .</kbd>
+- <kbd>Opt + .</kbd> (on Mac)
 
 ### Open online document to the side
 
-- Alt + . (Alt + F1)
-- Opt + . (Opt + F1 Mac)
+- <kbd>Alt + F1</kbd>
+- <kbd>Opt + F1</kbd> (on Mac)
 
 ## Known Issues
 

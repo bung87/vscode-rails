@@ -1,7 +1,7 @@
 {
     "name": "rails",
     "displayName": "rails",
-    "description": "Ruby on Rails \"Asset Helpers\" and \"Tag Helpers\" snippets. .erb syntax highlights,related files Navigation,Go to Definition",
+    "description": "Ruby on Rails support for Visual Studio Code",
     "version": "0.7.1",
     "publisher": "bung87",
     "icon": "rails.png",
