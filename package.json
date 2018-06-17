@@ -41,15 +41,12 @@
     "enableProposedApi": true,
     "contributes": {
         "menus": {
-            "commandPalette": [
-                {
-                    "command": "Rails:Document",
-                    "when": "editorHasSelection"
-                }
-            ]
+            "commandPalette": [{
+                "command": "Rails:Document",
+                "when": "editorHasSelection"
+            }]
         },
-        "commands": [
-            {
+        "commands": [{
                 "command": "Rails:Navigation",
                 "title": "Rails:Navigation"
             },
@@ -58,8 +55,7 @@
                 "title": "Rails:Document"
             }
         ],
-        "keybindings": [
-            {
+        "keybindings": [{
                 "command": "Rails:Navigation",
                 "key": "Alt+."
             },
@@ -68,14 +64,17 @@
                 "key": "Alt+F1"
             }
         ],
-        "snippets": [
-            {
+        "snippets": [{
                 "language": "js.erb",
                 "path": "./snippets/js.erb.json"
             },
             {
                 "language": "html.erb",
                 "path": "./snippets/html.erb.json"
+            },
+            {
+                "language": "slim",
+                "path": "./snippets/slim.json"
             },
             {
                 "language": "css.erb",
@@ -90,8 +89,7 @@
                 "path": "./snippets/ruby.json"
             }
         ],
-        "languages": [
-            {
+        "languages": [{
                 "id": "html.erb",
                 "aliases": [
                     "html.erb"
@@ -127,8 +125,7 @@
                 ]
             }
         ],
-        "grammars": [
-            {
+        "grammars": [{
                 "language": "html.erb",
                 "scopeName": "text.html.erb",
                 "path": "./syntaxes/html.erb.tmLanguage"

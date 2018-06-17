@@ -1,0 +1,304 @@
+{
+    "javascript_include_tag": {
+        "prefix": "javascript",
+        "body": [
+            "= javascript_include_tag \"$1\" "
+        ],
+        "description": "rails javascript_include_tag"
+    },
+    "javascript_pack_tag": {
+        "prefix": "javascript_pack",
+        "body": [
+            "= javascript_pack_tag \"$1\" "
+        ],
+        "description": "rails webpacker javascript_pack_tag"
+    },
+    "stylesheet_link_tag": {
+        "prefix": "stylesheet",
+        "body": [
+            "= stylesheet_link_tag \"$1\" "
+        ],
+        "description": "rails stylesheet_link_tag"
+    },
+    "stylesheet_pack_tag": {
+        "prefix": "stylesheet_pack",
+        "body": [
+            "= stylesheet_pack_tag \"$1\" "
+        ],
+        "description": "rails webpacker stylesheet_pack_tag"
+    },
+    "asset_pack_path": {
+        "prefix": "asset_pack",
+        "body": [
+            "= asset_pack_path '$1' "
+        ],
+        "description": "rails webpacker asset_pack_path"
+    },
+    "asset_path": {
+        "prefix": "asset_path",
+        "body": [
+            "= asset_path('$1' $2) "
+        ],
+        "description": "rails asset_path"
+    },
+    "raw": {
+        "prefix": "raw",
+        "body": [
+            "= raw $1 "
+        ],
+        "description": "rails raw"
+    },
+    "sanitize": {
+        "prefix": "sanitize",
+        "body": [
+            "= sanitize $1 "
+        ],
+        "description": "rails sanitize"
+    },
+    "link_to": {
+        "prefix": "link_to",
+        "body": [
+            "= link_to  \"${1:text}\", ${2:model} "
+        ],
+        "description": "rails link_to"
+    },
+    "image_tag": {
+        "prefix": "image_tag",
+        "body": [
+            "= image_tag  \"${1:filename_with_extension}\" "
+        ],
+        "description": "rails image_tag"
+    },
+    "video_tag": {
+        "prefix": "video_tag",
+        "body": [
+            "= image_tag  \"${1:filename_with_extension}\" "
+        ],
+        "description": "rails video_tag"
+    },
+    "render": {
+        "prefix": "render",
+        "body": [
+            "= render  \"${1:path}\" "
+        ],
+        "description": "rails render"
+    },
+    "partial": {
+        "prefix": "partial",
+        "body": [
+            "= render partial: \"${1:path}\" "
+        ],
+        "description": "rails render partial"
+    },
+    "audio_tag": {
+        "prefix": "audio_tag",
+        "body": [
+            "= image_tag  \"${1:filename_with_extension}\" "
+        ],
+        "description": "rails audio_tag"
+    },
+    "auto_discovery_link_tag": {
+        "prefix": "auto_discovery",
+        "body": [
+            "= auto_discovery_link_tag (${1|:rss,:atom},{action: \"${2:action}\"},{title:  \"${3:title}\"}) "
+        ],
+        "description": "rails auto_discovery_link_tag"
+    },
+    "button_to": {
+        "prefix": "button_to",
+        "body": [
+            "= button_to  \"${1:text}\", ${2:model} "
+        ],
+        "description": "rails button_to"
+    },
+    "check_box_tag": {
+        "prefix": "check_box",
+        "body": [
+            "= check_box_tag (:${1:id_name}) "
+        ],
+        "description": "rails check_box_tag"
+    },
+    "text_field_tag": {
+        "prefix": "text_field",
+        "body": [
+            "= text_field_tag (:${1:id_name}) "
+        ],
+        "description": "rails text_field_tag"
+    },
+    "label_tag": {
+        "prefix": "label_tag",
+        "body": [
+            "= label_tag (:${1:for}, \"${2:text}\") "
+        ],
+        "description": "rails label_tag"
+    },
+    "radio_button_tag": {
+        "prefix": "radio_button",
+        "body": [
+            "= radio_button_tag (:${1:name}, \"${2:value}\") "
+        ],
+        "description": "rails radio_button_tag,id will be ${name}_${value}"
+    },
+    "text_area_tag": {
+        "prefix": "text_area",
+        "body": [
+            "= text_area_tag (:${1:id_name}, \"${2:content}\"), size: \"${3:colsxrols}\" "
+        ],
+        "description": "rails text_area_tag"
+    },
+    "password_field_tag": {
+        "prefix": "password_field",
+        "body": [
+            "= password_field_tag (:${1:id_name}) "
+        ],
+        "description": "rails password_field_tag"
+    },
+    "search_field": {
+        "prefix": "search_field",
+        "body": [
+            "= search_field (:${1:id_name}) "
+        ],
+        "description": "rails search_field"
+    },
+    "telephone_field": {
+        "prefix": "telephone_field",
+        "body": [
+            "= telephone_field (:${1:id_name}) "
+        ],
+        "description": "rails telephone_field"
+    },
+    "date_field": {
+        "prefix": "date_field",
+        "body": [
+            "= date_field (:${1:id_name}) "
+        ],
+        "description": "rails date_field"
+    },
+    "datetime_local_field": {
+        "prefix": "datetime_local_field",
+        "body": [
+            "= datetime_local_field (:${1:id_name}) "
+        ],
+        "description": "rails datetime_local_field"
+    },
+    "month_field": {
+        "prefix": "month_field",
+        "body": [
+            "= month_field (:${1:id_name}) "
+        ],
+        "description": "rails month_field"
+    },
+    "week_field": {
+        "prefix": "week_field",
+        "body": [
+            "= week_field (:${1:id_name}) "
+        ],
+        "description": "rails datetime_local_field"
+    },
+    "url_field": {
+        "prefix": "url_field",
+        "body": [
+            "= url_field (:${1:id_name}) "
+        ],
+        "description": "rails url_field"
+    },
+    "email_field": {
+        "prefix": "email_field",
+        "body": [
+            "= email_field (:${1:id_name}) "
+        ],
+        "description": "rails email_field"
+    },
+    "color_field": {
+        "prefix": "color_field",
+        "body": [
+            "= color_field (:${1:id_name}) "
+        ],
+        "description": "rails color_field"
+    },
+    "time_field": {
+        "prefix": "time_field",
+        "body": [
+            "= time_field (:${1:id_name}) "
+        ],
+        "description": "rails time_field"
+    },
+    "number_field": {
+        "prefix": "number_field",
+        "body": [
+            "= number_field (:${1:id_name}, in: ${2:1.0..20.0}, step: ${3:0.5}) "
+        ],
+        "description": "rails number_field"
+    },
+    "range_field": {
+        "prefix": "range_field",
+        "body": [
+            "= range_field (:${1:id_name}, in: ${2:1..100}) "
+        ],
+        "description": "rails range_field"
+    },
+    "select_tag": {
+        "prefix": "select_tag",
+        "body": [
+            "= select_tag (:${1:id_name}, options_for_select(${2:options})) "
+        ],
+        "description": "rails select_tag,options example:[['Lisbon', 1], ['Madrid', 2], ...], 2"
+    },
+    "options_for_select": {
+        "prefix": "options_for_select",
+        "body": [
+            "= options_for_select(${1:options})) "
+        ],
+        "description": "rails options_for_select,options example:[['Lisbon', 1], ['Madrid', 2], ...], 2"
+    },
+    "time_zone_select": {
+        "prefix": "time_zone_select",
+        "body": [
+            "= time_zone_select (:${1:id_name}) "
+        ],
+        "description": "rails time_zone_select"
+    },
+    "hidden_field_tag": {
+        "prefix": "hidden_field",
+        "body": [
+            "= hidden_field_tag (:${1:id_name}, \"${2:value}\") "
+        ],
+        "description": "rails hidden_field_tag"
+    },
+    "content_for": {
+        "prefix": "content_for",
+        "body": [
+            "= content_for :$1 do ",
+            "  $2",
+            "\n"
+        ],
+        "description": "rails content_for"
+    },
+    "content_for?": {
+        "prefix": "content_for?",
+        "body": [
+            "- if content_for?(:$1)",
+            "  =yield (:$1)",
+            "\n"
+        ],
+        "description": "rails content_for?"
+    },
+    "form_for": {
+        "prefix": "form_for",
+        "body": [
+            "= form_for( ${1:variable} , remote: ${2:true}) do |f| ",
+            "  $2",
+            "\n"
+        ],
+        "description": "rails form_for"
+    },
+    "form_tag": {
+        "prefix": "form_tag",
+        "body": [
+            "= form_tag( '${1:path}' , remote: ${2:true}) do |f| ",
+            "  $2",
+            "\n"
+        ],
+        "description": "rails form_tag"
+    }
+}
