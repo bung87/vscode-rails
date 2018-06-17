@@ -29,7 +29,7 @@ function injectBase(html, base) {
   return _html;
 }
 
-function doRequest(url: string, endpoint: string) {
+function doRequest(url: string, symbol: string) {
   let context: vscode.ExtensionContext = this;
   let request = rp(url)
     .then(function(htmlString) {
@@ -45,7 +45,7 @@ function doRequest(url: string, endpoint: string) {
       } else {
         currentPanel = vscode.window.createWebviewPanel(
           "Rails:Document",
-          `Rails:Document-${endpoint}`,
+          `Rails:Document-${symbol}`,
           vscode.ViewColumn.Two,
           {
             // Enable scripts in the webview
@@ -97,5 +97,5 @@ export function viewDoc() {
   }
   let url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")
-  doRequest.call(context, url, endpoint);
+  doRequest.call(context, url, symbol);
 }

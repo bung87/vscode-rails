@@ -353,6 +353,7 @@ export function getFunctionOrClassInfoInFile(
   }
   return [definitionInformation, classDeclaration];
 }
+
 export function findFunctionOrClassByClassNameInFile(
   fileAbsPath,
   reg
@@ -383,6 +384,7 @@ export function findFunctionOrClassByClassNameInFile(
     return definitionInformation;
   }
 }
+
 export function findFunctionOrClassByClassName(
   entryDocument: vscode.TextDocument,
   position: vscode.Position,
@@ -467,6 +469,7 @@ export function modelDefinitionLocation(
 
   return promise;
 }
+
 var FileTypeHandlers = new Map([
   [FileType.Controller, controllerDefinitionLocation],
   [FileType.Helper, controllerDefinitionLocation],

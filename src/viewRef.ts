@@ -32,33 +32,34 @@ const SYMBOL_END = "[^\\w]";
 export function findViews(
   document: vscode.TextDocument,
   position: vscode.Position,
-  word: string,
   _path: string,
   fileType: string = "",
-  viewType: string = "partial"
+  viewType: string = "partial" // partial or template
 ) {
   let filePath,
     isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
     isViewsRelativePath = _path.indexOf("/") !== -1,
+    ext = path.parse(_path).ext,
+    _underscore = viewType == "partial" ? "_" : "",
     definitionInformation: RailsDefinitionInformation = {
       file: null,
       line: 0
     };
 
-  console.log(_path);
-  let _underscore = viewType == "partial" ? "_" : "";
   if (isSameDirPartial) {
     let fileName = vscode.workspace.asRelativePath(document.fileName),
       dir = path.dirname(fileName);
     filePath = path.join(dir, `${_underscore}${_path}${fileType}.*`);
     definitionInformation.file = filePath;
+  } else if (ext) {
+    filePath = path.join(REL_VIEWS, _path);
+    definitionInformation.file = filePath;
   } else if (isViewsRelativePath) {
     filePath = path.join(
-      "app/views",
+      REL_VIEWS,
       path.dirname(_path),
       `${_underscore}${path.basename(_path)}${fileType}.*`
     );
-    console.log(path.dirname(_path), path.basename(_path));
     definitionInformation.file = filePath;
   } else {
     return Promise.resolve(null);
@@ -117,18 +118,30 @@ export function definitionLocation(
   goConfig?: vscode.WorkspaceConfiguration,
   token?: vscode.CancellationToken
 ): Thenable<RailsDefinitionInformation> {
-  let wordRange = document.getWordRangeAtPosition(position);
+  let wordRange = document.getWordRangeAtPosition(
+    position,
+    /([A-Za-z\/0-9_-]+)(\.[A-Za-z0-9]+)*/
+  );
   let lineText = document.lineAt(position.line).text.trim();
   let lineStartToWord = document
     .getText(
       new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)
     )
     .trim();
+  let lineStartToWordStart = document
+    .getText(
+      new vscode.Range(new vscode.Position(position.line, 0), wordRange.start)
+    )
+    .trim();
+  let matched = lineStartToWordStart.match(PATTERNS.RENDER_MATCH),
+    preWord = matched && matched[matched.length - 1],
+    viewType = preWord && !preWord.includes("render") ? preWord : "partial";
+  console.log(`viewType:${viewType}`);
   let word = document.getText(wordRange);
   console.log(word);
-  if (lineText.startsWith("//") || word.match(/^\d+.?\d+$/)) {
-    return Promise.resolve(null);
-  }
+  // if (lineText.startsWith("/") || word.match(/^\d+.?\d+$/)) {
+  //   return Promise.resolve(null);
+  // }
   if (!goConfig) {
     goConfig = vscode.workspace.getConfiguration("rails");
   }
@@ -140,23 +153,9 @@ export function definitionLocation(
     return Promise.resolve(null);
   }
   let renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
-  let renderFuncMatched = lineText.match(VIEWS_PATTERNS.RENDER_FUNC_PATTERN) || lineText.match(VIEWS_PATTERNS.RENDER_FUNC_PATTERN2);
   if (renderMatched) {
-    let _path = renderMatched[2];
     console.log(renderMatched);
-    return findViews(document, position, word, _path);
-  } else if (renderFuncMatched) {
-    console.log(renderFuncMatched);
-    let _path = renderFuncMatched[5],
-      //   fileType =
-      //     renderFuncMatched[1] == "j" ||
-      //     renderFuncMatched[1] == "escape_javascript"
-      //       ? ".js"
-      // 	  : "",
-      viewType = renderFuncMatched[3];
-    return findViews(document, position, word, _path, "", viewType);
-  } else {
-    return Promise.resolve(null);
+    return findViews(document, position, word, "", viewType);
   }
 }
 
