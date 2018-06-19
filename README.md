@@ -48,14 +48,9 @@ Notice: Since I'm not a regex pro and rails pro these codes of current stage may
 
 about testing: Manually testing in 2 exsits rails projects.
 
-### Todo List for next stage
+### Todo for next stage
 
 The next stage of this extension will fill the lack of previews stage may implements a long running process for collection all symbols(module,class,method and etc) in gems for completion and "go to definition",detect ruby env and may interact with [vscode-ruby](https://github.com/rubyide/vscode-ruby) ,caching all completion and definition infomations.
-
-List sort by priority.
-
-- [ ] avoid ruby's std lib go to definition.
-- [ ] seaching definition in gems.
 
 ## Contribution
 

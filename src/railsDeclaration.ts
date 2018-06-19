@@ -20,6 +20,7 @@ import {
   PATTERNS
 } from "../src/constants";
 import { RAILS } from "./symbols/rails";
+import { RUBY } from "./symbols/ruby";
 import inflection = require("inflection");
 import lineByLine = require("n-readlines");
 import { RailsDefinitionInformation } from "./interfaces";
@@ -536,12 +537,12 @@ export function definitionLocation(
   let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(
     lineStartToWord
   )[1];
-  if (RAILS.has(symbol)) {
+  if (RAILS.has(symbol) || RUBY.has(symbol)) {
     // context.logger.debug("rails symbols")
     return Promise.resolve(null);
   }
   let fileType = dectFileType(document.fileName);
-  let exclude;
+  // let exclude;
   return FileTypeHandlers.get(fileType)(
     document,
     position,
