@@ -1,12 +1,11 @@
 "use strict";
 
 import vscode = require("vscode");
-import cp = require("child_process");
 import path = require("path");
 import { isPositionInString, dectFileType } from "./utils";
 import { definitionLocation } from "./railsDeclaration";
 import minimatch = require("minimatch");
-var Minimatch = require("minimatch").Minimatch;
+
 import {
   FileType,
   PATTERNS,

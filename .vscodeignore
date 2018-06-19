@@ -8,4 +8,4 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 rails/**
-rails_symbols.js
+bin/**

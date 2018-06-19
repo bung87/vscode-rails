@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { dirname, join, basename } from "path";
 import rp = require("request-promise-native");
-import { RAILS } from "./rails";
-import { debug } from "vscode";
+import { RAILS } from "./symbols/rails";
+import { RUBY,VERSION } from "./symbols/ruby";
 
 // Track currently webview panel
 var currentPanel: vscode.WebviewPanel | undefined = undefined;
@@ -41,11 +40,12 @@ function doRequest(url: string, symbol: string) {
         // If we already have a panel, show it in the target column
 
         currentPanel.webview.html = html;
+        currentPanel.title = `Document ${symbol}`;
         currentPanel.reveal(columnToShowIn);
       } else {
         currentPanel = vscode.window.createWebviewPanel(
-          "Rails:Document",
-          `Rails:Document-${symbol}`,
+          "Document",
+          `Document ${symbol}`,
           vscode.ViewColumn.Two,
           {
             // Enable scripts in the webview
@@ -67,6 +67,7 @@ function doRequest(url: string, symbol: string) {
       }
     })
     .catch(function(err) {
+      console.error(err)
       // Crawling failed...
       // context.logger.debug(err);
     });
@@ -88,14 +89,24 @@ export function viewDoc() {
   )[1];
   // context.logger.debug(`symbol:${symbol}`);
   var endpoint = null;
-  if (symbol && RAILS.has(symbol.toLowerCase())) {
+  var is_rails_symbol = RAILS.has(symbol.toLowerCase());
+  var is_ruby_symbol = RUBY.has(symbol.toLowerCase());
+  if (symbol && (is_rails_symbol || is_ruby_symbol) ) {
     endpoint = symbol.replace("::", "/");
   }
+  console.log(`symbol:${symbol},endpoint:${endpoint}`)
   // context.logger.debug(`endpoint:${endpoint}`);
   if (endpoint == null) {
     return;
   }
-  let url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
+  var  url = '';
+  if(is_rails_symbol){
+    url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
+  }else if(is_ruby_symbol){
+
+    url = `http://docs.rubydocs.org/ruby-${VERSION.replace(/\./g,"-")}/classes/${endpoint}.html`;
+  }
+  console.log(is_rails_symbol,is_ruby_symbol)
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")
   doRequest.call(context, url, symbol);
 }

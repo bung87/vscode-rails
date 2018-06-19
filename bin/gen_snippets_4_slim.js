@@ -1,11 +1,14 @@
+#!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
+const root = path.dirname(__dirname);
 
 function replace(s) {
     return s.replace("<%\n", "").replace("%>", "").replace("<%", "")
 }
 
-fs.readFile(path.join(__dirname, "snippets/html.erb.json"), 'utf8', (err, data) => {
+
+fs.readFile(path.join(root, "snippets/html.erb.json"), 'utf8', (err, data) => {
     if (err) throw err;
     let obj = JSON.parse(data);
     for (let prefix in obj) {

@@ -19,7 +19,7 @@ import {
   REL_STYLESHEETS,
   PATTERNS
 } from "../src/constants";
-import { RAILS } from "./rails";
+import { RAILS } from "./symbols/rails";
 import inflection = require("inflection");
 import lineByLine = require("n-readlines");
 import { RailsDefinitionInformation } from "./interfaces";

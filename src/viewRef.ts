@@ -21,7 +21,7 @@ import {
   VIEWS_PATTERNS
 } from "../src/constants";
 import { RailsDefinitionInformation } from "./interfaces";
-import { RAILS } from "./rails";
+import { RAILS } from "./symbols/rails";
 import inflection = require("inflection");
 import lineByLine = require("n-readlines");
 
