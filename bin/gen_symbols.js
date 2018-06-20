@@ -20,7 +20,12 @@ const MAP = {
     },
     ruby: {
         url: "http://docs.rubydocs.org/ruby-2-5-1/js/search_index.js",
-        version: "2.5.1"
+        version: "2.5.1",
+        filter: (value, index, self) => {
+            return value.indexOf("::") === -1 ? self.find((v) => {
+                return v.indexOf(`${value}::`) !== -1
+            }) : true
+        }
     }
 };
 
@@ -31,8 +36,8 @@ function gen(key, value) {
                 theVar = JSON.parse(js.replace(/var\s+search_data\s+=\s+/, "")),
                 index = theVar["index"],
                 longSearchIndex = index["longSearchIndex"],
-                uni = longSearchIndex.filter((value, index, self) => self.indexOf(value) === index && value.indexOf("specs") === -1 && value !== ""),
-                exclude_foo_bar = uni.filter((value, index, self) => !/foo(\d*)?\b/.test(value) && !/bar\b/.test(value) && !/super\b/.test(value)),
+                uni = longSearchIndex.filter((value, index, self) => self.indexOf(value) === index && value !== ""),
+                exclude_foo_bar = typeof MAP[key]["filter"] == "function" ? uni.filter(MAP[key].filter) : uni,
                 list = JSON.stringify(exclude_foo_bar, null, 4),
                 content = `${COMMENT}export const ${key.toUpperCase()} = new Set(${list});\nexport const VERSION = "${value.version}"`;
             fs.writeFile(path.join(DEST, `${key}.ts`), content, function (err) {
