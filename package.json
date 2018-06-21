@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "Rails",
     "description": "Ruby on Rails support for Visual Studio Code",
-    "version": "0.7.1",
+    "version": "0.8.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -40,12 +40,15 @@
     "main": "./out/src/extension",
     "contributes": {
         "menus": {
-            "commandPalette": [{
-                "command": "Rails:Document",
-                "when": "editorHasSelection"
-            }]
+            "commandPalette": [
+                {
+                    "command": "Rails:Document",
+                    "when": "editorHasSelection"
+                }
+            ]
         },
-        "commands": [{
+        "commands": [
+            {
                 "command": "Rails:Navigation",
                 "title": "Rails:Navigation"
             },
@@ -54,7 +57,8 @@
                 "title": "Rails:Document"
             }
         ],
-        "keybindings": [{
+        "keybindings": [
+            {
                 "command": "Rails:Navigation",
                 "key": "Alt+."
             },
@@ -63,7 +67,8 @@
                 "key": "Alt+F1"
             }
         ],
-        "snippets": [{
+        "snippets": [
+            {
                 "language": "js.erb",
                 "path": "./snippets/js.erb.json"
             },
@@ -88,7 +93,8 @@
                 "path": "./snippets/ruby.json"
             }
         ],
-        "languages": [{
+        "languages": [
+            {
                 "id": "html.erb",
                 "aliases": [
                     "html.erb"
@@ -124,7 +130,8 @@
                 ]
             }
         ],
-        "grammars": [{
+        "grammars": [
+            {
                 "language": "html.erb",
                 "scopeName": "text.html.erb",
                 "path": "./syntaxes/html.erb.tmLanguage"
@@ -151,7 +158,9 @@
         "compile": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
-    "extensionDependencies":["bung87.vscode-gemfile"],
+    "extensionDependencies": [
+        "bung87.vscode-gemfile"
+    ],
     "devDependencies": {
         "@types/node": "^9.4.6",
         "typescript": "^2.8.3"
