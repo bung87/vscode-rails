@@ -1,6 +1,15 @@
 # Rails
 
-[![Join the chat at https://gitter.im/vscode-rails/Lobby](https://badges.gitter.im/vscode-rails/Lobby.svg)](https://gitter.im/vscode-rails/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/vscode-rails/Lobby](https://badges.gitter.im/vscode-rails/Lobby.svg)](https://gitter.im/vscode-rails/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
+[![](https://vsmarketplacebadge.apphb.com/version/bung87.rails.svg
+)](https://marketplace.visualstudio.com/items?itemName=bung87.rails)
+[![](https://vsmarketplacebadge.apphb.com/installs-short/bung87.rails.svg
+)](https://marketplace.visualstudio.com/items?itemName=bung87.rails)
+[![](https://vsmarketplacebadge.apphb.com/rating-short/bung87.rails.svg
+)](https://marketplace.visualstudio.com/items?itemName=bung87.rails)
+[![](https://vsmarketplacebadge.apphb.com/trending-monthly/bung87.rails.svg
+)](https://marketplace.visualstudio.com/items?itemName=bung87.rails)
+
 
 Ruby on Rails support for Visual Studio Code
 

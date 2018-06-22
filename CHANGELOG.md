@@ -1,5 +1,13 @@
 ## Release Notes
 
+### 0.8.0  
+
+* Developed [vscode-gemfile](https://marketplace.visualstudio.com/items?itemName=bung87.vscode-gemfile) as extension dependency.
+
+* snippets supports Slim templates as well as erb
+
+* move the cursor to a symbol(support Rails and Ruby,Gems not support),and <kbd>alt+F1</kbd> show online document to side.
+
 ### 0.7.0
 
 rails helper go to definition and view path definition in views.
