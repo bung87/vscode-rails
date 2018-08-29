@@ -183,13 +183,16 @@ export class RailsCompletionItemProvider
         position.line,
         position.character - 1
       );
-      if (PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
+      if ( triggerCharacter === TriggerCharacter.dot && PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
         let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
           lineTillCurrentPosition
         );
         position2 = new vscode.Position(position.line, lineText.indexOf(id));
       }
       let wordAtPosition = document.getWordRangeAtPosition(position2);
+      if(!wordAtPosition){
+        return resolve(null);
+      }
       let word = document.getText(wordAtPosition);
       let currentWord = "";
       if (
@@ -204,7 +207,7 @@ export class RailsCompletionItemProvider
       if (currentWord.match(/^\d+$/)) {
         return resolve([]);
       }
-      console.log(character);
+      console.log(wordAtPosition,currentWord,character);
       if (triggerCharacter == TriggerCharacter.dot) {
         let info, fileType;
         try {
