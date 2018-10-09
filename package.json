@@ -159,7 +159,8 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "extensionDependencies": [
-        "bung87.vscode-gemfile"
+        "bung87.vscode-gemfile",
+        "sianglim.slim"
     ],
     "devDependencies": {
         "@types/node": "^9.4.6",

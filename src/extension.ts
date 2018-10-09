@@ -88,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
           registerViewDefinitionProvider();
           registerViewDocCommand();
           // context.logger.debug("Project Gemfile contains rails"); //cause Proposed API is only available when running out of dev or
-          console.debug("Project Gemfile contains rails");
+          context.logger.debug("Project Gemfile contains rails");
           break;
         }
       }
