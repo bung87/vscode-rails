@@ -3,8 +3,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import * as path from "path";
-import { dirname, join, basename } from "path";
 import { RailsHelper } from "./rails_helper";
 import { RailsDefinitionProvider } from "./railsDeclaration";
 import { RailsCompletionItemProvider } from "./rails_completion";
@@ -87,8 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (/gem\s+['"]rails['"]/.test(lineText)) {
           registerViewDefinitionProvider();
           registerViewDocCommand();
-          // context.logger.debug("Project Gemfile contains rails"); //cause Proposed API is only available when running out of dev or
-          context.logger.debug("Project Gemfile contains rails");
+          console.debug("Project Gemfile contains rails");
           break;
         }
       }
