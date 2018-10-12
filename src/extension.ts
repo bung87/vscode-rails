@@ -85,7 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (/gem\s+['"]rails['"]/.test(lineText)) {
           registerViewDefinitionProvider();
           registerViewDocCommand();
-          console.debug("Project Gemfile contains rails");
+          console.log("Project Gemfile contains rails");
           break;
         }
       }
