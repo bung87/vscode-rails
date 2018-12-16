@@ -103,7 +103,8 @@
                     ".html.erb",
                     ".rhtml",
                     ".rhtm"
-                ]
+                ],
+                "configuration": "./language-configuration-erb.json"
             },
             {
                 "id": "js.erb",
@@ -134,7 +135,13 @@
             {
                 "language": "html.erb",
                 "scopeName": "text.html.erb",
-                "path": "./syntaxes/html.erb.tmLanguage"
+                "path": "./syntaxes/html.erb.tmLanguage",
+                "embeddedLanguages": {
+                    "source.css": "css",
+                    "source.html": "html",
+                    "source.js": "javascript",
+                    "source.ruby": "ruby"
+                  }
             },
             {
                 "language": "js.erb",
