@@ -62,7 +62,7 @@ export function findViews(
     );
     definitionInformation.file = filePath;
   } else {
-    return Promise.resolve(null);
+    return Promise.reject("not a view");
   }
   console.log(filePath, isViewsRelativePath, isSameDirPartial);
   let promise = new Promise<RailsDefinitionInformation>(
@@ -102,7 +102,7 @@ export function definitionResolver(
             // rh.showQuickPick(
             //   uris.map(uri => vscode.workspace.asRelativePath(uri.path))
             // );
-            resolve(null);
+            reject("Can not find definition!");
           }
         },
         () => {
@@ -149,8 +149,7 @@ export function definitionLocation(
     lineStartToWord
   )[1];
   if (RAILS.has(symbol)) {
-    console.log("rails symbols");
-    return Promise.resolve(null);
+    return Promise.reject("Rails symbols");
   }
   let renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
   if (renderMatched) {
