@@ -2,9 +2,7 @@
 
 import vscode = require("vscode");
 import path = require("path");
-import fs = require("fs");
-import { dectFileType } from "../src/utils";
-import { RailsHelper } from "../src/rails_helper";
+
 import {
   FileType,
   FileTypeRelPath,
@@ -19,15 +17,14 @@ import {
   REL_STYLESHEETS,
   PATTERNS,
   VIEWS_PATTERNS
-} from "../src/constants";
+} from "./constants";
 import { RailsDefinitionInformation } from "./interfaces";
 import { RAILS } from "./symbols/rails";
-import inflection = require("inflection");
-import lineByLine = require("n-readlines");
 
 const missingFilelMsg = "Missing file: ";
 const couldNotOpenMsg = "Could Not Open file: ";
 const SYMBOL_END = "[^\\w]";
+const NO_DEFINITION = "No definition found!";
 
 export function findViews(
   document: vscode.TextDocument,
@@ -102,7 +99,7 @@ export function definitionResolver(
             // rh.showQuickPick(
             //   uris.map(uri => vscode.workspace.asRelativePath(uri.path))
             // );
-            reject("Can not find definition!");
+            reject(NO_DEFINITION);
           }
         },
         () => {
@@ -187,10 +184,10 @@ export class ViewDefinitionProvider implements vscode.DefinitionProvider {
           if (typeof err === "string" && err.startsWith(missingFilelMsg)) {
             // promptForMissingTool(err.substr(missingToolMsg.length));
           } else {
-            return Promise.reject(err);
+            return Promise.reject(NO_DEFINITION);
           }
         }
-        return Promise.resolve(null);
+        return Promise.reject(NO_DEFINITION);
       }
     );
   }

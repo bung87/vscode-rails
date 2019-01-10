@@ -3,7 +3,7 @@ import * as path from "path";
 import rp = require("request-promise-native");
 import { RAILS } from "./symbols/rails";
 import { RUBY,VERSION } from "./symbols/ruby";
-
+const url = require("url");
 // Track currently webview panel
 var currentPanel: vscode.WebviewPanel | undefined = undefined;
 
@@ -28,11 +28,11 @@ function injectBase(html, base) {
   return _html;
 }
 
-function doRequest(url: string, symbol: string) {
+function doRequest(_url: string, symbol: string) {
   let context: vscode.ExtensionContext = this;
-  let request = rp(url)
+  let request = rp({url:url.parse(_url),timeout:1e3})
     .then(function(htmlString) {
-      let html = injectBase(htmlString, url);
+      let html = injectBase(htmlString, _url);
       const columnToShowIn = vscode.window.activeTextEditor
         ? vscode.window.activeTextEditor.viewColumn
         : undefined;
@@ -100,11 +100,10 @@ export function viewDoc() {
     return;
   }
   var  url = '';
-  if(is_rails_symbol){
-    url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
-  }else if(is_ruby_symbol){
-
+  if(is_ruby_symbol){
     url = `http://docs.rubydocs.org/ruby-${VERSION.replace(/\./g,"-")}/classes/${endpoint}.html`;
+  }else if(is_rails_symbol){
+    url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
   }
   console.log(is_rails_symbol,is_ruby_symbol)
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")

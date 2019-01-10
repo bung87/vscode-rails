@@ -3,8 +3,8 @@
 import vscode = require("vscode");
 import path = require("path");
 import fs = require("fs");
-import { dectFileType } from "../src/utils";
-import { RailsHelper } from "../src/rails_helper";
+import { dectFileType } from "./utils";
+import { RailsHelper } from "./rails_helper";
 import {
   FileType,
   FileTypeRelPath,
@@ -18,7 +18,7 @@ import {
   REL_JAVASCRIPTS,
   REL_STYLESHEETS,
   PATTERNS
-} from "../src/constants";
+} from "./constants";
 import { RAILS } from "./symbols/rails";
 import { RUBY } from "./symbols/ruby";
 import inflection = require("inflection");
@@ -235,6 +235,7 @@ export function controllerDefinitionLocation(
     //lib or model combination
     return getLibOrModelFilePath(lineStartToWord, word);
   } else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
+    
     let filePath = document.fileName,
       line = document
         .getText()
@@ -415,7 +416,11 @@ export function findFunctionOrClassByClassName(
       beforeLines = beforeText.split("\n");
     let line = beforeLines.find(line =>
         new RegExp("^class\\s+.*" + clasName + SYMBOL_END).test(line.trim())
-      ),
+      )
+    if (!line){
+      return Promise.reject('')
+    }
+    let
       filePath = getParentControllerFilePathByDocument(entryDocument, line),
       fileAbsPath = path.join(vscode.workspace.rootPath, filePath);
     return new Promise<RailsDefinitionInformation>((resolve, reject) => {

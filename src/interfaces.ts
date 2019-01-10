@@ -1,6 +1,6 @@
 import {
 	FileType
-} from "../src/constants";
+} from "./constants";
 
 export interface RailsDefinitionInformation {
 	file: string; // relative glob pattern

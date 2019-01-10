@@ -18,7 +18,7 @@ import {
   REL_STYLESHEETS
 } from "./constants";
 import lineByLine = require("n-readlines");
-import { RailsHelper } from "../src/rails_helper";
+import { RailsHelper } from "./rails_helper";
 
 export enum TriggerCharacter {
   dot,

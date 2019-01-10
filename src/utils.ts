@@ -1,4 +1,3 @@
-import { dirname, join, sep, basename } from 'path';
 import { FileType, FileTypeRelPath } from "./constants"
 import vscode = require('vscode');
 
