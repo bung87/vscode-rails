@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import rp = require("request-promise-native");
+import rp = require("request-promise");
 import { RAILS } from "./symbols/rails";
 import { RUBY,VERSION } from "./symbols/ruby";
 const url = require("url");
