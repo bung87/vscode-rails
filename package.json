@@ -168,7 +168,8 @@
     },
     "extensionDependencies": [
         "bung87.vscode-gemfile",
-        "sianglim.slim"
+        "sianglim.slim",
+        "castwide.solargraph"
     ],
     "devDependencies": {
         "@types/node": "^9.4.6",

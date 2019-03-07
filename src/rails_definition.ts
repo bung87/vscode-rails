@@ -192,18 +192,19 @@ export function controllerDefinitionLocation(
     file: null,
     line: 0
   };
-  if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineStartToWord)) {
-    // exclude = REL_CONTROLLERS
-    // if (parentController == "ActionController::Base") {
-    // 	//@todo provide rails online doc link
-    // 	return Promise.reject(missingToolMsg + 'godef');
-    // }
-    let filePath = getParentControllerFilePathByDocument(
-      document,
-      lineStartToWord
-    );
-    definitionInformation.file = filePath;
-  } else if (
+  // if (PATTERNS.CLASS_INHERIT_DECLARATION.test(lineStartToWord)) {
+  //   // exclude = REL_CONTROLLERS
+  //   // if (parentController == "ActionController::Base") {
+  //   // 	//@todo provide rails online doc link
+  //   // 	return Promise.reject(missingToolMsg + 'godef');
+  //   // }
+  //   let filePath = getParentControllerFilePathByDocument(
+  //     document,
+  //     lineStartToWord
+  //   );
+  //   definitionInformation.file = filePath;
+  // } else
+   if (
     PATTERNS.FUNCTION_DECLARATON.test(lineStartToWord) &&
     !PATTERNS.PARAMS_DECLARATION.test(word)
   ) {
@@ -231,9 +232,9 @@ export function controllerDefinitionLocation(
       lineStartToWord,
       FileType.ControllerConcerns
     );
-  } else if (PATTERNS.CAPITALIZED.test(word)) {
-    //lib or model combination
-    return getLibOrModelFilePath(lineStartToWord, word);
+  // } else if (PATTERNS.CAPITALIZED.test(word)) {
+  //   //lib or model combination
+  //   return getLibOrModelFilePath(lineStartToWord, word);
   } else if (PATTERNS.PARAMS_DECLARATION.test(word)) {
     
     let filePath = document.fileName,
@@ -258,7 +259,8 @@ export function controllerDefinitionLocation(
       word,
       lineStartToWord
     );
-  } else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
+  }
+   else if (PATTERNS.CONTROLLER_FILTERS.test(lineStartToWord)) {
     let fileNameWithoutSuffix = path.parse(document.fileName).name,
       controllerName = inflection.camelize(fileNameWithoutSuffix);
     return findFunctionOrClassByClassName(
@@ -454,8 +456,8 @@ export function modelDefinitionLocation(
       lineStartToWord,
       FileType.ModelConcerns
     );
-  } else if (PATTERNS.CAPITALIZED.test(word)) {
-    return getLibOrModelFilePath(lineStartToWord, word);
+  // } else if (PATTERNS.CAPITALIZED.test(word)) {
+  //   return getLibOrModelFilePath(lineStartToWord, word);
   } else if (
     PATTERNS.RENDER_DECLARATION.test(lineStartToWord) ||
     PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)
@@ -467,7 +469,7 @@ export function modelDefinitionLocation(
       lineStartToWord
     );
   } else {
-    return findLocationByWord(document, position, word, lineStartToWord);
+    // return findLocationByWord(document, position, word, lineStartToWord);
   }
   let promise = new Promise<RailsDefinitionInformation>(
     definitionResolver(document, definitionInformation)
@@ -479,8 +481,8 @@ export function modelDefinitionLocation(
 var FileTypeHandlers = new Map([
   [FileType.Controller, controllerDefinitionLocation],
   [FileType.Helper, controllerDefinitionLocation],
-  [FileType.Model, modelDefinitionLocation],
-  [FileType.Unkown, findLocationByWord]
+  [FileType.Model, modelDefinitionLocation]
+  // [FileType.Unkown, findLocationByWord]
 ]);
 
 export function definitionResolver(

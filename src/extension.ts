@@ -4,7 +4,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { RailsHelper } from "./rails_helper";
-import { RailsDefinitionProvider } from "./railsDeclaration";
+import { RailsDefinitionProvider } from "./rails_definition";
 import { RailsCompletionItemProvider } from "./rails_completion";
 import { ViewDefinitionProvider } from "./viewRef";
 import lineByLine = require("n-readlines");

@@ -3,7 +3,7 @@
 import vscode = require("vscode");
 import path = require("path");
 import { isPositionInString, dectFileType } from "./utils";
-import { definitionLocation } from "./railsDeclaration";
+import { definitionLocation } from "./rails_definition";
 import minimatch = require("minimatch");
 
 import {
