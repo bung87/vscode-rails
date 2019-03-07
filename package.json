@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "Rails",
     "description": "Ruby on Rails support for Visual Studio Code",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
