@@ -549,6 +549,9 @@ export function definitionLocation(
     return Promise.resolve(null);
   }
   let fileType = dectFileType(document.fileName);
+  if(FileType.Unkown === fileType) {
+    return Promise.resolve(null);
+  }
   // let exclude;
   return FileTypeHandlers.get(fileType)(
     document,
