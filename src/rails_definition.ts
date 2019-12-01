@@ -553,7 +553,11 @@ export function definitionLocation(
     return Promise.resolve(null);
   }
   // let exclude;
-  return FileTypeHandlers.get(fileType)(
+  let handle = FileTypeHandlers.get(fileType)
+  if(!handle) {
+    return Promise.resolve(null);
+  }
+  return handle(
     document,
     position,
     word,
