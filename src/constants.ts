@@ -1,4 +1,4 @@
-import { dirname, join, sep, basename } from "path";
+import { join } from "path";
 export const REL_CONTROLLERS = join("app", "controllers");
 export const REL_MODELS = join("app", "models");
 export const REL_VIEWS = join("app", "views");

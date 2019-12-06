@@ -5,7 +5,7 @@
  about sdoc:https://github.com/zzak/sdoc
 */
 
-var rp = require("request-promise-native");
+var rp = require('axios').default;
 var fs = require("fs");
 var path = require("path");
 
