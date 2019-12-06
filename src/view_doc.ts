@@ -5,7 +5,7 @@ import { RAILS } from "./symbols/rails";
 import { RUBY, VERSION } from "./symbols/ruby";
 const url = require("url");
 // Track currently webview panel
-var currentPanel: vscode.WebviewPanel | undefined = undefined;
+// var currentPanel: vscode.WebviewPanel | undefined = undefined;
 
 function injectBase(html, base) {
   let policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src vscode-resource: http:; script-src vscode-resource: http: 'unsafe-inline' ; style-src vscode-resource: http: 'unsafe-inline';">`;
@@ -35,13 +35,13 @@ function showSide(symbol: string, html: string, context: vscode.ExtensionContext
   const columnToShowIn = vscode.window.activeTextEditor
     ? vscode.window.activeTextEditor.viewColumn
     : undefined;
-  if (currentPanel) {
-    // If we already have a panel, show it in the target column
-    currentPanel.webview.html = html;
-    currentPanel.title = `Document ${symbol}`;
-    currentPanel.reveal(columnToShowIn);
-  } else {
-    currentPanel = vscode.window.createWebviewPanel(
+  // if (currentPanel) {
+  //   // If we already have a panel, show it in the target column
+  //   currentPanel.webview.html = html;
+  //   currentPanel.title = `Document ${symbol}`;
+  //   currentPanel.reveal(columnToShowIn);
+  // } else {
+    let currentPanel = vscode.window.createWebviewPanel(
       "Document",
       `Document ${symbol}`,
       vscode.ViewColumn.Two,
@@ -54,23 +54,28 @@ function showSide(symbol: string, html: string, context: vscode.ExtensionContext
 
     currentPanel.webview.html = html;
     // Reset when the current panel is closed
-    currentPanel.onDidDispose(
-      () => {
-        currentPanel = undefined;
-        source.cancel('request canceled as WebviewPanel Disposed.');
-      },
-      null,
-      context.subscriptions
-    );
-  }
+    // currentPanel.onDidDispose(
+    //   () => {
+    //     currentPanel = undefined;
+    //     source.cancel('request canceled as WebviewPanel Disposed.');
+    //   },
+    //   null,
+    //   context.subscriptions
+    // );
 }
 
 function doRequest(_url: string, symbol: string) {
   let context: vscode.ExtensionContext = this;
   let request = axios({ url: url.parse(_url), timeout: 5e3, cancelToken: source.token })
     .then(function (htmlString) {
-      let html = injectBase(htmlString, _url);
-      showSide(symbol, html, context)
+      if (typeof htmlString == "string") {
+        let html = injectBase(htmlString, _url);
+        showSide(symbol, html, context)
+      } else {
+        let html = "No valid response content.";
+        showSide(symbol, html, context)
+      }
+
     })
     .catch(function (err) {
       console.error(err);
