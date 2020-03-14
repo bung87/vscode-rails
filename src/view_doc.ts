@@ -67,9 +67,9 @@ function showSide(symbol: string, html: string, context: vscode.ExtensionContext
 function doRequest(_url: string, symbol: string) {
   let context: vscode.ExtensionContext = this;
   let request = axios({ url: url.parse(_url), timeout: 5e3, cancelToken: source.token })
-    .then(function (htmlString) {
-      if (typeof htmlString == "string") {
-        let html = injectBase(htmlString, _url);
+    .then(function (r) {
+      if (typeof r.data == "string") {
+        let html = injectBase(r.data, _url);
         showSide(symbol, html, context)
       } else {
         let html = "No valid response content.";
@@ -97,7 +97,7 @@ export function viewDoc() {
   let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(
     lineStartToWord
   )[1];
-  // context.logger.debug(`symbol:${symbol}`);
+  console.log(`symbol:${symbol}`);
   var endpoint = "";
   var is_rails_symbol = RAILS.has(symbol.toLowerCase());
   var is_ruby_symbol = RUBY.has(symbol.toLowerCase());
@@ -105,7 +105,6 @@ export function viewDoc() {
     endpoint = symbol.replace("::", "/");
   }
   console.log(`symbol:${symbol},endpoint:${endpoint}`)
-  // context.logger.debug(`endpoint:${endpoint}`);
   if (endpoint == null) {
     return;
   }
@@ -115,7 +114,8 @@ export function viewDoc() {
   } else if (is_rails_symbol) {
     url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
   } else {
-    showSide(symbol, "No matched symbol on extension side.", context)
+    showSide(symbol, "No matched symbol on extension side.", context);
+    return
   }
   console.log(is_rails_symbol, is_ruby_symbol, url)
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")
