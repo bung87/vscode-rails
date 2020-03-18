@@ -1,9 +1,5 @@
 import * as vscode from 'vscode';
-
-import path = require('path');
-import fs = require('fs');
 import jsbeautify = require('js-beautify');
-import mkdirp = require('mkdirp');
 
 export function format(document: vscode.TextDocument, range: vscode.Range) {
     if (range === null) {
@@ -25,14 +21,8 @@ export function format(document: vscode.TextDocument, range: vscode.Range) {
     return result;
 };
 
-function getRootPath() {
-    return vscode.workspace.rootPath || '.';
-}
 
 function beatify(documentContent: String, languageId) {
-
-    var global = path.join(__dirname, 'formatter.json');
-    var local = path.join(getRootPath(), '.vscode', 'formatter.json');
 
     var beatiFunc = null;
 
@@ -55,17 +45,7 @@ function beatify(documentContent: String, languageId) {
             break;
     }
     if (!beatiFunc) return;
-    var beutifyOptions;
-
-    try {
-        beutifyOptions = require(local)[languageId];
-    } catch (error) {
-        try {
-            beutifyOptions = require(global)[languageId];
-        } catch (error) {
-            beutifyOptions = {};
-        }
-    }
+    var beutifyOptions = {};
 
     return beatiFunc(documentContent, beutifyOptions);
 }
@@ -92,7 +72,7 @@ export class Formatter {
             range = new vscode.Range(start, end);
         }
 
-        var result: vscode.TextEdit[] = [];
+        // var result: vscode.TextEdit[] = [];
 
         var content = document.getText(range);
 
@@ -123,72 +103,26 @@ export class Formatter {
         return format(document, range);
     }
 
-    public generateLocalConfig() {
-        var local = path.join(getRootPath(), '.vscode', 'formatter.json');
-
-        var content = fs.readFileSync(path.join(__dirname, 'formatter.json')).toString('utf8');
-
-        mkdirp.sync(path.dirname(local));
-        fs.stat(local, function (err, stat) {
-            if (err == null) {
-                showMesage('Local config file existed: ' + local);
-            } else if (err.code == 'ENOENT') {
-                fs.writeFile(local, content, function (e) {
-                    showMesage('Generate local config file: ' + local)
-                })
-            } else {
-                showMesage('Some other error: ' + err.code);
-            }
-        });
-    }
-
-    public openConfig(filename, succ, fail) {
-        vscode.workspace.openTextDocument(filename).then(function (textDocument) {
-            if (!textDocument) {
-                showMesage('Can not open file!');
-                return;
-            }
-            vscode.window.showTextDocument(textDocument).then(function (editor) {
-                if (!editor) {
-                    showMesage('Can not show document!');
-                    return;
-                }
-                !!succ && succ();
-
-            }, function () {
-                showMesage('Can not Show file: ' + filename);
-                return;
-            });
-        }, function () {
-            !!fail && fail();
-            return;
-        });
-    }
-
+  
     public onSave(e: vscode.TextDocumentWillSaveEvent) {
         var { document } = e;
+
         var docType: Array<string> = ['css.erb', 'scss.erb', 'html.erb']
-        var global = path.join(__dirname, 'formatter.json');
-        var local = path.join(getRootPath(), '.vscode', 'formatter.json');
-        var onSave;
-
-        try {
-            onSave = require(local).onSave;
-        } catch (error) {
-            try {
-                onSave = require(global).onSave;
-            } catch (error) {
-                onSave = true;
-            }
-        }
-
-        if (!onSave) {
-            return;
-        }
+       
         if (docType.indexOf(document.languageId) == -1) {
             return;
         }
-
+        const prefix = document.languageId.split(".")[0];
+        var onSave = false;
+        const config = vscode.workspace.getConfiguration('', e.document);
+        try{
+            onSave = config[`[${prefix}`][`erb]`]["editor.formatOnSave"]
+        }catch(e){
+            onSave = vscode.workspace.getConfiguration("editor").get("formatOnSave")
+        }
+        if(!onSave){
+            return;
+        }
 
         var start = new vscode.Position(0, 0);
         var end = new vscode.Position(document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);

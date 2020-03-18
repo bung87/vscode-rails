@@ -86,7 +86,7 @@ function registerFormatter(context: vscode.ExtensionContext){
 
 
   function registerDocType(type) {
-    console.log(type)
+
       context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(type, {
           provideDocumentFormattingEdits: (document, options, token) => {
               return formatter.registerBeautify(null)
