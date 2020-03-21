@@ -61,6 +61,10 @@ about testing: Manually testing in 2 exsits rails projects.
 
 The next stage of this extension will fill the lack of previews stage may implements a long running process for collection all symbols(module,class,method and etc) in gems for completion and "go to definition",detect ruby env and may interact with [vscode-ruby](https://github.com/rubyide/vscode-ruby) ,caching all completion and definition infomations.
 
+## Donate
+
+[![buy me a coffee](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-orange.svg)](https://www.buymeacoffee.com/d4v36nCg1)  
+
 ## Contribution
 
 This extension made by mine free time,contributions are welcome!
