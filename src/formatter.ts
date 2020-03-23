@@ -29,14 +29,16 @@ function beatify(documentContent: String, languageId) {
     switch (languageId) {
         case 'scss.erb':
             languageId = 'css';
+            beatiFunc = jsbeautify.css;
         case 'css.erb':
             beatiFunc = jsbeautify.css;
             break;
         // case 'json':
         //     languageId = 'javascript';
-        // case 'javascript':
-        //     beatiFunc = jsbeautify.js;
-        //     break;
+        case 'js.erb':
+            languageId = 'javascript';
+            beatiFunc = jsbeautify.js;
+            break;
         case 'html.erb':
             beatiFunc = jsbeautify.html;
             break;
@@ -45,7 +47,19 @@ function beatify(documentContent: String, languageId) {
             break;
     }
     if (!beatiFunc) return;
+    var tabSize = null;
     var beutifyOptions = {};
+    const prefix = languageId.split(".")[0];
+    const config = vscode.workspace.getConfiguration('');
+    try {
+        tabSize = config[`[${prefix}`][`erb]`]["editor.tabSize"]
+    } catch (e) {
+        tabSize = vscode.workspace.getConfiguration("editor").get("tabSize")
+    }
+    if (tabSize != null) {
+        beutifyOptions["indent_size"] = tabSize;
+    }
+
 
     return beatiFunc(documentContent, beutifyOptions);
 }
@@ -103,24 +117,24 @@ export class Formatter {
         return format(document, range);
     }
 
-  
+
     public onSave(e: vscode.TextDocumentWillSaveEvent) {
         var { document } = e;
 
         var docType: Array<string> = ['css.erb', 'scss.erb', 'html.erb']
-       
+
         if (docType.indexOf(document.languageId) == -1) {
             return;
         }
         const prefix = document.languageId.split(".")[0];
         var onSave = false;
         const config = vscode.workspace.getConfiguration('', e.document);
-        try{
+        try {
             onSave = config[`[${prefix}`][`erb]`]["editor.formatOnSave"]
-        }catch(e){
+        } catch (e) {
             onSave = vscode.workspace.getConfiguration("editor").get("formatOnSave")
         }
-        if(!onSave){
+        if (!onSave) {
             return;
         }
 
