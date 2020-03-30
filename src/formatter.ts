@@ -13,8 +13,8 @@ export function format(document: vscode.TextDocument, range: vscode.Range) {
     var content = document.getText(range);
 
     var formatted = beatify(content, document.languageId);
-
-    if (formatted) {
+    var isFormatted = !!formatted && formatted != content;
+    if (isFormatted) {
         result.push(new vscode.TextEdit(range, formatted));
     }
 
@@ -22,7 +22,7 @@ export function format(document: vscode.TextDocument, range: vscode.Range) {
 };
 
 
-function beatify(documentContent: String, languageId) {
+function beatify(documentContent: string, languageId):string {
 
     var beatiFunc = null;
 
@@ -91,7 +91,8 @@ export class Formatter {
         var content = document.getText(range);
 
         var formatted = beatify(content, document.languageId);
-        if (formatted) {
+        var isFormatted = !!formatted && formatted != content;
+        if (isFormatted) {
             return activeEditor.edit(function (editor) {
                 var start = new vscode.Position(0, 0);
                 var end = new vscode.Position(document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
@@ -142,13 +143,13 @@ export class Formatter {
         var end = new vscode.Position(document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
         var range = new vscode.Range(start, end);
 
-        var result: vscode.TextEdit[] = [];
+        // var result: vscode.TextEdit[] = [];
 
         var content = document.getText(range);
 
         var formatted = beatify(content, document.languageId);
-
-        if (formatted) {
+        var isFormatted = !!formatted && formatted != content;
+        if (isFormatted) {
             var start = new vscode.Position(0, 0);
             var end = new vscode.Position(document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
             range = new vscode.Range(start, end);

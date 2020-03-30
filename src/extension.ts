@@ -57,11 +57,13 @@ function registerFormatter(context: vscode.ExtensionContext) {
 
   function registerDocType(type) {
 
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(type, {
-      provideDocumentFormattingEdits: (document, options, token) => {
-        return formatter.registerBeautify(null)
-      }
-    }));
+    // context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(type, {
+    //   provideDocumentFormattingEdits: (document, options, token) => {
+    //     return formatter.registerBeautify(null)
+    //   }
+    // }));
+    // Note: A document range provider is also a document formatter 
+    // which means there is no need to register a document formatter when also registering a range provider.
     context.subscriptions.push(vscode.languages.registerDocumentRangeFormattingEditProvider(type, {
       provideDocumentRangeFormattingEdits: (document, range, options, token) => {
         var start = new vscode.Position(0, 0);
