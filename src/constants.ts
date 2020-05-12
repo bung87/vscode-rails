@@ -1,15 +1,15 @@
-import { join } from "path";
-export const REL_CONTROLLERS = join("app", "controllers");
-export const REL_MODELS = join("app", "models");
-export const REL_VIEWS = join("app", "views");
-export const REL_LAYOUTS = join("app", "views", "layouts");
-export const REL_HELPERS = join("app", "helpers");
-export const REL_JAVASCRIPTS = join("app", "assets", "javascripts");
-export const REL_STYLESHEETS = join("app", "assets", "stylesheets");
-export const REL_SPEC = "spec";
-export const REL_TEST = "test";
-export const REL_CONTROLLERS_CONCERNS = join("app", "controllers", "concerns");
-export const REL_MODELS_CONCERNS = join("app", "models", "concerns");
+import { join } from 'path';
+export const REL_CONTROLLERS = join('app', 'controllers');
+export const REL_MODELS = join('app', 'models');
+export const REL_VIEWS = join('app', 'views');
+export const REL_LAYOUTS = join('app', 'views', 'layouts');
+export const REL_HELPERS = join('app', 'helpers');
+export const REL_JAVASCRIPTS = join('app', 'assets', 'javascripts');
+export const REL_STYLESHEETS = join('app', 'assets', 'stylesheets');
+export const REL_SPEC = 'spec';
+export const REL_TEST = 'test';
+export const REL_CONTROLLERS_CONCERNS = join('app', 'controllers', 'concerns');
+export const REL_MODELS_CONCERNS = join('app', 'models', 'concerns');
 export enum FileType {
   Controller,
   ControllerConcerns,
@@ -22,9 +22,9 @@ export enum FileType {
   StyleSheet,
   Rspec,
   Test,
-  Unkown
+  Unkown,
 }
-export var FileTypeRelPath = new Map([
+export let FileTypeRelPath = new Map([
   [FileType.Controller, REL_CONTROLLERS],
   [FileType.ControllerConcerns, REL_CONTROLLERS_CONCERNS],
   [FileType.Model, REL_MODELS],
@@ -35,7 +35,7 @@ export var FileTypeRelPath = new Map([
   [FileType.Javascript, REL_JAVASCRIPTS],
   [FileType.StyleSheet, REL_STYLESHEETS],
   [FileType.Rspec, REL_SPEC],
-  [FileType.Test, REL_TEST]
+  [FileType.Test, REL_TEST],
 ]);
 
 export const PATTERNS = {
@@ -52,11 +52,11 @@ export const PATTERNS = {
   MODEL_RELATIONS: /^has_one|^has_many|^has_and_belongs_to_many|^belongs_to/,
   CONTROLLER_FILTERS: /^(skip_|prepend_)?(before|after|around)_(action|filter)/,
   HELPER_METHODS: /^helper_method/,
-  CLASS_STATIC_METHOD_CALL: /(([A-Z][A-Za-z]+)\.[^\)]*)/
+  CLASS_STATIC_METHOD_CALL: /(([A-Z][A-Za-z]+)\.[^\)]*)/,
 };
 
 export const VIEWS_PATTERNS = {
   RENDER_PATTERN: /render/,
   RENDER_FUNC_PATTERN: /(escape_javascript|j)?[\s\(]render([\s\(]:([a-z]+)\s*=>\s*)?(["'])([^\4]+)\4/,
-  RENDER_FUNC_PATTERN2: /(escape_javascript|j)?[\s\(]render([\s\(]([a-z]+):\s*)?(["'])([^\4]+)\4/
+  RENDER_FUNC_PATTERN2: /(escape_javascript|j)?[\s\(]render([\s\(]([a-z]+):\s*)?(["'])([^\4]+)\4/,
 };

@@ -1,0 +1,17 @@
+{
+    "extends": [
+      "tslint:latest",
+      "tslint-config-prettier"
+    ],
+    "rules":{
+      "no-implicit-dependencies":false,
+      "ordered-imports":false,
+      "no-submodule-imports":false,
+      "member-access":false,
+      "no-shadowed-variable":false,
+      "no-console":false,
+      "no-conditional-assignment":false,
+      "prefer-conditional-expression":false,
+      "one-variable-per-declaration":false
+    }
+  }

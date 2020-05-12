@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
-import vscode = require("vscode");
-import path = require("path");
-import { isPositionInString, dectFileType } from "./utils";
-import { definitionLocation } from "./rails_definition";
-import minimatch = require("minimatch");
+import vscode = require('vscode');
+import path = require('path');
+import { isPositionInString, dectFileType } from './utils';
+import { definitionLocation } from './rails_definition';
+import minimatch = require('minimatch');
 import fs = require('fs');
 import readline = require('readline');
 
@@ -17,53 +17,55 @@ import {
   REL_LAYOUTS,
   REL_HELPERS,
   REL_JAVASCRIPTS,
-  REL_STYLESHEETS
-} from "./constants";
+  REL_STYLESHEETS,
+} from './constants';
 
-import { RailsHelper } from "./rails_helper";
+import { RailsHelper } from './rails_helper';
+
+const QUERY_METHODS = [
+  'find_by',
+  'first',
+  'last',
+  'take',
+  'find',
+  'find_each',
+  'find_in_batches',
+  'create_with',
+  'distinct',
+  'eager_load',
+  'extending',
+  'from',
+  'group',
+  'having',
+  'includes',
+  'joins',
+  'left_outer_joins',
+  'limit',
+  'lock',
+  'none',
+  'offset',
+  'order',
+  'preload',
+  'readonly',
+  'references',
+  'reorder',
+  'reverse_order',
+  'select',
+  'where',
+  'all',
+];
 
 export enum TriggerCharacter {
   dot,
   quote,
-  colon
+  colon,
 }
 
 export function modelQueryInterface(): vscode.CompletionItem[] {
-  var suggestions: vscode.CompletionItem[] = [];
-  let query_methods = [
-    "find_by",
-    "first",
-    "last",
-    "take",
-    "find",
-    "find_each",
-    "find_in_batches",
-    "create_with",
-    "distinct",
-    "eager_load",
-    "extending",
-    "from",
-    "group",
-    "having",
-    "includes",
-    "joins",
-    "left_outer_joins",
-    "limit",
-    "lock",
-    "none",
-    "offset",
-    "order",
-    "preload",
-    "readonly",
-    "references",
-    "reorder",
-    "reverse_order",
-    "select",
-    "where",
-    "all"
-  ];
-  query_methods.forEach(value => {
-    let item = new vscode.CompletionItem(value);
+  const suggestions: vscode.CompletionItem[] = [];
+
+  QUERY_METHODS.forEach((value) => {
+    const item = new vscode.CompletionItem(value);
     item.insertText = value;
     item.kind = vscode.CompletionItemKind.Method;
     suggestions.push(item);
@@ -81,16 +83,15 @@ async function getCols(
 
   const rl = readline.createInterface({
     input: fileStream,
-    crlfDelay: Infinity
+    crlfDelay: Infinity,
   });
-  var
-    cols = [],
-    lineNumber = 0;
+  const cols = [];
+  let lineNumber = 0;
   for await (const lineText of rl) {
     if (/^#\s+([a-z0-9_]+)/.test(lineText)) {
-      let col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
-      let name = prefix ? prefix + col : col;
-      let item = new vscode.CompletionItem(name);
+      const col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
+      const name = prefix ? prefix + col : col;
+      const item = new vscode.CompletionItem(name);
       item.insertText = name;
       item.kind = vscode.CompletionItemKind.Field;
       // @todo? move cusor next to quote eg. Client.where('locked' => true) :id=>
@@ -102,17 +103,15 @@ async function getCols(
 }
 
 async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
-  var
-    methods = [],
-    line,
-    lineNumber = 0,
+  const methods = [];
+  let lineNumber = 0,
     markAsStart = false,
     markAsEnd = false;
   const fileStream = fs.createReadStream(fileAbsPath);
 
   const rl = readline.createInterface({
     input: fileStream,
-    crlfDelay: Infinity
+    crlfDelay: Infinity,
   });
   for await (const lineText of rl) {
     if (/^class\s+<<\s+self/.test(lineText)) {
@@ -124,8 +123,8 @@ async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
     }
     if (markAsEnd) continue;
     if (markAsStart && PATTERNS.FUNCTION_DECLARATON.test(lineText)) {
-      let func = lineText.replace(PATTERNS.FUNCTION_DECLARATON, "");
-      let item = new vscode.CompletionItem(func);
+      const func = lineText.replace(PATTERNS.FUNCTION_DECLARATON, '');
+      const item = new vscode.CompletionItem(func);
       item.insertText = func;
       item.kind = vscode.CompletionItemKind.Method;
       methods.push(item);
@@ -149,7 +148,7 @@ export class RailsCompletionItemProvider
       document,
       position,
       token,
-      vscode.workspace.getConfiguration("rails", document.uri)
+      vscode.workspace.getConfiguration('rails', document.uri)
     );
   }
 
@@ -160,27 +159,27 @@ export class RailsCompletionItemProvider
     config: vscode.WorkspaceConfiguration
   ): Promise<vscode.CompletionItem[]> {
     return new Promise<vscode.CompletionItem[]>(async (resolve, reject) => {
-      var suggestions: vscode.CompletionItem[] = [];
-      let filename = document.fileName;
-      let lineText = document.lineAt(position.line).text;
-      let lineTillCurrentPosition = lineText.substr(0, position.character);
+      const suggestions: vscode.CompletionItem[] = [];
+      const filename = document.fileName;
+      const lineText = document.lineAt(position.line).text;
+      const lineTillCurrentPosition = lineText.substr(0, position.character);
       console.log(`lineTillCurrentPosition:${lineTillCurrentPosition}`);
-      let character =
+      const character =
         lineTillCurrentPosition[lineTillCurrentPosition.length - 1];
       // let autocompleteUnimportedPackages = config['autocompleteUnimportedPackages'] === true && !lineText.match(/^(\s)*(import|package)(\s)+/);
       if (lineText.match(/^\s*\/\//)) {
         return resolve([]);
       }
-      var triggerCharacter: TriggerCharacter;
+      let triggerCharacter: TriggerCharacter;
       switch (character) {
-        case ".":
+        case '.':
           triggerCharacter = TriggerCharacter.dot;
           break;
         case '"':
         case "'":
           triggerCharacter = TriggerCharacter.quote;
           break;
-        case ":":
+        case ':':
           triggerCharacter = TriggerCharacter.colon;
       }
       console.log(`triggerCharacter:${triggerCharacter}`);
@@ -194,18 +193,21 @@ export class RailsCompletionItemProvider
         position.line,
         position.character - 1
       );
-      if (triggerCharacter === TriggerCharacter.dot && PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
-        let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
+      if (
+        triggerCharacter === TriggerCharacter.dot &&
+        PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)
+      ) {
+        const [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
           lineTillCurrentPosition
         );
         position2 = new vscode.Position(position.line, lineText.indexOf(id));
       }
-      let wordAtPosition = document.getWordRangeAtPosition(position2);
+      const wordAtPosition = document.getWordRangeAtPosition(position2);
       if (!wordAtPosition) {
         return resolve(null);
       }
-      let word = document.getText(wordAtPosition);
-      let currentWord = "";
+      const word = document.getText(wordAtPosition);
+      let currentWord = '';
       if (
         wordAtPosition &&
         wordAtPosition.start.character < position.character
@@ -219,7 +221,7 @@ export class RailsCompletionItemProvider
         return resolve([]);
       }
       console.log(wordAtPosition, currentWord, character);
-      if (triggerCharacter == TriggerCharacter.dot) {
+      if (triggerCharacter === TriggerCharacter.dot) {
         let info, fileType;
         try {
           info = await definitionLocation(document, position2);
@@ -231,26 +233,26 @@ export class RailsCompletionItemProvider
         switch (fileType) {
           case FileType.Model: // model static methods
             suggestions.push(...modelQueryInterface());
-            let methods = await getMethods(info.file);
+            const methods = await getMethods(info.file);
             suggestions.push(...methods);
-            let cols = await getCols(
+            const cols = await getCols(
               info.file,
               position,
               triggerCharacter,
-              "find_by_"
+              'find_by_'
             );
             suggestions.push(...cols);
             break;
         }
       } else if (
-        triggerCharacter == TriggerCharacter.colon ||
-        triggerCharacter == TriggerCharacter.quote
+        triggerCharacter === TriggerCharacter.colon ||
+        triggerCharacter === TriggerCharacter.quote
       ) {
         if (PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
-          let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
+          const [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
             lineTillCurrentPosition
           );
-          let position2 = new vscode.Position(
+          const position2 = new vscode.Position(
             position.line,
             lineText.indexOf(id)
           );
@@ -264,7 +266,7 @@ export class RailsCompletionItemProvider
           }
           switch (fileType) {
             case FileType.Model: // model field suggestion
-              let cols = await getCols(info.file, position, triggerCharacter);
+              const cols = await getCols(info.file, position, triggerCharacter);
               suggestions.push(...cols);
               break;
           }
@@ -275,127 +277,133 @@ export class RailsCompletionItemProvider
           ) ||
           PATTERNS.LAYOUT_DECLARATION.test(lineTillCurrentPosition.trim())
         ) {
-          let matches = lineTillCurrentPosition.match(/([a-z]+)/g),
+          const matches = lineTillCurrentPosition.match(/([a-z]+)/g),
             id = matches.pop();
-          console.log("render type:" + id);
+          console.log('render type:' + id);
           switch (id) {
-            case "partial": // @todo if it is not controller related partial
-              var relativeFileName = vscode.workspace.asRelativePath(
-                document.fileName
-              ),
-                rh = new RailsHelper(relativeFileName, null);
-              var paths = rh.searchPaths().filter((v: string) => {
-                return (
-                  v.startsWith(REL_LAYOUTS) === false &&
-                  v.startsWith(REL_VIEWS) === true
-                );
-              });
-              console.log(`paths:${paths}`);
-              var items = await rh.generateList(paths).then(list => {
-                let partials = list
-                  .map(v => path.parse(v).name.split(".")[0])
-                  .filter(v => {
-                    return v.startsWith("_");
-                  });
-                console.log(`partials:${partials}`);
-                let items = partials.map((v: string) => {
-                  let name = v.substring(1);
-                  let item = new vscode.CompletionItem(name);
-                  item.insertText =
-                    triggerCharacter == TriggerCharacter.colon
-                      ? " '" + name + "'"
-                      : name;
-                  item.kind = vscode.CompletionItemKind.File;
-                  return item;
+            case 'partial': // @todo if it is not controller related partial
+              {
+                const relativeFileName = vscode.workspace.asRelativePath(
+                    document.fileName
+                  ),
+                  rh = new RailsHelper(relativeFileName, null);
+                const paths = rh.searchPaths().filter((v: string) => {
+                  return (
+                    v.startsWith(REL_LAYOUTS) === false &&
+                    v.startsWith(REL_VIEWS) === true
+                  );
                 });
-                return items;
-              });
-              suggestions.push(...items);
-              break;
-            case "template": // @todo if it is base application controller or helper suggest all views
-              var relativeFileName = vscode.workspace.asRelativePath(
-                document.fileName
-              ),
-                rh = new RailsHelper(relativeFileName, null);
-              var paths = rh.searchPaths().filter((v: string) => {
-                return (
-                  v.startsWith(REL_LAYOUTS) === false &&
-                  v.startsWith(REL_VIEWS) === true
-                );
-              });
-
-              var items = await rh.generateList(paths).then(list => {
-                let templates = list
-                  .map(v =>
-                    path.basename(
-                      v.substring(REL_VIEWS.length + 1).split(".")[0]
-                    )
-                  )
-                  .filter(v => {
-                    return path.basename(v).startsWith("_") === false;
-                  });
-                let items = templates.map((v: string) => {
-                  let name = v;
-                  let item = new vscode.CompletionItem(name);
-                  item.insertText =
-                    triggerCharacter == TriggerCharacter.colon
-                      ? " '" + name + "'"
-                      : name;
-                  item.kind = vscode.CompletionItemKind.File;
-                  return item;
-                });
-                return items;
-              });
-              suggestions.push(...items);
-              if (TriggerCharacter.quote == triggerCharacter) {
-                var views = await vscode.workspace
-                  .findFiles(path.join(REL_VIEWS, "**"), REL_LAYOUTS)
-                  .then(res => {
-                    return res
-                      .filter(v => {
-                        let p = vscode.workspace.asRelativePath(v);
-                        return (
-                          paths.some(v2 => {
-                            return !minimatch(p, v2);
-                          }) || path.basename(p).startsWith("_")
-                        );
-                      })
-                      .map(i => {
-                        let name = vscode.workspace
-                          .asRelativePath(i)
-                          .substring(REL_VIEWS.length + 1)
-                          .split(".")[0],
-                          item = new vscode.CompletionItem(name);
-                        item.insertText =
-                          triggerCharacter == TriggerCharacter.colon
-                            ? " '" + name + "'"
-                            : name;
-                        item.kind = vscode.CompletionItemKind.File;
-                        return item;
-                      });
-                  });
-                suggestions.push(...views);
-              }
-              break;
-            case "layout":
-              var views = await vscode.workspace
-                .findFiles(path.join(REL_LAYOUTS, "**"), null)
-                .then(res => {
-                  return res.map(i => {
-                    let name = vscode.workspace
-                      .asRelativePath(i)
-                      .substring(REL_LAYOUTS.length + 1)
-                      .split(".")[0],
-                      item = new vscode.CompletionItem(name);
+                console.log(`paths:${paths}`);
+                const items = await rh.generateList(paths).then((list) => {
+                  const partials = list
+                    .map((v) => path.parse(v).name.split('.')[0])
+                    .filter((v) => {
+                      return v.startsWith('_');
+                    });
+                  console.log(`partials:${partials}`);
+                  const items = partials.map((v: string) => {
+                    const name = v.substring(1);
+                    const item = new vscode.CompletionItem(name);
                     item.insertText =
-                      triggerCharacter == TriggerCharacter.colon
+                      triggerCharacter === TriggerCharacter.colon
                         ? " '" + name + "'"
                         : name;
                     item.kind = vscode.CompletionItemKind.File;
                     return item;
                   });
+                  return items;
                 });
-              suggestions.push(...views);
+                suggestions.push(...items);
+              }
+              break;
+            case 'template': // @todo if it is base application controller or helper suggest all views
+              {
+                const relativeFileName = vscode.workspace.asRelativePath(
+                    document.fileName
+                  ),
+                  rh = new RailsHelper(relativeFileName, null);
+                const paths = rh.searchPaths().filter((v: string) => {
+                  return (
+                    v.startsWith(REL_LAYOUTS) === false &&
+                    v.startsWith(REL_VIEWS) === true
+                  );
+                });
+
+                const items = await rh.generateList(paths).then((list) => {
+                  const templates = list
+                    .map((v) =>
+                      path.basename(
+                        v.substring(REL_VIEWS.length + 1).split('.')[0]
+                      )
+                    )
+                    .filter((v) => {
+                      return path.basename(v).startsWith('_') === false;
+                    });
+                  const items = templates.map((v: string) => {
+                    const name = v;
+                    const item = new vscode.CompletionItem(name);
+                    item.insertText =
+                      triggerCharacter === TriggerCharacter.colon
+                        ? " '" + name + "'"
+                        : name;
+                    item.kind = vscode.CompletionItemKind.File;
+                    return item;
+                  });
+                  return items;
+                });
+                suggestions.push(...items);
+                if (TriggerCharacter.quote === triggerCharacter) {
+                  const views = await vscode.workspace
+                    .findFiles(path.join(REL_VIEWS, '**'), REL_LAYOUTS)
+                    .then((res) => {
+                      return res
+                        .filter((v) => {
+                          const p = vscode.workspace.asRelativePath(v);
+                          return (
+                            paths.some((v2) => {
+                              return !minimatch(p, v2);
+                            }) || path.basename(p).startsWith('_')
+                          );
+                        })
+                        .map((i) => {
+                          const name = vscode.workspace
+                              .asRelativePath(i)
+                              .substring(REL_VIEWS.length + 1)
+                              .split('.')[0],
+                            item = new vscode.CompletionItem(name);
+                          item.insertText =
+                            triggerCharacter === TriggerCharacter.colon
+                              ? " '" + name + "'"
+                              : name;
+                          item.kind = vscode.CompletionItemKind.File;
+                          return item;
+                        });
+                    });
+                  suggestions.push(...views);
+                }
+              }
+              break;
+            case 'layout':
+              {
+                const views = await vscode.workspace
+                  .findFiles(path.join(REL_LAYOUTS, '**'), null)
+                  .then((res) => {
+                    return res.map((i) => {
+                      const name = vscode.workspace
+                          .asRelativePath(i)
+                          .substring(REL_LAYOUTS.length + 1)
+                          .split('.')[0],
+                        item = new vscode.CompletionItem(name);
+                      item.insertText =
+                        triggerCharacter === TriggerCharacter.colon
+                          ? " '" + name + "'"
+                          : name;
+                      item.kind = vscode.CompletionItemKind.File;
+                      return item;
+                    });
+                  });
+                suggestions.push(...views);
+              }
               break;
           }
         }

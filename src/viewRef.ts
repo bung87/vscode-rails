@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-import vscode = require("vscode");
-import path = require("path");
+import vscode = require('vscode');
+import path = require('path');
 
 import {
   FileType,
@@ -16,43 +16,44 @@ import {
   REL_JAVASCRIPTS,
   REL_STYLESHEETS,
   PATTERNS,
-  VIEWS_PATTERNS
-} from "./constants";
-import { RailsDefinitionInformation } from "./interfaces";
-import { RAILS } from "./symbols/rails";
+  VIEWS_PATTERNS,
+} from './constants';
+import { RailsDefinitionInformation } from './interfaces';
+import { RAILS } from './symbols/rails';
 
-const missingFilelMsg = "Missing file: ";
-const couldNotOpenMsg = "Could Not Open file: ";
-const SYMBOL_END = "[^\\w]";
-const NO_DEFINITION = "No definition found!";
+const missingFilelMsg = 'Missing file: ';
+const couldNotOpenMsg = 'Could Not Open file: ';
+const SYMBOL_END = '[^\\w]';
+const NO_DEFINITION = 'No definition found!';
 /**
- * 
- * @param document 
- * @param position 
- * @param _path 
- * @param fileType 
- * @param viewType 
+ *
+ * @param document
+ * @param position
+ * @param _path
+ * @param fileType
+ * @param viewType
  * @returns promised view glob path
  */
 export function findViews(
   document: vscode.TextDocument,
   position: vscode.Position,
   _path: string,
-  fileType: string = "",
-  viewType: string = "partial" // partial or template
+  fileType: string = '',
+  viewType: string = 'partial' // partial or template
 ) {
-  let filePath,
-    isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
-    isViewsRelativePath = _path.indexOf("/") !== -1,
+  let filePath;
+  const isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
+    isViewsRelativePath = _path.indexOf('/') !== -1,
     ext = path.parse(_path).ext,
-    _underscore = viewType.endsWith("partial") ? "_" : "", // viewType could be "json.partial"
+    _underscore = viewType.endsWith('partial') ? '_' : '', // viewType could be "json.partial"
     definitionInformation: RailsDefinitionInformation = {
       file: null,
-      line: 0
+      line: 0,
+      column: 0,
     };
 
   if (isSameDirPartial) {
-    let fileName = vscode.workspace.asRelativePath(document.fileName),
+    const fileName = vscode.workspace.asRelativePath(document.fileName),
       dir = path.dirname(fileName);
     filePath = path.join(dir, `${_underscore}${_path}${fileType}.*`);
     definitionInformation.file = filePath;
@@ -67,23 +68,23 @@ export function findViews(
     );
     definitionInformation.file = filePath;
   } else {
-    return Promise.reject("not a view");
+    return Promise.reject('not a view');
   }
-  console.log(viewType,filePath, isViewsRelativePath, isSameDirPartial);
-  let promise = new Promise<RailsDefinitionInformation>(
+  console.log(viewType, filePath, isViewsRelativePath, isSameDirPartial);
+  const promise = new Promise<RailsDefinitionInformation>(
     definitionResolver(document, definitionInformation)
   );
   return promise;
 }
 
-var FileTypeHandlers = new Map([
-  [FileType.View, findViews]
+const FileTypeHandlers = new Map([
+  [FileType.View, findViews],
   // [FileType.Model, modelDefinitionLocation],
   // [FileType.Unkown, findLocationByWord]
 ]);
 
 /**
- * 
+ *
  * @returns Promise callback resolved glob path(exact path)
  */
 export function definitionResolver(
@@ -99,7 +100,7 @@ export function definitionResolver(
         (uris: vscode.Uri[]) => {
           if (!uris.length) {
             reject(missingFilelMsg + definitionInformation.file);
-          } else if (uris.length == 1) {
+          } else if (uris.length === 1) {
             definitionInformation.file = uris[0].fsPath;
             resolve(definitionInformation);
           } else {
@@ -129,45 +130,45 @@ export function definitionLocation(
   goConfig?: vscode.WorkspaceConfiguration,
   token?: vscode.CancellationToken
 ): Thenable<RailsDefinitionInformation> {
-  let wordRange = document.getWordRangeAtPosition(
+  const wordRange = document.getWordRangeAtPosition(
     position,
     /([A-Za-z\/0-9_-]+)(\.[A-Za-z0-9]+)*/
   );
-  let lineText = document.lineAt(position.line).text.trim();
-  let lineStartToWord = document
+  const lineText = document.lineAt(position.line).text.trim();
+  const lineStartToWord = document
     .getText(
       new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)
     )
     .trim();
-  let lineStartToWordStart = document
+  const lineStartToWordStart = document
     .getText(
       new vscode.Range(new vscode.Position(position.line, 0), wordRange.start)
     )
     .trim();
-  let matched = lineStartToWordStart.match(PATTERNS.RENDER_MATCH),
+  const matched = lineStartToWordStart.match(PATTERNS.RENDER_MATCH),
     preWord = matched && matched[matched.length - 1],
-    viewType = preWord && !preWord.includes("render") ? preWord : "partial";
+    viewType = preWord && !preWord.includes('render') ? preWord : 'partial';
   console.log(`viewType:${viewType}`);
-  let word = document.getText(wordRange);
+  const word = document.getText(wordRange);
   console.log(word);
   // if (lineText.startsWith("/") || word.match(/^\d+.?\d+$/)) {
   //   return Promise.resolve(null);
   // }
   if (!goConfig) {
-    goConfig = vscode.workspace.getConfiguration("rails");
+    goConfig = vscode.workspace.getConfiguration('rails');
   }
-  let symbol = new RegExp("(((::)?[A-Za-z]+)*(::)?" + word + ")").exec(
+  const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
   )[1];
   if (RAILS.has(symbol)) {
-    return Promise.reject("Rails symbols");
+    return Promise.reject('Rails symbols');
   }
-  let renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
+  const renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
   if (renderMatched) {
     console.log(renderMatched);
-    return findViews(document, position, word, "", viewType)
-  }else{
-    return findViews(document, position, word, "", viewType)
+    return findViews(document, position, word, '', viewType);
+  } else {
+    return findViews(document, position, word, '', viewType);
   }
 }
 
@@ -184,20 +185,21 @@ export class ViewDefinitionProvider implements vscode.DefinitionProvider {
     token: vscode.CancellationToken
   ): Thenable<vscode.Location> {
     return definitionLocation(document, position, this.goConfig, token).then(
-      definitionInfo => {
-        if (definitionInfo == null || definitionInfo.file == null) return null;
-        let definitionResource = vscode.Uri.file(definitionInfo.file);
-        let pos = new vscode.Position(
+      (definitionInfo) => {
+        if (definitionInfo === null || definitionInfo.file === null)
+          return null;
+        const definitionResource = vscode.Uri.file(definitionInfo.file);
+        const pos = new vscode.Position(
           definitionInfo.line,
           definitionInfo.column || 0 // required here otherwise rais "Invalid arguments."
         );
         return new vscode.Location(definitionResource, pos);
       },
-      err => {
+      (err) => {
         if (err) {
           // Prompt for missing tool is located here so that the
           // prompts dont show up on hover or signature help
-          if (typeof err === "string" && err.startsWith(missingFilelMsg)) {
+          if (typeof err === 'string' && err.startsWith(missingFilelMsg)) {
             // promptForMissingTool(err.substr(missingToolMsg.length));
           } else {
             return Promise.reject(NO_DEFINITION);
