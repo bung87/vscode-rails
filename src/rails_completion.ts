@@ -21,6 +21,7 @@ import {
 } from './constants';
 
 import { RailsHelper } from './rails_helper';
+import { RailsDefinitionInformation } from './interfaces';
 
 const QUERY_METHODS = [
   'find_by',
@@ -86,7 +87,6 @@ async function getCols(
     crlfDelay: Infinity,
   });
   const cols = [];
-  let lineNumber = 0;
   for await (const lineText of rl) {
     if (/^#\s+([a-z0-9_]+)/.test(lineText)) {
       const col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
@@ -97,15 +97,13 @@ async function getCols(
       // @todo? move cusor next to quote eg. Client.where('locked' => true) :id=>
       cols.push(item);
     }
-    lineNumber++;
   }
   return cols;
 }
 
 async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
   const methods = [];
-  let lineNumber = 0,
-    markAsStart = false,
+  let markAsStart = false,
     markAsEnd = false;
   const fileStream = fs.createReadStream(fileAbsPath);
 
@@ -129,7 +127,6 @@ async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
       item.kind = vscode.CompletionItemKind.Method;
       methods.push(item);
     }
-    lineNumber++;
   }
 
   return methods;
@@ -222,7 +219,7 @@ export class RailsCompletionItemProvider
       }
       console.log(wordAtPosition, currentWord, character);
       if (triggerCharacter === TriggerCharacter.dot) {
-        let info, fileType;
+        let info: RailsDefinitionInformation, fileType: FileType;
         try {
           info = await definitionLocation(document, position2);
           fileType = dectFileType(info.file);
@@ -256,7 +253,7 @@ export class RailsCompletionItemProvider
             position.line,
             lineText.indexOf(id)
           );
-          let info, fileType;
+          let info: RailsDefinitionInformation, fileType: FileType;
           try {
             info = await definitionLocation(document, position2);
             fileType = dectFileType(info.file);
@@ -336,9 +333,7 @@ export class RailsCompletionItemProvider
                         v.substring(REL_VIEWS.length + 1).split('.')[0]
                       )
                     )
-                    .filter((v) => {
-                      return path.basename(v).startsWith('_') === false;
-                    });
+                    .filter((v) => path.basename(v).startsWith('_') === false);
                   const items = templates.map((v: string) => {
                     const name = v;
                     const item = new vscode.CompletionItem(name);

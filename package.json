@@ -168,7 +168,8 @@
     "scripts": {
         "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
         "lint": "tslint --fix -p ./tsconfig.json --force --format verbose \"src/**/*.ts\"",
-        "vscode:prepublish": "tsc -p ./",
+        "lintFormat": "yarn lint && yarn format",
+        "vscode:prepublish": "yarn lintFormat && tsc -p ./",
         "compile": "tsc -watch -p ./"
     },
     "extensionDependencies": [

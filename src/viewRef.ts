@@ -25,11 +25,10 @@ const missingFilelMsg = 'Missing file: ';
 const couldNotOpenMsg = 'Could Not Open file: ';
 const SYMBOL_END = '[^\\w]';
 const NO_DEFINITION = 'No definition found!';
+
 /**
- *
- * @param document
- * @param position
- * @param _path
+ * narrow view finding path
+ * @param _path parts after app/views
  * @param fileType
  * @param viewType
  * @returns promised view glob path
@@ -88,10 +87,10 @@ const FileTypeHandlers = new Map([
  * @returns Promise callback resolved glob path(exact path)
  */
 export function definitionResolver(
-  document,
-  definitionInformation,
-  exclude = null,
-  maxNum = null
+  document: vscode.TextDocument,
+  definitionInformation: RailsDefinitionInformation,
+  exclude: vscode.GlobPattern = null,
+  maxNum: number = null
 ) {
   return (resolve, reject) => {
     vscode.workspace
