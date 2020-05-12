@@ -25,7 +25,15 @@ const missingFilelMsg = "Missing file: ";
 const couldNotOpenMsg = "Could Not Open file: ";
 const SYMBOL_END = "[^\\w]";
 const NO_DEFINITION = "No definition found!";
-
+/**
+ * 
+ * @param document 
+ * @param position 
+ * @param _path 
+ * @param fileType 
+ * @param viewType 
+ * @returns promised view glob path
+ */
 export function findViews(
   document: vscode.TextDocument,
   position: vscode.Position,
@@ -37,7 +45,7 @@ export function findViews(
     isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
     isViewsRelativePath = _path.indexOf("/") !== -1,
     ext = path.parse(_path).ext,
-    _underscore = viewType == "partial" ? "_" : "",
+    _underscore = viewType.endsWith("partial") ? "_" : "", // viewType could be "json.partial"
     definitionInformation: RailsDefinitionInformation = {
       file: null,
       line: 0
@@ -61,7 +69,7 @@ export function findViews(
   } else {
     return Promise.reject("not a view");
   }
-  console.log(filePath, isViewsRelativePath, isSameDirPartial);
+  console.log(viewType,filePath, isViewsRelativePath, isSameDirPartial);
   let promise = new Promise<RailsDefinitionInformation>(
     definitionResolver(document, definitionInformation)
   );
@@ -74,6 +82,10 @@ var FileTypeHandlers = new Map([
   // [FileType.Unkown, findLocationByWord]
 ]);
 
+/**
+ * 
+ * @returns Promise callback resolved glob path(exact path)
+ */
 export function definitionResolver(
   document,
   definitionInformation,
@@ -85,7 +97,6 @@ export function definitionResolver(
       .findFiles(vscode.workspace.asRelativePath(definitionInformation.file))
       .then(
         (uris: vscode.Uri[]) => {
-          console.log(uris);
           if (!uris.length) {
             reject(missingFilelMsg + definitionInformation.file);
           } else if (uris.length == 1) {
@@ -108,7 +119,10 @@ export function definitionResolver(
       );
   };
 }
-
+/**
+ * interaction with provideDefinition
+ * @returns Thenable<RailsDefinitionInformation>
+ */
 export function definitionLocation(
   document: vscode.TextDocument,
   position: vscode.Position,
@@ -151,7 +165,9 @@ export function definitionLocation(
   let renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
   if (renderMatched) {
     console.log(renderMatched);
-    return findViews(document, position, word, "", viewType);
+    return findViews(document, position, word, "", viewType)
+  }else{
+    return findViews(document, position, word, "", viewType)
   }
 }
 
@@ -173,7 +189,7 @@ export class ViewDefinitionProvider implements vscode.DefinitionProvider {
         let definitionResource = vscode.Uri.file(definitionInfo.file);
         let pos = new vscode.Position(
           definitionInfo.line,
-          definitionInfo.column
+          definitionInfo.column || 0 // required here otherwise rais "Invalid arguments."
         );
         return new vscode.Location(definitionResource, pos);
       },

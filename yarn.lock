@@ -199,11 +199,6 @@ ms@2.0.0:
   version "2.0.0"
   resolved "http://r.cnpmjs.org/ms/download/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-n-readlines@^1.0.0:
-  version "1.0.0"
-  resolved "http://r.cnpmjs.org/n-readlines/download/n-readlines-1.0.0.tgz#c353797f216c253fdfef7e91da4e8b17c29a91a6"
-  integrity sha1-w1N5fyFsJT/f736R2k6LF8KakaY=
-
 nopt@~4.0.1:
   version "4.0.3"
   resolved "http://r.cnpmjs.org/nopt/download/nopt-4.0.3.tgz#a375cad9d02fd921278d954c2254d5aa57e15e48"

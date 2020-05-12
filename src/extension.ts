@@ -7,10 +7,10 @@ import { RailsHelper } from "./rails_helper";
 import { RailsDefinitionProvider } from "./rails_definition";
 import { RailsCompletionItemProvider } from "./rails_completion";
 import { ViewDefinitionProvider } from "./viewRef";
-import lineByLine = require("n-readlines");
 import { viewDoc } from "./view_doc";
-import path = require('path');
 import { Formatter } from './formatter';
+import fs = require('fs');
+import readline = require('readline');
 
 const RAILS_MODE: vscode.DocumentFilter = { language: "ruby", scheme: "file" };
 const VIEW_MODE: vscode.DocumentFilter = {
@@ -111,13 +111,15 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  vscode.workspace.findFiles("Gemfile").then((uris: vscode.Uri[]) => {
+  vscode.workspace.findFiles("Gemfile").then(async (uris: vscode.Uri[]) => {
     if (uris.length == 1) {
       let fileAbsPath = uris[0].fsPath;
-      var liner = new lineByLine(fileAbsPath),
-        line;
-      while ((line = liner.next())) {
-        let lineText = line.toString("utf8").trim();
+      const fileStream = fs.createReadStream(fileAbsPath);
+      const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+      });
+      for await (const lineText of rl) {
         if (/gem\s+['"]rails['"]/.test(lineText)) {
           registerViewDefinitionProvider();
           registerViewDocCommand();
@@ -126,6 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
           break;
         }
       }
+
     }
   });
 }

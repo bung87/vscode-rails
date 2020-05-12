@@ -5,6 +5,8 @@ import path = require("path");
 import { isPositionInString, dectFileType } from "./utils";
 import { definitionLocation } from "./rails_definition";
 import minimatch = require("minimatch");
+import fs = require('fs');
+import readline = require('readline');
 
 import {
   FileType,
@@ -17,7 +19,7 @@ import {
   REL_JAVASCRIPTS,
   REL_STYLESHEETS
 } from "./constants";
-import lineByLine = require("n-readlines");
+
 import { RailsHelper } from "./rails_helper";
 
 export enum TriggerCharacter {
@@ -68,20 +70,23 @@ export function modelQueryInterface(): vscode.CompletionItem[] {
   });
   return suggestions;
 }
-function getCols(
+
+async function getCols(
   fileAbsPath,
   position: vscode.Position,
   triggerCharacter: TriggerCharacter,
   prefix?: string
-): vscode.CompletionItem[] {
-  var liner = new lineByLine(fileAbsPath),
-    cols = [],
-    line,
-    lineNumber = 0,
-    lineIndex = -1;
-  while ((line = liner.next())) {
-    let lineText = line.toString("utf8").trim();
+): Promise<vscode.CompletionItem[]> {
+  const fileStream = fs.createReadStream(fileAbsPath);
 
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+  var
+    cols = [],
+    lineNumber = 0;
+  for await (const lineText of rl) {
     if (/^#\s+([a-z0-9_]+)/.test(lineText)) {
       let col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
       let name = prefix ? prefix + col : col;
@@ -95,16 +100,21 @@ function getCols(
   }
   return cols;
 }
-function getMethods(fileAbsPath): vscode.CompletionItem[] {
-  var liner = new lineByLine(fileAbsPath),
+
+async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
+  var
     methods = [],
     line,
     lineNumber = 0,
     markAsStart = false,
-    markAsEnd = false,
-    lineIndex = -1;
-  while ((line = liner.next())) {
-    let lineText = line.toString("utf8").trim();
+    markAsEnd = false;
+  const fileStream = fs.createReadStream(fileAbsPath);
+
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+  for await (const lineText of rl) {
     if (/^class\s+<<\s+self/.test(lineText)) {
       markAsStart = true;
       markAsEnd = false;
@@ -122,6 +132,7 @@ function getMethods(fileAbsPath): vscode.CompletionItem[] {
     }
     lineNumber++;
   }
+
   return methods;
 }
 
@@ -183,14 +194,14 @@ export class RailsCompletionItemProvider
         position.line,
         position.character - 1
       );
-      if ( triggerCharacter === TriggerCharacter.dot && PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
+      if (triggerCharacter === TriggerCharacter.dot && PATTERNS.CLASS_STATIC_METHOD_CALL.test(lineTillCurrentPosition)) {
         let [, id, model] = PATTERNS.CLASS_STATIC_METHOD_CALL.exec(
           lineTillCurrentPosition
         );
         position2 = new vscode.Position(position.line, lineText.indexOf(id));
       }
       let wordAtPosition = document.getWordRangeAtPosition(position2);
-      if(!wordAtPosition){
+      if (!wordAtPosition) {
         return resolve(null);
       }
       let word = document.getText(wordAtPosition);
@@ -207,7 +218,7 @@ export class RailsCompletionItemProvider
       if (currentWord.match(/^\d+$/)) {
         return resolve([]);
       }
-      console.log(wordAtPosition,currentWord,character);
+      console.log(wordAtPosition, currentWord, character);
       if (triggerCharacter == TriggerCharacter.dot) {
         let info, fileType;
         try {
@@ -220,9 +231,9 @@ export class RailsCompletionItemProvider
         switch (fileType) {
           case FileType.Model: // model static methods
             suggestions.push(...modelQueryInterface());
-            let methods = getMethods(info.file);
+            let methods = await getMethods(info.file);
             suggestions.push(...methods);
-            let cols = getCols(
+            let cols = await getCols(
               info.file,
               position,
               triggerCharacter,
@@ -253,7 +264,7 @@ export class RailsCompletionItemProvider
           }
           switch (fileType) {
             case FileType.Model: // model field suggestion
-              let cols = getCols(info.file, position, triggerCharacter);
+              let cols = await getCols(info.file, position, triggerCharacter);
               suggestions.push(...cols);
               break;
           }
@@ -270,8 +281,8 @@ export class RailsCompletionItemProvider
           switch (id) {
             case "partial": // @todo if it is not controller related partial
               var relativeFileName = vscode.workspace.asRelativePath(
-                  document.fileName
-                ),
+                document.fileName
+              ),
                 rh = new RailsHelper(relativeFileName, null);
               var paths = rh.searchPaths().filter((v: string) => {
                 return (
@@ -303,8 +314,8 @@ export class RailsCompletionItemProvider
               break;
             case "template": // @todo if it is base application controller or helper suggest all views
               var relativeFileName = vscode.workspace.asRelativePath(
-                  document.fileName
-                ),
+                document.fileName
+              ),
                 rh = new RailsHelper(relativeFileName, null);
               var paths = rh.searchPaths().filter((v: string) => {
                 return (
@@ -351,9 +362,9 @@ export class RailsCompletionItemProvider
                       })
                       .map(i => {
                         let name = vscode.workspace
-                            .asRelativePath(i)
-                            .substring(REL_VIEWS.length + 1)
-                            .split(".")[0],
+                          .asRelativePath(i)
+                          .substring(REL_VIEWS.length + 1)
+                          .split(".")[0],
                           item = new vscode.CompletionItem(name);
                         item.insertText =
                           triggerCharacter == TriggerCharacter.colon
@@ -372,9 +383,9 @@ export class RailsCompletionItemProvider
                 .then(res => {
                   return res.map(i => {
                     let name = vscode.workspace
-                        .asRelativePath(i)
-                        .substring(REL_LAYOUTS.length + 1)
-                        .split(".")[0],
+                      .asRelativePath(i)
+                      .substring(REL_LAYOUTS.length + 1)
+                      .split(".")[0],
                       item = new vscode.CompletionItem(name);
                     item.insertText =
                       triggerCharacter == TriggerCharacter.colon

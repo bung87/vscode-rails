@@ -1,5 +1,9 @@
 ## Release Notes
-
+### 0.16.4 
+* bug fix: provideDefinition position.character(column) should be number  otherwise raise "Invalid arguments"  
+* remove `n-readlines`, using Built-in `readline` module  
+* bug fix: find partial view in jbuilder template
+* make some functions async
 ### 0.8.0  
 
 * Developed [vscode-gemfile](https://marketplace.visualstudio.com/items?itemName=bung87.vscode-gemfile) as extension dependency.
