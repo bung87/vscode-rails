@@ -1,23 +1,23 @@
 'use strict';
 
-import vscode = require('vscode');
-import path = require('path');
-import { isPositionInString, dectFileType } from './utils';
+import * as vscode from 'vscode';
+import  * as path from 'path';
+import { dectFileType } from './utils';
 import { definitionLocation } from './rails_definition';
-import minimatch = require('minimatch');
-import fs = require('fs');
-import readline = require('readline');
+import * as minimatch from 'minimatch';
+import * as fs from 'fs';
+import * as readline from 'readline';
 
 import {
   FileType,
   PATTERNS,
-  REL_CONTROLLERS,
-  REL_MODELS,
+  // REL_CONTROLLERS,
+  // REL_MODELS,
   REL_VIEWS,
   REL_LAYOUTS,
-  REL_HELPERS,
-  REL_JAVASCRIPTS,
-  REL_STYLESHEETS,
+  // REL_HELPERS,
+  // REL_JAVASCRIPTS,
+  // REL_STYLESHEETS,
 } from './constants';
 
 import { RailsHelper } from './rails_helper';
@@ -134,8 +134,7 @@ async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
 
 export class RailsCompletionItemProvider
   implements vscode.CompletionItemProvider {
-  private pkgsList = new Map<string, string>();
-
+  // private pkgsList = new Map<string, string>();
   public provideCompletionItems(
     document: vscode.TextDocument,
     position: vscode.Position,

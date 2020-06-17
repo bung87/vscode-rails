@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import jsbeautify = require('js-beautify');
+import * as jsbeautify from 'js-beautify';
 
 export function format(document: vscode.TextDocument, range: vscode.Range) {
   if (range === null) {

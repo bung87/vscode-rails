@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { dirname, join, sep, basename } from 'path';
+import { dirname, join, basename } from 'path';
 import * as utils from './utils';
 import {
   FileType,

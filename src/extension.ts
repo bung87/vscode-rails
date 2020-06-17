@@ -9,8 +9,8 @@ import { RailsCompletionItemProvider } from './rails_completion';
 import { ViewDefinitionProvider } from './viewRef';
 import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
-import fs = require('fs');
-import readline = require('readline');
+import * as fs from 'fs';
+import * as readline from 'readline';
 
 const RAILS_MODE: vscode.DocumentFilter = { language: 'ruby', scheme: 'file' };
 const VIEW_MODE: vscode.DocumentFilter = {

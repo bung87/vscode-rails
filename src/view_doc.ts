@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
 import url = require('url');

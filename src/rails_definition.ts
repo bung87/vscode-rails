@@ -1,21 +1,21 @@
 'use strict';
 
-import vscode = require('vscode');
-import path = require('path');
-import fs = require('fs');
+import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
 import { dectFileType } from './utils';
 import { RailsHelper } from './rails_helper';
 import {
   FileType,
   FileTypeRelPath,
   REL_CONTROLLERS,
-  REL_CONTROLLERS_CONCERNS,
+  // REL_CONTROLLERS_CONCERNS,
   REL_MODELS,
-  REL_MODELS_CONCERNS,
+  // REL_MODELS_CONCERNS,
   REL_VIEWS,
   REL_LAYOUTS,
-  REL_HELPERS,
-  REL_JAVASCRIPTS,
+  // REL_HELPERS,
+  // REL_JAVASCRIPTS,
   REL_STYLESHEETS,
   PATTERNS,
 } from './constants';

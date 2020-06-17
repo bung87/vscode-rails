@@ -1,5 +1,5 @@
 import { FileType, FileTypeRelPath } from './constants';
-import vscode = require('vscode');
+import * as vscode from 'vscode';
 
 export function dectFileType(filePath: string): FileType {
   for (const [key, value] of FileTypeRelPath) {

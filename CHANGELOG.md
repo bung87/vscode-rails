@@ -1,4 +1,10 @@
 ## Release Notes
+### 0.16.5  
+* `require` to `import`, commented unused imports
+* use `terser` for compress beauty and `drop_console`
+* update engines dep `"node": ">=7.10.1"` that suport `async`,`await` keyword. ts compiles to `exnext`.  
+
+
 ### 0.16.4 
 * bug fix: provideDefinition position.character(column) should be number  otherwise raise "Invalid arguments"  
 * remove `n-readlines`, using Built-in `readline` module  

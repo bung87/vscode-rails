@@ -1,20 +1,20 @@
 'use strict';
 
-import vscode = require('vscode');
-import path = require('path');
+import * as vscode from 'vscode';
+import * as path from 'path';
 
 import {
   FileType,
-  FileTypeRelPath,
-  REL_CONTROLLERS,
-  REL_CONTROLLERS_CONCERNS,
-  REL_MODELS,
-  REL_MODELS_CONCERNS,
+  // FileTypeRelPath,
+  // REL_CONTROLLERS,
+  // REL_CONTROLLERS_CONCERNS,
+  // REL_MODELS,
+  // REL_MODELS_CONCERNS,
   REL_VIEWS,
-  REL_LAYOUTS,
-  REL_HELPERS,
-  REL_JAVASCRIPTS,
-  REL_STYLESHEETS,
+  // REL_LAYOUTS,
+  // REL_HELPERS,
+  // REL_JAVASCRIPTS,
+  // REL_STYLESHEETS,
   PATTERNS,
   VIEWS_PATTERNS,
 } from './constants';

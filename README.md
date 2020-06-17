@@ -13,6 +13,10 @@
 
 Ruby on Rails support for Visual Studio Code
 
+notice: in order to make this extension work you need  
+- open vscode with root of your project  
+- your project root has `Gemfile` and contains `gem rails`  
+
 ## Features
 
 - Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.

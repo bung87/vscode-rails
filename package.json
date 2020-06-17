@@ -7,7 +7,7 @@
     "icon": "rails.png",
     "engines": {
         "vscode": "^1.43.0",
-        "node": ">=0.12.0"
+        "node": ">=7.10.1"
     },
     "galleryBanner": {
         "color": "#c52f24",
@@ -169,8 +169,9 @@
         "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
         "lint": "tslint --fix -p ./tsconfig.json --force --format verbose \"src/**/*.ts\"",
         "lintFormat": "yarn lint && yarn format",
-        "vscode:prepublish": "yarn lintFormat && tsc -p ./",
-        "compile": "tsc -watch -p ./"
+        "drop": "find ./out -type f -name '*.js' -exec npx terser {} -b --ecma=2017 --module  --keep-fnames  --keep-classnames -c drop_console=true -o {} \\;",
+        "vscode:prepublish": "yarn lintFormat && tsc -p ./ && yarn drop",
+        "compile": "tsc -p ./ && drop"
     },
     "extensionDependencies": [
         "bung87.vscode-gemfile",
@@ -180,6 +181,7 @@
         "@types/node": "^13.9.1",
         "@types/vscode": "^1.43.0",
         "prettier": "^2.0.5",
+        "terser": "^4.7.0",
         "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
         "typescript": "^3.8.3",
