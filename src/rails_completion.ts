@@ -1,10 +1,10 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import  * as path from 'path';
+import * as path from 'path';
 import { dectFileType } from './utils';
 import { definitionLocation } from './rails_definition';
-import * as minimatch from 'minimatch';
+import minimatch from 'minimatch';
 import * as fs from 'fs';
 import * as readline from 'readline';
 

@@ -3,7 +3,7 @@ import * as path from 'path';
 import axios from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
-import url = require('url');
+import * as url from 'url';
 // Track currently webview panel
 // var currentPanel: vscode.WebviewPanel | undefined = undefined;
 

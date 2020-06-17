@@ -13,7 +13,7 @@ import {
   REL_JAVASCRIPTS,
   REL_STYLESHEETS,
 } from './constants';
-import inflection = require('inflection');
+import * as inflection from 'inflection2';
 
 export class RailsHelper {
   private fileName: string;

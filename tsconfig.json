@@ -1,16 +1,23 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "ES2015",
         "target": "esnext",
-        "outDir": "out",
+        "outDir": "dist",
+        "resolveJsonModule":true,
         "lib": [
             "esnext"
         ],
-        "sourceMap": true,
-        "rootDir": "."
+        "moduleResolution": "node",
+        "sourceMap": false,
+        "rootDir": "src",
+        "allowSyntheticDefaultImports":true,
+        "esModuleInterop":true
     },
+    
     "exclude": [
         "node_modules",
-        ".vscode-test"
+        ".vscode-test",
+        "test",
+        "rollup.config.ts"
     ]
 }

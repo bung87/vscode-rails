@@ -21,8 +21,8 @@ import {
 } from './constants';
 import { RAILS } from './symbols/rails';
 import { RUBY } from './symbols/ruby';
-import inflection = require('inflection');
-import readline = require('readline');
+import * as inflection from 'inflection2';
+import * as readline from 'readline';
 import { RailsDefinitionInformation } from './interfaces';
 
 const missingFilelMsg = 'Missing file: ';

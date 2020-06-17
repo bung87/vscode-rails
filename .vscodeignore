@@ -9,3 +9,18 @@ tsconfig.json
 vsc-extension-quickstart.md
 rails/**
 bin/**
+
+node_modules/
+out/
+# use rollup now ignore everything under node_modules/
+node_modules/**/*.md
+node_modules/**/*.markdown
+node_modules/**/.travis.yml
+node_modules/**/LICENSE
+node_modules/**/Makefile
+node_modules/**/license
+node_modules/**/test
+node_modules/**/example
+node_modules/**/*.ts
+node_modules/js-beautify/js/src
+node_modules/axios/dist/

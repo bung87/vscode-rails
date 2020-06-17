@@ -38,7 +38,7 @@
         "onLanguage:ruby",
         "workspaceContains:**/Gemfile"
     ],
-    "main": "./out/src/extension",
+    "main": "./dist/extension.js",
     "contributes": {
         "menus": {
             "commandPalette": [
@@ -166,21 +166,27 @@
         ]
     },
     "scripts": {
+        "clean": "rm -rf out/",
+        "dist": "rollup -c rollup.config.ts",
         "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
         "lint": "tslint --fix -p ./tsconfig.json --force --format verbose \"src/**/*.ts\"",
         "lintFormat": "yarn lint && yarn format",
-        "drop": "find ./out -type f -name '*.js' -exec npx terser {} -b --ecma=2017 --module  --keep-fnames  --keep-classnames -c drop_console=true -o {} \\;",
-        "vscode:prepublish": "yarn lintFormat && tsc -p ./ && yarn drop",
-        "compile": "tsc -p ./ && drop"
+        "vscode:prepublish": "yarn lintFormat && yarn dist",
+        "compile": "yarn dist"
     },
     "extensionDependencies": [
         "bung87.vscode-gemfile",
         "sianglim.slim"
     ],
     "devDependencies": {
+        "@rollup/plugin-commonjs": "^13.0.0",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^8.0.1",
         "@types/node": "^13.9.1",
         "@types/vscode": "^1.43.0",
         "prettier": "^2.0.5",
+        "rollup": "^2.17.0",
+        "rollup-plugin-typescript2": "^0.27.1",
         "terser": "^4.7.0",
         "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
@@ -188,8 +194,9 @@
         "vscode-test": "^1.3.0"
     },
     "dependencies": {
+        "@types/minimatch": "^3.0.3",
         "axios": "^0.19.0",
-        "inflection": "^1.12.0",
+        "inflection2": "^2.0.1",
         "is_js": "^0.9.0",
         "js-beautify": "^1.10.3",
         "minimatch": "^3.0.4"
