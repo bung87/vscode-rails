@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { dectFileType } from './utils';
 import { definitionLocation } from './rails_definition';
-import minimatch from 'minimatch';
+import micromatch from 'micromatch';
 import * as fs from 'fs';
 import * as readline from 'readline';
 
@@ -355,7 +355,7 @@ export class RailsCompletionItemProvider
                           const p = vscode.workspace.asRelativePath(v);
                           return (
                             paths.some((v2) => {
-                              return !minimatch(p, v2);
+                              return !micromatch(p, v2);
                             }) || path.basename(p).startsWith('_')
                           );
                         })
