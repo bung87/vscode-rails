@@ -63,7 +63,11 @@ function showSide(
   // );
 }
 
-function doRequest(this: vscode.ExtensionContext, _url: string, symbol: string) {
+function doRequest(
+  this: vscode.ExtensionContext,
+  _url: string,
+  symbol: string
+) {
   const request = axios({
     url: _url,
     timeout: 5e3,
@@ -88,8 +92,12 @@ export function viewDoc(this: vscode.ExtensionContext) {
   const document = vscode.window.activeTextEditor.document;
   const position = vscode.window.activeTextEditor.selection.active;
   const wordRange = document.getWordRangeAtPosition(position);
-  if(typeof wordRange === 'undefined'){
-    showSide("word range not found", 'Can\'t find word range from your active editor selection.', this);
+  if (typeof wordRange === 'undefined') {
+    showSide(
+      'word range not found',
+      "Can't find word range from your active editor selection.",
+      this
+    );
   }
   const word = document.getText(wordRange);
   const lineStartToWord = document
