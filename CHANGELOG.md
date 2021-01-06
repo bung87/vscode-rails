@@ -1,4 +1,8 @@
 ## Release Notes
+
+### 0.16.8
+* clean view_doc.ts and change docs endpoint to https version,show message on side when no word range found fix #51  
+
 ### 0.16.5  
 * `require` to `import`, commented unused imports
 * use `terser` for compress beauty and `drop_console`
