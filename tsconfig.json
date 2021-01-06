@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "ES2015",
+        "module": "CommonJS",
         "target": "esnext",
         "outDir": "dist",
         "resolveJsonModule":true,

@@ -76,12 +76,6 @@ export function findViews(
   return promise;
 }
 
-const FileTypeHandlers = new Map([
-  [FileType.View, findViews],
-  // [FileType.Model, modelDefinitionLocation],
-  // [FileType.Unkown, findLocationByWord]
-]);
-
 /**
  *
  * @returns Promise callback resolved glob path(exact path)
@@ -185,8 +179,9 @@ export class ViewDefinitionProvider implements vscode.DefinitionProvider {
   ): Thenable<vscode.Location> {
     return definitionLocation(document, position, this.goConfig, token).then(
       (definitionInfo) => {
-        if (definitionInfo === null || definitionInfo.file === null)
+        if (definitionInfo === null || definitionInfo.file === null) {
           return null;
+        }
         const definitionResource = vscode.Uri.file(definitionInfo.file);
         const pos = new vscode.Position(
           definitionInfo.line,

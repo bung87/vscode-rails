@@ -11,7 +11,7 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": ["${workspaceRoot}/dist"],
-            "preLaunchTask": "yarn"
+            "preLaunchTask": "watch"
         },
         {
             "name": "Launch Tests",

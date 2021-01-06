@@ -173,7 +173,8 @@
         "lintFormat": "yarn lint && yarn format",
         "vscode:prepublish": "yarn lintFormat && yarn dist",
         "compile": "yarn dist",
-        "watch": "rollup -c -w rollup.config.js"
+        "watchbundled": "rollup -c -w rollup.config.js",
+        "watch":"tsc -p . -w "
     },
     "extensionDependencies": [
         "bung87.vscode-gemfile",
