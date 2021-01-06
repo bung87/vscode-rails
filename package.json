@@ -2,7 +2,7 @@
     "name": "rails",
     "displayName": "Rails",
     "description": "Ruby on Rails support for Visual Studio Code",
-    "version": "0.16.7",
+    "version": "0.16.8",
     "publisher": "bung87",
     "icon": "rails.png",
     "engines": {
@@ -174,7 +174,7 @@
         "vscode:prepublish": "yarn lintFormat && yarn dist",
         "compile": "yarn dist",
         "watchbundled": "rollup -c -w rollup.config.js",
-        "watch":"tsc -p . -w "
+        "watch": "tsc -p . -w "
     },
     "extensionDependencies": [
         "bung87.vscode-gemfile",
