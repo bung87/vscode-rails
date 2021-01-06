@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
-import * as url from 'url';
 // Track currently webview panel
 // var currentPanel: vscode.WebviewPanel | undefined = undefined;
 
@@ -16,11 +15,7 @@ function injectBase(html, base) {
     '$1 $3'
   );
 
-  // // Add <base> just before </head>
-  // html = html.replace(
-  //   /(<[^>/]*head[^>]*>[\s\S]*?)(<[^>]*head[^>]*>)/gim,
-
-  // );
+  // Add <base> just before </head>
   _html = _html.replace(
     /<head>/gim,
     `<head><base href="${_base}">\n${policy}\n<style> body{margin:20px;}</style>`
@@ -36,9 +31,9 @@ function showSide(
   html: string,
   context: vscode.ExtensionContext
 ) {
-  const columnToShowIn = vscode.window.activeTextEditor
-    ? vscode.window.activeTextEditor.viewColumn
-    : undefined;
+  // const columnToShowIn = vscode.window.activeTextEditor
+  //   ? vscode.window.activeTextEditor.viewColumn
+  //   : undefined;
   // if (currentPanel) {
   //   // If we already have a panel, show it in the target column
   //   currentPanel.webview.html = html;
@@ -68,36 +63,34 @@ function showSide(
   // );
 }
 
-function doRequest(_url: string, symbol: string) {
-  // tslint:disable-next-line: no-this-assignment
-  const context: vscode.ExtensionContext = this;
-  // @ts-ignore
+function doRequest(this: vscode.ExtensionContext, _url: string, symbol: string) {
   const request = axios({
-    url: url.parse(_url),
+    url: _url,
     timeout: 5e3,
     cancelToken: source.token,
   })
     .then((r: { data: any }) => {
       if (typeof r.data === 'string') {
         const html = injectBase(r.data, _url);
-        showSide(symbol, html, context);
+        showSide(symbol, html, this);
       } else {
         const html = 'No valid response content.';
-        showSide(symbol, html, context);
+        showSide(symbol, html, this);
       }
     })
     .catch((err) => {
       console.error(err);
-      showSide(symbol, err.toString(), context);
+      showSide(symbol, err.toString(), this);
     });
 }
 
-export function viewDoc() {
-  // tslint:disable-next-line: no-this-assignment
-  const context: vscode.ExtensionContext = this;
+export function viewDoc(this: vscode.ExtensionContext) {
   const document = vscode.window.activeTextEditor.document;
   const position = vscode.window.activeTextEditor.selection.active;
   const wordRange = document.getWordRangeAtPosition(position);
+  if(typeof wordRange === 'undefined'){
+    showSide("word range not found", 'Can\'t find word range from your active editor selection.', this);
+  }
   const word = document.getText(wordRange);
   const lineStartToWord = document
     .getText(
@@ -111,6 +104,7 @@ export function viewDoc() {
   let endpoint = '';
   const isRailsSymbol = RAILS.has(symbol.toLowerCase());
   const isRubySymbol = RUBY.has(symbol.toLowerCase());
+  console.log(`isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`);
   if (symbol && (isRailsSymbol || isRubySymbol)) {
     endpoint = symbol.replace('::', '/');
   }
@@ -120,17 +114,17 @@ export function viewDoc() {
   }
   let url = '';
   if (isRubySymbol) {
-    url = `http://docs.rubydocs.org/ruby-${VERSION.replace(
+    url = `https://docs.rubydocs.org/ruby-${VERSION.replace(
       /\./g,
       '-'
     )}/classes/${endpoint}.html`;
   } else if (isRailsSymbol) {
-    url = `http://api.rubyonrails.org/classes/${endpoint}.html`;
+    url = `https://api.rubyonrails.org/classes/${endpoint}.html`;
   } else {
-    showSide(symbol, 'No matched symbol on extension side.', context);
+    showSide(symbol, 'No matched symbol on extension side.', this);
     return;
   }
   console.log(isRailsSymbol, isRubySymbol, url);
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")
-  doRequest.call(context, url, symbol);
+  doRequest.call(this, url, symbol);
 }
