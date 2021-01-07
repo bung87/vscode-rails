@@ -91,7 +91,7 @@ export class RailsHelper {
         break;
       case FileType.Model:
         const filePatten = join(prefix, this.fileName.replace(/\.rb$/, ''));
-        this.filePatten = inflection.pluralize(this.filePatten.toString());
+        this.filePatten = inflection.pluralize(filePatten.toString());
         break;
       case FileType.Layout:
         this.filePatten = join(
