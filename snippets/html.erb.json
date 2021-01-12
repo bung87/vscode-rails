@@ -1,5 +1,5 @@
 {
-	  "ruby-expression":{
+	"ruby-expression":{
 		 "prefix":"<%",
 		 "body":[
 			 "<%$1 %>"],
@@ -64,28 +64,28 @@
 	"link_to":{
 		"prefix": "link_to",
 		"body": [
-			"<%= link_to  \"${1:text}\", ${2:model} %>"
+			"<%= link_to \"${1:text}\", ${2:model} %>"
 		],
 		"description": "rails link_to"
 	},
 	"image_tag":{
 		"prefix": "image_tag",
 		"body": [
-			"<%= image_tag  \"${1:filename_with_extension}\" %>"
+			"<%= image_tag \"${1:filename_with_extension}\" %>"
 		],
 		"description": "rails image_tag"
 	},
 	"video_tag":{
 		"prefix": "video_tag",
 		"body": [
-			"<%= image_tag  \"${1:filename_with_extension}\" %>"
+			"<%= image_tag \"${1:filename_with_extension}\" %>"
 		],
 		"description": "rails video_tag"
 	},
 	"render":{
 		"prefix": "render",
 		"body": [
-			"<%= render  \"${1:path}\" %>"
+			"<%= render \"${1:path}\" %>"
 		],
 		"description": "rails render"
 	},
@@ -99,21 +99,21 @@
 	"audio_tag":{
 		"prefix": "audio_tag",
 		"body": [
-			"<%= image_tag  \"${1:filename_with_extension}\" %>"
+			"<%= image_tag \"${1:filename_with_extension}\" %>"
 		],
 		"description": "rails audio_tag"
 	},
 	"auto_discovery_link_tag":{
 		"prefix": "auto_discovery",
 		"body": [
-			"<%= auto_discovery_link_tag (${1|:rss,:atom},{action: \"${2:action}\"},{title:  \"${3:title}\"}) %>"
+			"<%= auto_discovery_link_tag (${1|:rss,:atom},{action: \"${2:action}\"},{title: \"${3:title}\"}) %>"
 		],
 		"description": "rails auto_discovery_link_tag"
 	},
 	"button_to":{
 		"prefix": "button_to",
 		"body": [
-			"<%= button_to  \"${1:text}\", ${2:model} %>"
+			"<%= button_to \"${1:text}\", ${2:model} %>"
 		],
 		"description": "rails button_to"
 	},
