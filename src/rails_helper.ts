@@ -21,8 +21,12 @@ export class RailsHelper {
   private relativeFileName;
   private line: string; // @TODO detect by current line
   private targetFile: string;
-  private document: vscode.TextDocument
-  public constructor(document: vscode.TextDocument,relativeFileName: string, line: string) {
+  private document: vscode.TextDocument;
+  public constructor(
+    document: vscode.TextDocument,
+    relativeFileName: string,
+    line: string
+  ) {
     this.document = document;
     this.relativeFileName = relativeFileName;
     this.fileName = basename(relativeFileName);
@@ -160,7 +164,11 @@ export class RailsHelper {
     p.then((value) => {
       if (!value) return;
       const fn = vscode.Uri.parse(
-        'file://' + join(vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path, value)
+        'file://' +
+          join(
+            vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path,
+            value
+          )
       );
       vscode.workspace.openTextDocument(fn).then((doc) => {
         return vscode.window.showTextDocument(doc);

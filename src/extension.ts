@@ -31,7 +31,11 @@ function railsNavigation() {
     .lineAt(vscode.window.activeTextEditor.selection.active.line)
     .text.trim();
 
-  const rh = new RailsHelper(vscode.window.activeTextEditor.document,relativeFileName, line);
+  const rh = new RailsHelper(
+    vscode.window.activeTextEditor.document,
+    relativeFileName,
+    line
+  );
   rh.showFileList();
 }
 
