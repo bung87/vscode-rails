@@ -282,7 +282,7 @@ export class RailsCompletionItemProvider
                 const relativeFileName = vscode.workspace.asRelativePath(
                     document.fileName
                   ),
-                  rh = new RailsHelper(relativeFileName, null);
+                  rh = new RailsHelper(document,relativeFileName, null);
                 const paths = rh.searchPaths().filter((v: string) => {
                   return (
                     v.startsWith(REL_LAYOUTS) === false &&
@@ -317,7 +317,7 @@ export class RailsCompletionItemProvider
                 const relativeFileName = vscode.workspace.asRelativePath(
                     document.fileName
                   ),
-                  rh = new RailsHelper(relativeFileName, null);
+                  rh = new RailsHelper(document,relativeFileName, null);
                 const paths = rh.searchPaths().filter((v: string) => {
                   return (
                     v.startsWith(REL_LAYOUTS) === false &&
