@@ -40,6 +40,7 @@ export function findViews(
   fileType: string = '',
   viewType: string = 'partial' // partial or template
 ) {
+  console.log(`findViews`,arguments)
   let filePath;
   const isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
     isViewsRelativePath = _path.indexOf('/') !== -1,
@@ -86,6 +87,7 @@ export function definitionResolver(
   exclude: vscode.GlobPattern = null,
   maxNum: number = null
 ) {
+  console.log(`definitionResolver`,arguments)
   return (resolve, reject) => {
     vscode.workspace
       .findFiles(vscode.workspace.asRelativePath(definitionInformation.file))
@@ -123,6 +125,7 @@ export function definitionLocation(
   goConfig?: vscode.WorkspaceConfiguration,
   token?: vscode.CancellationToken
 ): Thenable<RailsDefinitionInformation> {
+  console.log(`definitionLocation`,arguments)
   const wordRange = document.getWordRangeAtPosition(
     position,
     /([A-Za-z\/0-9_-]+)(\.[A-Za-z0-9]+)*/
