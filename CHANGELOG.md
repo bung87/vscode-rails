@@ -1,4 +1,7 @@
 ## Release Notes
+### 0.16.10  
+* Fix double space in html.erb snippets  
+* workspace.rootPath deprecated use workspace.getWorkspaceFolder instead
 
 ### 0.16.8
 * clean view_doc.ts and change docs endpoint to https version,show message on side when no word range found fix #51  
