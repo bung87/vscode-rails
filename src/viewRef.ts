@@ -20,6 +20,7 @@ import {
 } from './constants';
 import { RailsDefinitionInformation } from './interfaces';
 import { RAILS } from './symbols/rails';
+import { findFiles } from './utils';
 
 const missingFilelMsg = 'Missing file: ';
 const couldNotOpenMsg = 'Could Not Open file: ';
@@ -89,8 +90,7 @@ export function definitionResolver(
 ) {
   console.log(`definitionResolver`, arguments);
   return (resolve, reject) => {
-    vscode.workspace
-      .findFiles(vscode.workspace.asRelativePath(definitionInformation.file))
+    findFiles(document,vscode.workspace.asRelativePath(definitionInformation.file))
       .then(
         (uris: vscode.Uri[]) => {
           if (!uris.length) {

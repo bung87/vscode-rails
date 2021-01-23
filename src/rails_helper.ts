@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { dirname, join, basename } from 'path';
-import * as utils from './utils';
+// import * as utils from './utils';
 import {
   FileType,
   FileTypeRelPath,
@@ -14,6 +14,7 @@ import {
   REL_STYLESHEETS,
 } from './constants';
 import * as inflection from 'inflection2';
+import { findFiles, dectFileType, flatten } from './utils';
 
 export class RailsHelper {
   private fileName: string;
@@ -79,7 +80,7 @@ export class RailsHelper {
   private initPatten(filePath) {
     this.filePatten = null;
     this.targetFile = null;
-    const fileType = utils.dectFileType(filePath),
+    const fileType = dectFileType(filePath),
       prefix = filePath.substring(FileTypeRelPath.get(fileType).length + 1);
     switch (fileType) {
       case FileType.Controller:
@@ -144,7 +145,7 @@ export class RailsHelper {
 
   public generateList(arr: string[]) {
     const ap = arr.map(async (cur) => {
-      const res = await vscode.workspace.findFiles(cur.toString(), null);
+      const res = await findFiles(this.document, cur.toString(), null);
       return res
         .map((i) => {
           return vscode.workspace.asRelativePath(i);
@@ -152,7 +153,7 @@ export class RailsHelper {
         .filter((v) => this.relativeFileName !== v);
     });
     return Promise.all(ap).then((lists) => {
-      return utils.flatten(lists);
+      return flatten(lists);
     });
   }
 
@@ -165,10 +166,10 @@ export class RailsHelper {
       if (!value) return;
       const fn = vscode.Uri.parse(
         'file://' +
-          join(
-            vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path,
-            value
-          )
+        join(
+          vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path,
+          value
+        )
       );
       vscode.workspace.openTextDocument(fn).then((doc) => {
         return vscode.window.showTextDocument(doc);

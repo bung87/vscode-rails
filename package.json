@@ -199,6 +199,7 @@
     },
     "dependencies": {
         "axios": "^0.21.1",
+        "gitignore-globs": "^0.1.1",
         "inflection2": "^2.0.1",
         "is_js": "^0.9.0",
         "js-beautify": "^1.10.3",

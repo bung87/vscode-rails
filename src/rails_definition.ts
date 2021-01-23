@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { dectFileType } from './utils';
+import { dectFileType, findFiles } from './utils';
 import { RailsHelper } from './rails_helper';
 import {
   FileType,
@@ -95,15 +95,14 @@ export async function getLibOrModelFilePath(
       : 'def\\s+',
     reg = new RegExp(regPrefix + funcOrClass + SYMBOL_END);
   console.log('getLibOrModelFilePath filePathInLib', filePathInLib);
-  let findInLibUris: vscode.Uri[] = []
+  let findInLibUris: vscode.Uri[] = [];
   try {
-    findInLibUris = await vscode.workspace.findFiles(filePathInLib, null, 1);
+    findInLibUris = await findFiles(document,filePathInLib, null, 1);
     // tslint:disable-next-line: no-empty
-  } catch (e) {
-  }
+  } catch (e) { }
 
-  let findInLib: RailsDefinitionInformation = null
-  console.log('findInLib', findInLibUris, thePath)
+  let findInLib: RailsDefinitionInformation = null;
+  console.log('findInLib', findInLibUris, thePath);
   if (thePath) {
     if (findInLibUris.length > 0) {
       try {
@@ -115,14 +114,11 @@ export async function getLibOrModelFilePath(
       } catch (e) {
         return Promise.reject(couldNotOpenMsg + filePathInLib);
       }
-
     } else {
       try {
-        findInLib = await findFunctionOrClassByClassNameInFile(thePath, reg)
+        findInLib = await findFunctionOrClassByClassNameInFile(thePath, reg);
         // tslint:disable-next-line: no-empty
-      } catch (e) {
-      }
-
+      } catch (e) { }
     }
   }
   if (findInLib) {
@@ -130,7 +126,7 @@ export async function getLibOrModelFilePath(
   }
 
   try {
-    const uris = await vscode.workspace.findFiles(filePathInModels, null, 1);
+    const uris = await findFiles(document,filePathInModels, null, 1);
     if (!uris.length) {
       return Promise.resolve(null);
     }
@@ -214,7 +210,12 @@ export function controllerDefinitionLocation(
   word: string,
   lineStartToWord: string
 ): Thenable<RailsDefinitionInformation> {
-  console.log(`controllerDefinitionLocation`, JSON.stringify(position), word, lineStartToWord);
+  console.log(
+    `controllerDefinitionLocation`,
+    JSON.stringify(position),
+    word,
+    lineStartToWord
+  );
   const definitionInformation: RailsDefinitionInformation = {
     file: null,
     line: 0,
@@ -327,7 +328,7 @@ export function getSymbolPath(
   fileType: FileType
 ) {
   console.log(`getSymbolPath`, arguments);
-  let filePath = ''
+  let filePath = '';
   const [currentClassRaw, parentClassRaw] = line.split('<'),
     currentClass = currentClassRaw.trim(),
     parentClass = parentClassRaw.trim(),
@@ -365,7 +366,7 @@ export async function getParentControllerFilePathByDocument(
     filePath = getSymbolPath(relPath, line, FileType.Controller);
   console.log(`getParentControllerFilePathByDocument returns`, filePath);
   return Promise.resolve(
-    vscode.workspace.findFiles(filePath, null, 1).then(
+    findFiles(entryDocument,filePath, null, 1).then(
       (uris) => {
         if (uris.length !== 0) {
           return filePath;
@@ -388,10 +389,10 @@ export async function getFunctionOrClassInfoInFile(
     line: -1,
     column: 0,
   };
-  const exists = promisify(fs.exists)
+  const exists = promisify(fs.exists);
   const existed = await exists(fileAbsPath);
   if (!existed) {
-    return Promise.reject()
+    return Promise.reject();
   }
 
   const fileStream = fs.createReadStream(fileAbsPath);
@@ -417,10 +418,12 @@ export async function getFunctionOrClassInfoInFile(
     lineNumber++;
   }
   console.log(
-    `getFunctionOrClassInfoInFile return`, JSON.stringify(definitionInformation), classDeclaration
+    `getFunctionOrClassInfoInFile return`,
+    JSON.stringify(definitionInformation),
+    classDeclaration
   );
   if (!definitionInformation.file) {
-    return Promise.reject()
+    return Promise.reject();
   }
   return [definitionInformation, classDeclaration];
 }
@@ -429,16 +432,19 @@ export async function findFunctionOrClassByClassNameInFile(
   fileAbsPath: string,
   reg: RegExp
 ): Promise<RailsDefinitionInformation> {
-  const root = vscode.workspace.getWorkspaceFolder(
-    vscode.Uri.file(fileAbsPath)
-  ).uri.path;
-  console.log(`findFunctionOrClassByClassNameInFile`, fileAbsPath, reg.toString());
+  const root = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(fileAbsPath))
+    .uri.path;
+  console.log(
+    `findFunctionOrClassByClassNameInFile`,
+    fileAbsPath,
+    reg.toString()
+  );
   // @todo find in included moduels
-  let
-    definitionInformation: RailsDefinitionInformation,
+  let definitionInformation: RailsDefinitionInformation,
     classDeclaration: string;
   try {
-    [definitionInformation,
+    [
+      definitionInformation,
       classDeclaration,
     ] = await getFunctionOrClassInfoInFile(fileAbsPath, reg);
   } catch (e) {
@@ -448,7 +454,7 @@ export async function findFunctionOrClassByClassNameInFile(
   let lineIndex = definitionInformation.line;
   while (-1 === lineIndex) {
     const [, symbol] = classDeclaration.split('<');
-    console.log('findFunctionOrClassByClassNameInFile symbol', symbol)
+    console.log('findFunctionOrClassByClassNameInFile symbol', symbol);
     const parentController = symbol.trim();
     const filePath = getSymbolPath(
       vscode.workspace.asRelativePath(fileAbsPath),
@@ -468,7 +474,10 @@ export async function findFunctionOrClassByClassNameInFile(
     lineIndex = definitionInformation.line;
   }
   if (-1 !== lineIndex) {
-    console.log('findFunctionOrClassByClassNameInFile return', JSON.stringify(definitionInformation))
+    console.log(
+      'findFunctionOrClassByClassNameInFile return',
+      JSON.stringify(definitionInformation)
+    );
     return definitionInformation;
   } else {
     return Promise.reject();
@@ -521,10 +530,7 @@ export async function findFunctionOrClassByClassName(
     const root = vscode.workspace.getWorkspaceFolder(entryDocument.uri).uri
       .path;
     const fileAbsPath = vscode.Uri.file(path.join(root, filePath)).path;
-    return findFunctionOrClassByClassNameInFile(
-      fileAbsPath,
-      reg
-    );
+    return findFunctionOrClassByClassNameInFile(fileAbsPath, reg);
   }
 }
 
@@ -534,7 +540,12 @@ export function modelDefinitionLocation(
   word: string,
   lineStartToWord: string
 ): Thenable<RailsDefinitionInformation> {
-  console.log(`modelDefinitionLocation`, JSON.stringify(position), word, lineStartToWord);
+  console.log(
+    `modelDefinitionLocation`,
+    JSON.stringify(position),
+    word,
+    lineStartToWord
+  );
   const definitionInformation: RailsDefinitionInformation = {
     file: null,
     line: 0,
@@ -581,8 +592,8 @@ const FileTypeHandlers = new Map([
 ]);
 
 export function definitionResolver(
-  document,
-  definitionInformation,
+  document: vscode.TextDocument,
+  definitionInformation: RailsDefinitionInformation,
   exclude = null,
   maxNum = null
 ) {
@@ -590,7 +601,7 @@ export function definitionResolver(
     const findPath = path.isAbsolute(definitionInformation.file)
       ? vscode.workspace.asRelativePath(definitionInformation.file)
       : definitionInformation.file;
-    vscode.workspace.findFiles(findPath).then(
+    findFiles(document,findPath).then(
       (uris: vscode.Uri[]) => {
         if (!uris.length) {
           reject(missingFilelMsg + definitionInformation.file);

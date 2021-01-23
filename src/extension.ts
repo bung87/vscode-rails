@@ -11,12 +11,17 @@ import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
 import * as fs from 'fs';
 import * as readline from 'readline';
+import { gitignores } from './utils';
+import parseGitignore from 'gitignore-globs';
+import path from 'path';
 
 const RAILS_MODE: vscode.DocumentFilter = { language: 'ruby', scheme: 'file' };
 const VIEW_MODE: vscode.DocumentFilter = {
   pattern: '**/views/**',
   scheme: 'file',
 };
+
+let gitignoreWatcher: vscode.FileSystemWatcher;
 
 function railsNavigation() {
   if (!vscode.window.activeTextEditor) {
@@ -145,6 +150,25 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   });
+
+  // initial gitignore glob
+  vscode.workspace.workspaceFolders.map(f => {
+    const ws = vscode.workspace.getWorkspaceFolder(f.uri);
+    const wsName = ws.name;
+    const file = path.join(ws.uri.fsPath, '.gitignore')
+    if (fs.existsSync(file)) {
+      gitignores[wsName] = parseGitignore(file)
+    }
+  })
+
+  gitignoreWatcher = vscode.workspace.createFileSystemWatcher('.gitignore', false, false, false);
+  gitignoreWatcher.onDidChange(uri => {
+    const ws = vscode.workspace.getWorkspaceFolder(uri);
+    const wsName = ws.name;
+    gitignores[wsName] = parseGitignore(uri.fsPath)
+  });
 }
 // this method is called when your extension is deactivated
-// export function deactivate() {}
+export function deactivate() {
+  gitignoreWatcher?.dispose()
+}

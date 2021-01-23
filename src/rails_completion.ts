@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { dectFileType } from './utils';
+import { dectFileType, findFiles } from './utils';
 import { definitionLocation } from './rails_definition';
 import micromatch from 'micromatch';
 import * as fs from 'fs';
@@ -347,8 +347,7 @@ export class RailsCompletionItemProvider
                 });
                 suggestions.push(...items);
                 if (TriggerCharacter.quote === triggerCharacter) {
-                  const views = await vscode.workspace
-                    .findFiles(path.join(REL_VIEWS, '**'), REL_LAYOUTS)
+                  const views = await findFiles(document,path.join(REL_VIEWS, '**'), REL_LAYOUTS)
                     .then((res) => {
                       return res
                         .filter((v) => {
@@ -379,8 +378,7 @@ export class RailsCompletionItemProvider
               break;
             case 'layout':
               {
-                const views = await vscode.workspace
-                  .findFiles(path.join(REL_LAYOUTS, '**'), null)
+                const views = await findFiles(document,path.join(REL_LAYOUTS, '**'), null)
                   .then((res) => {
                     return res.map((i) => {
                       const name = vscode.workspace
