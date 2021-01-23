@@ -46,7 +46,7 @@ export function flatten(arr) {
 }
 
 export function toPosixPath(s: string): string {
-  return s.split(path.sep).join(path.posix.sep)
+  return s.split(path.sep).join(path.posix.sep);
 }
 
 /**

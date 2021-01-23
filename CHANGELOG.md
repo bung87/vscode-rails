@@ -1,4 +1,8 @@
 ## Release Notes
+
+### 0.16.11  
+* `findFiles` in root of document and repect gitignore previous just `workspace.findFiles`
+
 ### 0.16.10  
 * Fix double space in html.erb snippets  
 * workspace.rootPath deprecated use workspace.getWorkspaceFolder instead
