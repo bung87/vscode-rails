@@ -8,6 +8,7 @@ import {
   GlobPattern,
   Uri,
 } from 'vscode';
+import path from 'path';
 
 export const gitignores = {};
 
@@ -44,6 +45,10 @@ export function flatten(arr) {
   }, []);
 }
 
+export function toPosixPath(s: string): string {
+  return s.split(path.sep).join(path.posix.sep)
+}
+
 /**
  * findFiles in root of document and repect gitignore
  */
@@ -56,7 +61,7 @@ export function findFiles(
 ): Thenable<Uri[]> {
   const ws = workspace.getWorkspaceFolder(document.uri);
   const name = ws.name;
-  const _include = new RelativePattern(ws, include);
+  const _include = new RelativePattern(ws, toPosixPath(include));
   const _exclude =
     gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
   return workspace.findFiles(_include, _exclude, maxResults, token);
