@@ -1,7 +1,15 @@
 import { FileType, FileTypeRelPath } from './constants';
-import { TextDocument,RelativePattern, workspace, Position, CancellationToken, GlobPattern, Uri } from 'vscode';
+import {
+  TextDocument,
+  RelativePattern,
+  workspace,
+  Position,
+  CancellationToken,
+  GlobPattern,
+  Uri,
+} from 'vscode';
 
-export const gitignores = {}
+export const gitignores = {};
 
 export function dectFileType(filePath: string): FileType {
   for (const [key, value] of FileTypeRelPath) {
@@ -39,10 +47,17 @@ export function flatten(arr) {
 /**
  * findFiles in root of document and repect gitignore
  */
-export function findFiles(document: TextDocument, include: string, exclude?: GlobPattern | null, maxResults?: number, token?: CancellationToken): Thenable<Uri[]> {
+export function findFiles(
+  document: TextDocument,
+  include: string,
+  exclude?: GlobPattern | null,
+  maxResults?: number,
+  token?: CancellationToken
+): Thenable<Uri[]> {
   const ws = workspace.getWorkspaceFolder(document.uri);
-  const name = workspace.getWorkspaceFolder(document.uri).name;
+  const name = ws.name;
   const _include = new RelativePattern(ws, include);
-  const _exclude = gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude
+  const _exclude =
+    gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
   return workspace.findFiles(_include, _exclude, maxResults, token);
 }

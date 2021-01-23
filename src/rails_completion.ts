@@ -347,53 +347,59 @@ export class RailsCompletionItemProvider
                 });
                 suggestions.push(...items);
                 if (TriggerCharacter.quote === triggerCharacter) {
-                  const views = await findFiles(document,path.join(REL_VIEWS, '**'), REL_LAYOUTS)
-                    .then((res) => {
-                      return res
-                        .filter((v) => {
-                          const p = vscode.workspace.asRelativePath(v);
-                          return (
-                            paths.some((v2) => {
-                              return !micromatch(p, v2);
-                            }) || path.basename(p).startsWith('_')
-                          );
-                        })
-                        .map((i) => {
-                          const name = vscode.workspace
-                              .asRelativePath(i)
-                              .substring(REL_VIEWS.length + 1)
-                              .split('.')[0],
-                            item = new vscode.CompletionItem(name);
-                          item.insertText =
-                            triggerCharacter === TriggerCharacter.colon
-                              ? " '" + name + "'"
-                              : name;
-                          item.kind = vscode.CompletionItemKind.File;
-                          return item;
-                        });
-                    });
+                  const views = await findFiles(
+                    document,
+                    path.join(REL_VIEWS, '**'),
+                    REL_LAYOUTS
+                  ).then((res) => {
+                    return res
+                      .filter((v) => {
+                        const p = vscode.workspace.asRelativePath(v);
+                        return (
+                          paths.some((v2) => {
+                            return !micromatch(p, v2);
+                          }) || path.basename(p).startsWith('_')
+                        );
+                      })
+                      .map((i) => {
+                        const name = vscode.workspace
+                            .asRelativePath(i)
+                            .substring(REL_VIEWS.length + 1)
+                            .split('.')[0],
+                          item = new vscode.CompletionItem(name);
+                        item.insertText =
+                          triggerCharacter === TriggerCharacter.colon
+                            ? " '" + name + "'"
+                            : name;
+                        item.kind = vscode.CompletionItemKind.File;
+                        return item;
+                      });
+                  });
                   suggestions.push(...views);
                 }
               }
               break;
             case 'layout':
               {
-                const views = await findFiles(document,path.join(REL_LAYOUTS, '**'), null)
-                  .then((res) => {
-                    return res.map((i) => {
-                      const name = vscode.workspace
-                          .asRelativePath(i)
-                          .substring(REL_LAYOUTS.length + 1)
-                          .split('.')[0],
-                        item = new vscode.CompletionItem(name);
-                      item.insertText =
-                        triggerCharacter === TriggerCharacter.colon
-                          ? " '" + name + "'"
-                          : name;
-                      item.kind = vscode.CompletionItemKind.File;
-                      return item;
-                    });
+                const views = await findFiles(
+                  document,
+                  path.join(REL_LAYOUTS, '**'),
+                  null
+                ).then((res) => {
+                  return res.map((i) => {
+                    const name = vscode.workspace
+                        .asRelativePath(i)
+                        .substring(REL_LAYOUTS.length + 1)
+                        .split('.')[0],
+                      item = new vscode.CompletionItem(name);
+                    item.insertText =
+                      triggerCharacter === TriggerCharacter.colon
+                        ? " '" + name + "'"
+                        : name;
+                    item.kind = vscode.CompletionItemKind.File;
+                    return item;
                   });
+                });
                 suggestions.push(...views);
               }
               break;

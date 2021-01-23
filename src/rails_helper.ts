@@ -166,10 +166,10 @@ export class RailsHelper {
       if (!value) return;
       const fn = vscode.Uri.parse(
         'file://' +
-        join(
-          vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path,
-          value
-        )
+          join(
+            vscode.workspace.getWorkspaceFolder(this.document.uri).uri.path,
+            value
+          )
       );
       vscode.workspace.openTextDocument(fn).then((doc) => {
         return vscode.window.showTextDocument(doc);

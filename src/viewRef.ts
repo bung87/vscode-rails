@@ -90,29 +90,31 @@ export function definitionResolver(
 ) {
   console.log(`definitionResolver`, arguments);
   return (resolve, reject) => {
-    findFiles(document,vscode.workspace.asRelativePath(definitionInformation.file))
-      .then(
-        (uris: vscode.Uri[]) => {
-          if (!uris.length) {
-            reject(missingFilelMsg + definitionInformation.file);
-          } else if (uris.length === 1) {
-            definitionInformation.file = uris[0].fsPath;
-            resolve(definitionInformation);
-          } else {
-            // let relativeFileName = vscode.workspace.asRelativePath(
-            //     document.fileName
-            //   ),
-            //   rh = new RailsHelper(relativeFileName, null);
-            // rh.showQuickPick(
-            //   uris.map(uri => vscode.workspace.asRelativePath(uri.path))
-            // );
-            reject(NO_DEFINITION);
-          }
-        },
-        () => {
+    findFiles(
+      document,
+      vscode.workspace.asRelativePath(definitionInformation.file)
+    ).then(
+      (uris: vscode.Uri[]) => {
+        if (!uris.length) {
           reject(missingFilelMsg + definitionInformation.file);
+        } else if (uris.length === 1) {
+          definitionInformation.file = uris[0].fsPath;
+          resolve(definitionInformation);
+        } else {
+          // let relativeFileName = vscode.workspace.asRelativePath(
+          //     document.fileName
+          //   ),
+          //   rh = new RailsHelper(relativeFileName, null);
+          // rh.showQuickPick(
+          //   uris.map(uri => vscode.workspace.asRelativePath(uri.path))
+          // );
+          reject(NO_DEFINITION);
         }
-      );
+      },
+      () => {
+        reject(missingFilelMsg + definitionInformation.file);
+      }
+    );
   };
 }
 /**

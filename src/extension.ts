@@ -152,23 +152,28 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // initial gitignore glob
-  vscode.workspace.workspaceFolders.map(f => {
+  vscode.workspace.workspaceFolders.map((f) => {
     const ws = vscode.workspace.getWorkspaceFolder(f.uri);
     const wsName = ws.name;
-    const file = path.join(ws.uri.fsPath, '.gitignore')
+    const file = path.join(ws.uri.fsPath, '.gitignore');
     if (fs.existsSync(file)) {
-      gitignores[wsName] = parseGitignore(file)
+      gitignores[wsName] = parseGitignore(file);
     }
-  })
+  });
 
-  gitignoreWatcher = vscode.workspace.createFileSystemWatcher('.gitignore', false, false, false);
-  gitignoreWatcher.onDidChange(uri => {
+  gitignoreWatcher = vscode.workspace.createFileSystemWatcher(
+    '.gitignore',
+    false,
+    false,
+    false
+  );
+  gitignoreWatcher.onDidChange((uri) => {
     const ws = vscode.workspace.getWorkspaceFolder(uri);
     const wsName = ws.name;
-    gitignores[wsName] = parseGitignore(uri.fsPath)
+    gitignores[wsName] = parseGitignore(uri.fsPath);
   });
 }
 // this method is called when your extension is deactivated
 export function deactivate() {
-  gitignoreWatcher?.dispose()
+  gitignoreWatcher?.dispose();
 }
