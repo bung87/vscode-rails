@@ -14,6 +14,7 @@ import * as readline from 'readline';
 import { gitignores } from './utils';
 import parseGitignore from 'gitignore-globs';
 import path from 'path';
+import { RailsHover } from './rails_hover';
 
 const RAILS_MODE: vscode.DocumentFilter = { language: 'ruby', scheme: 'file' };
 const VIEW_MODE: vscode.DocumentFilter = {
@@ -94,6 +95,7 @@ function registerFormatter(context: vscode.ExtensionContext) {
   }
 }
 
+
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('Rails:Navigation', railsNavigation)
@@ -102,6 +104,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerDefinitionProvider(
       RAILS_MODE,
       new RailsDefinitionProvider()
+    )
+  );
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider(
+      RAILS_MODE,
+      new RailsHover()
     )
   );
   context.subscriptions.push(

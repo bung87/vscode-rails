@@ -50,7 +50,10 @@ export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
   return filePath;
 }
 
-export function findClassInDocumentCallback(name, document):Promise<RailsDefinitionInformation> {
+export function findClassInDocumentCallback(
+  name,
+  document
+): Promise<RailsDefinitionInformation> {
   const line = document
       .getText()
       .split('\n')
@@ -64,8 +67,8 @@ export function findClassInDocumentCallback(name, document):Promise<RailsDefinit
       line: Math.max(line, 0),
       column: 0,
     };
-    console.log("findClassInDocumentCallback name",name)
-    console.log("findClassInDocumentCallback document",document)
+  console.log('findClassInDocumentCallback name', name);
+  console.log('findClassInDocumentCallback document', document);
   return Promise.resolve(definitionInformation);
 }
 
@@ -73,7 +76,7 @@ export async function getLibOrModelFilePath(
   document: vscode.TextDocument,
   lineStartToWord: string,
   word: string
-):Promise<RailsDefinitionInformation> {
+): Promise<RailsDefinitionInformation> {
   console.log(`getLibOrModelFilePath`, arguments);
   const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
@@ -96,7 +99,9 @@ export async function getLibOrModelFilePath(
       ? 'class\\s+'
       : 'def\\s+',
     reg = new RegExp(regPrefix + funcOrClass + SYMBOL_END);
-    console.log(`name:${name} demodulized:${demodulized} funcOrClass:${funcOrClass}`)
+  console.log(
+    `name:${name} demodulized:${demodulized} funcOrClass:${funcOrClass}`
+  );
   console.log('getLibOrModelFilePath filePathInLib', filePathInLib);
   let findInLibUris: vscode.Uri[] = [];
   try {
@@ -566,8 +571,8 @@ export function modelDefinitionLocation(
       lineStartToWord,
       FileType.ModelConcerns
     );
-    } else if (PATTERNS.CAPITALIZED.test(word)) {
-      return getLibOrModelFilePath(document,lineStartToWord, word);
+  } else if (PATTERNS.CAPITALIZED.test(word)) {
+    return getLibOrModelFilePath(document, lineStartToWord, word);
   } else if (
     PATTERNS.RENDER_DECLARATION.test(lineStartToWord) ||
     PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)
