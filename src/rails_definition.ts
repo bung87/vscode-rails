@@ -50,7 +50,7 @@ export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
   return filePath;
 }
 
-export function findClassInDocumentCallback(name, document) {
+export function findClassInDocumentCallback(name, document):Promise<RailsDefinitionInformation> {
   const line = document
       .getText()
       .split('\n')
@@ -64,6 +64,8 @@ export function findClassInDocumentCallback(name, document) {
       line: Math.max(line, 0),
       column: 0,
     };
+    console.log("findClassInDocumentCallback name",name)
+    console.log("findClassInDocumentCallback document",document)
   return Promise.resolve(definitionInformation);
 }
 
@@ -71,7 +73,7 @@ export async function getLibOrModelFilePath(
   document: vscode.TextDocument,
   lineStartToWord: string,
   word: string
-) {
+):Promise<RailsDefinitionInformation> {
   console.log(`getLibOrModelFilePath`, arguments);
   const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
@@ -94,6 +96,7 @@ export async function getLibOrModelFilePath(
       ? 'class\\s+'
       : 'def\\s+',
     reg = new RegExp(regPrefix + funcOrClass + SYMBOL_END);
+    console.log(`name:${name} demodulized:${demodulized} funcOrClass:${funcOrClass}`)
   console.log('getLibOrModelFilePath filePathInLib', filePathInLib);
   let findInLibUris: vscode.Uri[] = [];
   try {
@@ -108,7 +111,7 @@ export async function getLibOrModelFilePath(
       try {
         findInLib = await vscode.workspace
           .openTextDocument(findInLibUris[0])
-          .then(findClassInDocumentCallback.bind(null, name), () => {
+          .then(findClassInDocumentCallback.bind(null, demodulized), () => {
             return Promise.reject(couldNotOpenMsg + filePathInLib);
           });
       } catch (e) {
@@ -124,15 +127,16 @@ export async function getLibOrModelFilePath(
   if (findInLib) {
     return findInLib;
   }
-
+  console.log('filePathInModels', filePathInModels);
   try {
     const uris = await findFiles(document, filePathInModels, null, 1);
     if (!uris.length) {
       return Promise.resolve(null);
     }
+    console.log('filePathInModels uris', uris);
     return vscode.workspace
       .openTextDocument(uris[0])
-      .then(findClassInDocumentCallback.bind(null, name), () => {
+      .then(findClassInDocumentCallback.bind(null, demodulized), () => {
         return Promise.reject(couldNotOpenMsg + filePathInModels);
       });
   } catch (e) {
@@ -562,8 +566,8 @@ export function modelDefinitionLocation(
       lineStartToWord,
       FileType.ModelConcerns
     );
-    // } else if (PATTERNS.CAPITALIZED.test(word)) {
-    //   return getLibOrModelFilePath(lineStartToWord, word);
+    } else if (PATTERNS.CAPITALIZED.test(word)) {
+      return getLibOrModelFilePath(document,lineStartToWord, word);
   } else if (
     PATTERNS.RENDER_DECLARATION.test(lineStartToWord) ||
     PATTERNS.RENDER_TO_STRING_DECLARATION.test(lineStartToWord)
@@ -575,7 +579,7 @@ export function modelDefinitionLocation(
       lineStartToWord
     );
   } else {
-    // return findLocationByWord(document, position, word, lineStartToWord);
+    return findLocationByWord(document, position, word, lineStartToWord);
   }
   const promise = new Promise<RailsDefinitionInformation>(
     definitionResolver(document, definitionInformation)
