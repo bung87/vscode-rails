@@ -3,6 +3,7 @@ import * as path from 'path';
 import axios, { AxiosRequestConfig } from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
+import { getSymbol } from './utils';
 // Track currently webview panel
 // var currentPanel: vscode.WebviewPanel | undefined = undefined;
 
@@ -91,23 +92,15 @@ function doRequest(
 export function viewDoc(this: vscode.ExtensionContext) {
   const document = vscode.window.activeTextEditor.document;
   const position = vscode.window.activeTextEditor.selection.active;
-  const wordRange = document.getWordRangeAtPosition(position);
-  if (typeof wordRange === 'undefined') {
+  const symbol = getSymbol(document,position)
+  if (typeof symbol === 'undefined') {
     showSide(
       'word range not found',
       "Can't find word range from your active editor selection.",
       this
     );
   }
-  const word = document.getText(wordRange);
-  const lineStartToWord = document
-    .getText(
-      new vscode.Range(new vscode.Position(position.line, 0), wordRange.end)
-    )
-    .trim();
-  const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
-    lineStartToWord
-  )[1];
+ 
   console.log(`symbol:${symbol}`);
   let endpoint = '';
   const isRailsSymbol = RAILS.has(symbol.toLowerCase());

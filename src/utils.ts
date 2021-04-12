@@ -6,9 +6,11 @@ import {
   Position,
   CancellationToken,
   GlobPattern,
+  Range,
   Uri,
 } from 'vscode';
 import path from 'path';
+import * as inflection from 'inflection2';
 
 export const gitignores = {};
 
@@ -19,6 +21,14 @@ export function dectFileType(filePath: string): FileType {
     }
   }
   return FileType.Unkown;
+}
+
+export function wordsToPath(s) {
+  return inflection.underscore(
+    s.replace(/[A-Z]{2,}(?![a-z])/, (s) => {
+      return inflection.titleize(s);
+    })
+  );
 }
 
 export function isPositionInString(
@@ -65,4 +75,44 @@ export function findFiles(
   const _exclude =
     gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
   return workspace.findFiles(_include, _exclude, maxResults, token);
+}
+
+/**
+ * ...Word -> A::B::Word
+ */
+export function getSymbol(document:TextDocument,position:Position):string | undefined{
+  const wordRange = document.getWordRangeAtPosition(position);
+  if(!wordRange){
+    return void 0
+  }
+  const word = document.getText(wordRange);
+  if(!word){
+    return void 0
+  }
+  const lineStartToWord = document
+    .getText(
+      new Range(new Position(position.line, 0), wordRange.end)
+    )
+    .trim();
+  const r = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
+    lineStartToWord
+  )
+  if(r.length >= 2){
+    return r[1]
+  }
+}
+
+/**
+ * 
+ * @param symbol A::B::Word
+ * @returns lowercase name and sub path
+ */
+export function getSubPathBySymbol(symbol:string):[string,string]{
+  const seq = symbol
+  .split('::')
+  .map(wordsToPath)
+  .filter((v) => v !== ''),
+  sub = seq.slice(0, -1).join(path.sep),
+  name = seq[seq.length - 1];
+  return [name,sub]
 }

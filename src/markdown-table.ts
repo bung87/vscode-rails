@@ -1,4 +1,4 @@
-import repeat from 'repeat-string'
+import repeat from 'repeat-string';
 
 /**
  * @typedef MarkdownTableOptions
@@ -18,106 +18,106 @@ import repeat from 'repeat-string'
  * @param {MarkdownTableOptions} [options]
  * @returns {string}
  */
-export function markdownTable(table:string[][], options?:any) {
-  const settings = options || {}
-  const align = (settings.align || []).concat()
-  const stringLength = settings.stringLength || defaultStringLength
+export function markdownTable(table: string[][], options?: any) {
+  const settings = options || {};
+  const align = (settings.align || []).concat();
+  const stringLength = settings.stringLength || defaultStringLength;
   /** @type {number[]} Character codes as symbols for alignment per column. */
-  const alignments = []
-  let rowIndex = -1
+  const alignments = [];
+  let rowIndex = -1;
   /** @type {string[][]} Cells per row. */
-  const cellMatrix = []
+  const cellMatrix = [];
   /** @type {number[][]} Sizes of each cell per row. */
-  const sizeMatrix = []
+  const sizeMatrix = [];
   /** @type {number[]} */
-  const longestCellByColumn = []
-  let mostCellsPerRow = 0
+  const longestCellByColumn = [];
+  let mostCellsPerRow = 0;
   /** @type {number} */
-  let columnIndex
+  let columnIndex;
   /** @type {string[]} Cells of current row */
-  let row
+  let row;
   /** @type {number[]} Sizes of current row */
-  let sizes
+  let sizes;
   /** @type {number} Sizes of current cell */
-  let size
+  let size;
   /** @type {string} Current cell */
-  let cell
+  let cell;
   /** @type {string[]} */
-  let lines
+  let lines;
   /** @type {string[]} Chunks of current line. */
-  let line
+  let line;
   /** @type {string} */
-  let before
+  let before;
   /** @type {string} */
-  let after
+  let after;
   /** @type {number} */
-  let code
+  let code;
 
   // This is a superfluous loop if we don’t align delimiters, but otherwise we’d
   // do superfluous work when aligning, so optimize for aligning.
   while (++rowIndex < table.length) {
-    columnIndex = -1
-    row = []
-    sizes = []
+    columnIndex = -1;
+    row = [];
+    sizes = [];
 
     if (table[rowIndex].length > mostCellsPerRow) {
-      mostCellsPerRow = table[rowIndex].length
+      mostCellsPerRow = table[rowIndex].length;
     }
 
     while (++columnIndex < table[rowIndex].length) {
-      cell = serialize(table[rowIndex][columnIndex])
+      cell = serialize(table[rowIndex][columnIndex]);
 
       if (settings.alignDelimiters !== false) {
-        size = stringLength(cell)
-        sizes[columnIndex] = size
+        size = stringLength(cell);
+        sizes[columnIndex] = size;
 
         if (
           longestCellByColumn[columnIndex] === undefined ||
           size > longestCellByColumn[columnIndex]
         ) {
-          longestCellByColumn[columnIndex] = size
+          longestCellByColumn[columnIndex] = size;
         }
       }
 
-      row.push(cell)
+      row.push(cell);
     }
 
-    cellMatrix[rowIndex] = row
-    sizeMatrix[rowIndex] = sizes
+    cellMatrix[rowIndex] = row;
+    sizeMatrix[rowIndex] = sizes;
   }
 
   // Figure out which alignments to use.
-  columnIndex = -1
+  columnIndex = -1;
 
   if (typeof align === 'object' && 'length' in align) {
     while (++columnIndex < mostCellsPerRow) {
-      alignments[columnIndex] = toAlignment(align[columnIndex])
+      alignments[columnIndex] = toAlignment(align[columnIndex]);
     }
   } else {
-    code = toAlignment(align)
+    code = toAlignment(align);
 
     while (++columnIndex < mostCellsPerRow) {
-      alignments[columnIndex] = code
+      alignments[columnIndex] = code;
     }
   }
 
   // Inject the alignment row.
-  columnIndex = -1
-  row = []
-  sizes = []
+  columnIndex = -1;
+  row = [];
+  sizes = [];
 
   while (++columnIndex < mostCellsPerRow) {
-    code = alignments[columnIndex]
-    before = ''
-    after = ''
+    code = alignments[columnIndex];
+    before = '';
+    after = '';
 
     if (code === 99 /* `c` */) {
-      before = ':'
-      after = ':'
+      before = ':';
+      after = ':';
     } else if (code === 108 /* `l` */) {
-      before = ':'
+      before = ':';
     } else if (code === 114 /* `r` */) {
-      after = ':'
+      after = ':';
     }
 
     // There *must* be at least one hyphen-minus in each alignment cell.
@@ -127,62 +127,62 @@ export function markdownTable(table:string[][], options?:any) {
         : Math.max(
             1,
             longestCellByColumn[columnIndex] - before.length - after.length
-          )
+          );
 
-    cell = before + repeat('-', size) + after
+    cell = before + repeat('-', size) + after;
 
     if (settings.alignDelimiters !== false) {
-      size = before.length + size + after.length
+      size = before.length + size + after.length;
 
       if (size > longestCellByColumn[columnIndex]) {
-        longestCellByColumn[columnIndex] = size
+        longestCellByColumn[columnIndex] = size;
       }
 
-      sizes[columnIndex] = size
+      sizes[columnIndex] = size;
     }
 
-    row[columnIndex] = cell
+    row[columnIndex] = cell;
   }
 
   // Inject the alignment row.
-  cellMatrix.splice(1, 0, row)
-  sizeMatrix.splice(1, 0, sizes)
+  cellMatrix.splice(1, 0, row);
+  sizeMatrix.splice(1, 0, sizes);
 
-  rowIndex = -1
-  lines = []
+  rowIndex = -1;
+  lines = [];
 
   while (++rowIndex < cellMatrix.length) {
-    row = cellMatrix[rowIndex]
-    sizes = sizeMatrix[rowIndex]
-    columnIndex = -1
-    line = []
+    row = cellMatrix[rowIndex];
+    sizes = sizeMatrix[rowIndex];
+    columnIndex = -1;
+    line = [];
 
     while (++columnIndex < mostCellsPerRow) {
-      cell = row[columnIndex] || ''
-      before = ''
-      after = ''
+      cell = row[columnIndex] || '';
+      before = '';
+      after = '';
 
       if (settings.alignDelimiters !== false) {
-        size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0)
-        code = alignments[columnIndex]
+        size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
+        code = alignments[columnIndex];
 
         if (code === 114 /* `r` */) {
-          before = repeat(' ', size)
+          before = repeat(' ', size);
         } else if (code === 99 /* `c` */) {
           if (size % 2) {
-            before = repeat(' ', size / 2 + 0.5)
-            after = repeat(' ', size / 2 - 0.5)
+            before = repeat(' ', size / 2 + 0.5);
+            after = repeat(' ', size / 2 - 0.5);
           } else {
-            before = repeat(' ', size / 2)
-            after = before
+            before = repeat(' ', size / 2);
+            after = before;
           }
         } else {
-          after = repeat(' ', size)
+          after = repeat(' ', size);
         }
       }
 
       if (settings.delimiterStart !== false && !columnIndex) {
-        line.push('|')
+        line.push('|');
       }
 
       if (
@@ -192,28 +192,28 @@ export function markdownTable(table:string[][], options?:any) {
         !(settings.alignDelimiters === false && cell === '') &&
         (settings.delimiterStart !== false || columnIndex)
       ) {
-        line.push(' ')
+        line.push(' ');
       }
 
       if (settings.alignDelimiters !== false) {
-        line.push(before)
+        line.push(before);
       }
 
-      line.push(cell)
+      line.push(cell);
 
       if (settings.alignDelimiters !== false) {
-        line.push(after)
+        line.push(after);
       }
 
       if (settings.padding !== false) {
-        line.push(' ')
+        line.push(' ');
       }
 
       if (
         settings.delimiterEnd !== false ||
         columnIndex !== mostCellsPerRow - 1
       ) {
-        line.push('|')
+        line.push('|');
       }
     }
 
@@ -221,10 +221,10 @@ export function markdownTable(table:string[][], options?:any) {
       settings.delimiterEnd === false
         ? line.join('').replace(/ +$/, '')
         : line.join('')
-    )
+    );
   }
 
-  return lines.join('\n')
+  return lines.join('\n');
 }
 
 /**
@@ -232,7 +232,7 @@ export function markdownTable(table:string[][], options?:any) {
  * @returns {string}
  */
 function serialize(value) {
-  return value === null || value === undefined ? '' : String(value)
+  return value === null || value === undefined ? '' : String(value);
 }
 
 /**
@@ -240,7 +240,7 @@ function serialize(value) {
  * @returns {number}
  */
 function defaultStringLength(value) {
-  return value.length
+  return value.length;
 }
 
 /**
@@ -248,7 +248,7 @@ function defaultStringLength(value) {
  * @returns {number}
  */
 function toAlignment(value) {
-  const code = typeof value === 'string' ? value.charCodeAt(0) : 0
+  const code = typeof value === 'string' ? value.charCodeAt(0) : 0;
 
   return code === 67 /* `C` */ || code === 99 /* `c` */
     ? 99 /* `c` */
@@ -256,5 +256,5 @@ function toAlignment(value) {
     ? 108 /* `l` */
     : code === 82 /* `R` */ || code === 114 /* `r` */
     ? 114 /* `r` */
-    : 0
+    : 0;
 }

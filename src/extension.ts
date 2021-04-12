@@ -95,7 +95,6 @@ function registerFormatter(context: vscode.ExtensionContext) {
   }
 }
 
-
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('Rails:Navigation', railsNavigation)
@@ -107,10 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
   context.subscriptions.push(
-    vscode.languages.registerHoverProvider(
-      RAILS_MODE,
-      new RailsHover()
-    )
+    vscode.languages.registerHoverProvider(RAILS_MODE, new RailsHover())
   );
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
