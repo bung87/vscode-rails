@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 0.17.0  
+* table columns view on hover  
+
 ### 0.16.11  
 * `findFiles` in root of document and repect gitignore previous just `workspace.findFiles`
 
