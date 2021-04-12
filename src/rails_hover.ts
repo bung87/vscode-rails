@@ -1,6 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { dectFileType, getSubPathBySymbol, getSymbol, wordsToPath } from './utils';
+import {
+  dectFileType,
+  getSubPathBySymbol,
+  getSymbol,
+  wordsToPath,
+} from './utils';
 import { FileType, PATTERNS, REL_MODELS } from './constants';
 import * as inflection from 'inflection2';
 import fs from 'fs';
@@ -14,12 +19,12 @@ export class RailsHover implements vscode.HoverProvider {
     token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Hover> {
     const symbol = getSymbol(document, position);
-    if(!symbol){
-      return undefined
+    if (!symbol) {
+      return undefined;
     }
     const demodulized = inflection.demodulize(symbol);
     if (PATTERNS.CAPITALIZED.test(demodulized)) {
-      console.log(symbol)
+      console.log(symbol);
       const tableName = inflection.tableize(symbol);
       const root = vscode.workspace.getWorkspaceFolder(document.uri).uri.fsPath;
       const schemaPath = path.join(root, 'db', 'schema.rb');
@@ -47,7 +52,5 @@ export class RailsHover implements vscode.HoverProvider {
         }
       }
     }
-    }
-   
-
+  }
 }

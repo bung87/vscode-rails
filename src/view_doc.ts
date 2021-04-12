@@ -92,7 +92,7 @@ function doRequest(
 export function viewDoc(this: vscode.ExtensionContext) {
   const document = vscode.window.activeTextEditor.document;
   const position = vscode.window.activeTextEditor.selection.active;
-  const symbol = getSymbol(document,position)
+  const symbol = getSymbol(document, position);
   if (typeof symbol === 'undefined') {
     showSide(
       'word range not found',
@@ -100,7 +100,7 @@ export function viewDoc(this: vscode.ExtensionContext) {
       this
     );
   }
- 
+
   console.log(`symbol:${symbol}`);
   let endpoint = '';
   const isRailsSymbol = RAILS.has(symbol.toLowerCase());

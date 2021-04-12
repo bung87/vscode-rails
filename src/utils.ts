@@ -80,39 +80,40 @@ export function findFiles(
 /**
  * ...Word -> A::B::Word
  */
-export function getSymbol(document:TextDocument,position:Position):string | undefined{
+export function getSymbol(
+  document: TextDocument,
+  position: Position
+): string | undefined {
   const wordRange = document.getWordRangeAtPosition(position);
-  if(!wordRange){
-    return void 0
+  if (!wordRange) {
+    return void 0;
   }
   const word = document.getText(wordRange);
-  if(!word){
-    return void 0
+  if (!word) {
+    return void 0;
   }
   const lineStartToWord = document
-    .getText(
-      new Range(new Position(position.line, 0), wordRange.end)
-    )
+    .getText(new Range(new Position(position.line, 0), wordRange.end))
     .trim();
   const r = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
-  )
-  if(r.length >= 2){
-    return r[1]
+  );
+  if (r.length >= 2) {
+    return r[1];
   }
 }
 
 /**
- * 
+ *
  * @param symbol A::B::Word
  * @returns lowercase name and sub path
  */
-export function getSubPathBySymbol(symbol:string):[string,string]{
+export function getSubPathBySymbol(symbol: string): [string, string] {
   const seq = symbol
-  .split('::')
-  .map(wordsToPath)
-  .filter((v) => v !== ''),
-  sub = seq.slice(0, -1).join(path.sep),
-  name = seq[seq.length - 1];
-  return [name,sub]
+      .split('::')
+      .map(wordsToPath)
+      .filter((v) => v !== ''),
+    sub = seq.slice(0, -1).join(path.sep),
+    name = seq[seq.length - 1];
+  return [name, sub];
 }
