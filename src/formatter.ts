@@ -131,20 +131,21 @@ export class Formatter {
     }
     let onSave = false;
     const prefix = document.languageId.split('.')[0];
-    const conf = vscode.workspace.getConfiguration('rails.editor')
-    let confPrefixFormatOnSave:boolean
+    const conf = vscode.workspace.getConfiguration('rails.editor');
+    let confPrefixFormatOnSave: boolean;
     try {
-      confPrefixFormatOnSave = conf[`[${prefix}`][`erb]`]['editor.formatOnSave']
-    }catch(e){}
-    if(confPrefixFormatOnSave === false){
-      return 
+      confPrefixFormatOnSave =
+        conf[`[${prefix}`][`erb]`]['editor.formatOnSave'];
+    } catch (e) {}
+    if (confPrefixFormatOnSave === false) {
+      return;
     }
 
-    const confFormatOnSave = conf.get('formatOnSave')
-    if(confFormatOnSave === false){
-      return
+    const confFormatOnSave = conf.get('formatOnSave');
+    if (confFormatOnSave === false) {
+      return;
     }
-    
+
     const config = vscode.workspace.getConfiguration('', e.document);
     try {
       onSave = config[`[${prefix}`][`erb]`]['editor.formatOnSave'];
