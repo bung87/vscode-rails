@@ -1,4 +1,6 @@
 ## Release Notes
+### 0.17.1  
+* `rails.editor.formatOnSave` and `rails.editor.[html.erb].formatOnSave` ,`rails.editor.[css.erb].formatOnSave`, `rails.editor.[scss.erb].formatOnSave`  
 
 ### 0.17.0  
 * table columns view on hover  
