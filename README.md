@@ -46,6 +46,11 @@ notice: in order to make this extension work you need
 - <kbd>Alt + F1</kbd>
 - <kbd>Opt + F1</kbd> (on Mac)
 
+## Configuration  
+formatOnSave:  
+
+`rails.editor.formatOnSave` and `rails.editor.[html.erb].formatOnSave` ,`rails.editor.[css.erb].formatOnSave`, `rails.editor.[scss.erb].formatOnSave`
+
 ## Known Issues
 
 This extension is not fully implemented form_helpers of rails edge version ,exclude "select" families,"fields_for".
