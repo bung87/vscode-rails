@@ -1,4 +1,9 @@
 ## Release Notes
+
+### 0.17.2  
+
+table columns on hover use cached content 
+
 ### 0.17.1  
 * `rails.editor.formatOnSave` and `rails.editor.[html.erb].formatOnSave` ,`rails.editor.[css.erb].formatOnSave`, `rails.editor.[scss.erb].formatOnSave`  
 

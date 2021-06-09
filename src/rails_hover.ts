@@ -11,6 +11,45 @@ import * as inflection from 'inflection2';
 import fs from 'fs';
 import SkeemaParser from './skeemaParser';
 import { markdownTable } from './markdown-table';
+import { promisify } from 'util';
+
+const files = {};
+
+function readFile(path: string, options: {
+  encoding?: null;
+  flag?: string;
+} = {}, fn: (err: NodeJS.ErrnoException, data?: {}) => void) {
+  let _fn = fn
+  if (2 === arguments.length) {
+    // @ts-ignore
+    _fn = options;
+    options = {};
+  }
+
+  if (!files[path]) files[path] = {};
+  const file = files[path];
+
+  fs.stat(path, function(err, stats) {
+    if (err) return _fn(err);
+    else if (file.mtime >= stats.mtime) {
+      return _fn(null, file.content);
+    }
+
+    fs.readFile(path, options, function(err, buf) {
+      if (err) return _fn(err);
+        const parser = new SkeemaParser(buf.toString());
+      const tables = parser.parse();
+      files[path] = {
+        mtime: stats.mtime,
+        content: tables
+      };
+
+      _fn(null, tables);
+    });
+  });
+}
+
+const _readFile = promisify(readFile)
 
 export class RailsHover implements vscode.HoverProvider {
   provideHover(
@@ -24,18 +63,14 @@ export class RailsHover implements vscode.HoverProvider {
     }
     const demodulized = inflection.demodulize(symbol);
     if (PATTERNS.CAPITALIZED.test(demodulized)) {
-      console.log(symbol);
       const tableName = inflection.tableize(symbol);
       const root = vscode.workspace.getWorkspaceFolder(document.uri).uri.fsPath;
       const schemaPath = path.join(root, 'db', 'schema.rb');
-      if (!fs.statSync(schemaPath)) {
+      if (!files[schemaPath] && !fs.statSync(schemaPath)) {
         return undefined;
       }
-      const schema = fs.readFileSync(schemaPath).toString();
-      const parser = new SkeemaParser(schema);
-      const tables = parser.parse();
+      return  _readFile(schemaPath,{}).then( tables => {
       if (typeof tables !== 'undefined') {
-        console.log('RailsHover', tableName, tables);
         if (tableName in tables) {
           const table = tables[tableName];
           const tablemd = [['Field', 'Type']];
@@ -51,6 +86,8 @@ export class RailsHover implements vscode.HoverProvider {
           return new vscode.Hover(mds);
         }
       }
+      });
+      
     }
   }
 }
