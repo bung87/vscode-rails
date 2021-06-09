@@ -15,11 +15,15 @@ import { promisify } from 'util';
 
 const files = {};
 
-function readFile(path: string, options: {
-  encoding?: null;
-  flag?: string;
-} = {}, fn: (err: NodeJS.ErrnoException, data?: {}) => void) {
-  let _fn = fn
+function readFile(
+  path: string,
+  options: {
+    encoding?: null;
+    flag?: string;
+  } = {},
+  fn: (err: NodeJS.ErrnoException, data?: {}) => void
+) {
+  let _fn = fn;
   if (2 === arguments.length) {
     // @ts-ignore
     _fn = options;
@@ -29,19 +33,19 @@ function readFile(path: string, options: {
   if (!files[path]) files[path] = {};
   const file = files[path];
 
-  fs.stat(path, function(err, stats) {
+  fs.stat(path, function (err, stats) {
     if (err) return _fn(err);
     else if (file.mtime >= stats.mtime) {
       return _fn(null, file.content);
     }
 
-    fs.readFile(path, options, function(err, buf) {
+    fs.readFile(path, options, function (err, buf) {
       if (err) return _fn(err);
-        const parser = new SkeemaParser(buf.toString());
+      const parser = new SkeemaParser(buf.toString());
       const tables = parser.parse();
       files[path] = {
         mtime: stats.mtime,
-        content: tables
+        content: tables,
       };
 
       _fn(null, tables);
@@ -49,7 +53,7 @@ function readFile(path: string, options: {
   });
 }
 
-const _readFile = promisify(readFile)
+const _readFile = promisify(readFile);
 
 export class RailsHover implements vscode.HoverProvider {
   provideHover(
@@ -69,25 +73,24 @@ export class RailsHover implements vscode.HoverProvider {
       if (!files[schemaPath] && !fs.statSync(schemaPath)) {
         return undefined;
       }
-      return  _readFile(schemaPath,{}).then( tables => {
-      if (typeof tables !== 'undefined') {
-        if (tableName in tables) {
-          const table = tables[tableName];
-          const tablemd = [['Field', 'Type']];
-          Object.entries(table).forEach(([key, val]) => {
-            tablemd.push([
-              `<span style="color:#008000;">${key}</span>`,
-              `<span style="color:#cc0000;">${val.toString()}</span>`,
-            ]);
-          });
-          const md = markdownTable(tablemd);
-          const mds = new vscode.MarkdownString(md);
-          mds.isTrusted = true;
-          return new vscode.Hover(mds);
+      return _readFile(schemaPath, {}).then((tables) => {
+        if (typeof tables !== 'undefined') {
+          if (tableName in tables) {
+            const table = tables[tableName];
+            const tablemd = [['Field', 'Type']];
+            Object.entries(table).forEach(([key, val]) => {
+              tablemd.push([
+                `<span style="color:#008000;">${key}</span>`,
+                `<span style="color:#cc0000;">${val.toString()}</span>`,
+              ]);
+            });
+            const md = markdownTable(tablemd);
+            const mds = new vscode.MarkdownString(md);
+            mds.isTrusted = true;
+            return new vscode.Hover(mds);
+          }
         }
-      }
       });
-      
     }
   }
 }
