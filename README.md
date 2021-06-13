@@ -60,7 +60,9 @@ This extension is not fully implemented form_helpers of rails edge version ,excl
 
 - [ ] collect most popular rails version symbols instead just one version  
 - [ ] performance  
-## Donate
+## Donate  
+
+[paypal](https://paypal.me/bung87)  
 
 [![buy me a coffee](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-orange.svg)](https://www.buymeacoffee.com/d4v36nCg1)  
 
