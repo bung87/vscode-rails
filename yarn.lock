@@ -912,6 +912,11 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
+trie-prefix-tree@^1.5.1:
+  version "1.5.1"
+  resolved "https://r.cnpmjs.org/trie-prefix-tree/download/trie-prefix-tree-1.5.1.tgz#209c91f0e66cde53af2c5de8aceeca5558cdf03d"
+  integrity sha1-IJyR8OZs3lOvLF3orO7KVVjN8D0=
+
 ts-node@^8.10.2:
   version "8.10.2"
   resolved "https://r.cnpmjs.org/ts-node/download/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"

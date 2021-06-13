@@ -8,7 +8,7 @@
 var rp = require('axios').default;
 var fs = require("fs");
 var path = require("path");
-
+var Trie = require('dawg-lookup').Trie
 
 const ROOT = path.dirname(__dirname);
 const DEST = path.join(ROOT, "src", "symbols");
@@ -33,13 +33,23 @@ function gen(key, value) {
     rp(value.url)
         .then(function (js) {
             let
-                theVar = JSON.parse(js.replace(/var\s+search_data\s+=\s+/, "")),
+                theVar = JSON.parse(js.data.replace(/var\s+search_data\s+=\s+/, "")),
                 index = theVar["index"],
                 longSearchIndex = index["longSearchIndex"],
                 uni = longSearchIndex.filter((value, index, self) => self.indexOf(value) === index && value !== ""),
-                exclude_foo_bar = typeof MAP[key]["filter"] == "function" ? uni.filter(MAP[key].filter) : uni,
-                list = JSON.stringify(exclude_foo_bar, null, 4),
-                content = `${COMMENT}export const ${key.toUpperCase()} = new Set(${list});\nexport const VERSION = "${value.version}"`;
+                _list = typeof MAP[key]["filter"] == "function" ? uni.filter(MAP[key].filter) : uni;
+                console.log("list is array",Array.isArray(_list));
+            let list = JSON.stringify(_list, null, 4);
+            let
+                // trie = new Trie(_list),
+                // packed = trie.pack()
+                // import {PTrie} from 'dawg-lookup/lib/ptrie';\n
+                // const packed = '${packed}';\n
+                imports = "import trie from 'trie-prefix-tree';\n",
+                content = `${COMMENT}${imports}const list = ${list};\nexport const ${key.toUpperCase()} = trie(list);\nexport const VERSION = "${value.version}"`;
+            // if (key === "rails"){
+            //         console.log("actioncontroller::base is word",trie.isWord("actioncontroller::base"))
+            //     }
             fs.writeFile(path.join(DEST, `${key}.ts`), content, function (err) {
                 if (err) {
                     return console.error(err);

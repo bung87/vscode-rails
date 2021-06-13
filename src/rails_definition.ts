@@ -152,21 +152,27 @@ export async function getLibOrModelFilePath(
   const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
   )[1];
+  console.log(`symbol:${symbol}`);
   const [name, sub] = getSubPathBySymbol(symbol),
     demodulized = inflection.demodulize(symbol);
   let result = null;
   try {
     result = await getLibFilePath(document, demodulized, name, sub);
-  } catch (e) {}
+  } catch (e) {
+  }
   if (result) {
     return result;
   }
 
   try {
     result = await getModelFilePath(document, demodulized, name, sub);
-  } catch (e) {}
+  } catch (e) {
+  }
   if (result) {
     return result;
+  }
+  if(!result){
+    return Promise.reject()
   }
 }
 
@@ -663,7 +669,7 @@ export function definitionLocation(
   token?: vscode.CancellationToken
 ): Thenable<RailsDefinitionInformation> {
   console.log('definitionLocation', arguments);
-  //   let context: vscode.ExtensionContext = this;
+    // let context: vscode.ExtensionContext = this;
   const wordRange = document.getWordRangeAtPosition(position);
   const lineText = document.lineAt(position.line).text.trim();
   const lineStartToWord = document
@@ -682,8 +688,8 @@ export function definitionLocation(
   const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
   )[1];
-  if (RAILS.has(symbol) || RUBY.has(symbol)) {
-    // context.logger.debug("rails symbols")
+  if (RAILS.hasWord(symbol.toLowerCase()) || RUBY.hasWord(symbol.toLowerCase())) {
+    console.log("rails symbols:" + symbol);
     return Promise.resolve(null);
   }
   const fileType = dectFileType(document.fileName);

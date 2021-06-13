@@ -99,17 +99,25 @@ export function viewDoc(this: vscode.ExtensionContext) {
       "Can't find word range from your active editor selection.",
       this
     );
+    return ;
   }
 
-  console.log(`symbol:${symbol}`);
   let endpoint = '';
-  const isRailsSymbol = RAILS.has(symbol.toLowerCase());
-  const isRubySymbol = RUBY.has(symbol.toLowerCase());
-  console.log(`isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`);
+  const lowerSymbol = symbol.toLowerCase()
+  const isRailsSymbol = RAILS.hasWord(lowerSymbol);
+  const isRubySymbol = RUBY.hasWord(lowerSymbol);
+  console.log(`symbol:${lowerSymbol} isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`);
   if (symbol && (isRailsSymbol || isRubySymbol)) {
     endpoint = symbol.replace('::', '/');
+  }else{
+    showSide(
+      'symbol not found',
+      `symbol:${symbol} neither ruby nor rails symbol`,
+      this
+    );
+    return 
   }
-  console.log(`symbol:${symbol},endpoint:${endpoint}`);
+  console.log(`symbol:${lowerSymbol},endpoint:${endpoint}`);
   if (endpoint === null) {
     return;
   }
@@ -125,7 +133,7 @@ export function viewDoc(this: vscode.ExtensionContext) {
     showSide(symbol, 'No matched symbol on extension side.', this);
     return;
   }
-  console.log(isRailsSymbol, isRubySymbol, url);
+  console.log(`doc url:${url}`);
   // let info = vscode.window.showInformationMessage("Rails:Document-loading...")
   doRequest.call(this, url, symbol);
 }

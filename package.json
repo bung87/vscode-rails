@@ -205,7 +205,8 @@
         "js-beautify": "^1.10.3",
         "markdown-table": "^3.0.0",
         "micromatch": "^4.0.2",
-        "repeat-string": "^1.6.1"
+        "repeat-string": "^1.6.1",
+        "trie-prefix-tree": "^1.5.1"
     },
     "husky": {
         "hooks": {

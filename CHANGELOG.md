@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 0.17.3  
+
+view doc symbol looking use lower case, store symbols as trie  
+
 ### 0.17.2  
 
 table columns on hover use cached content 

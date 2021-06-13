@@ -158,7 +158,7 @@ export function definitionLocation(
   const symbol = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
     lineStartToWord
   )[1];
-  if (RAILS.has(symbol)) {
+  if (RAILS.hasWord(symbol.toLowerCase())) {
     return Promise.reject('Rails symbols');
   }
   const renderMatched = lineText.match(VIEWS_PATTERNS.RENDER_PATTERN);
