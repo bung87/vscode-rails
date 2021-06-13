@@ -99,23 +99,25 @@ export function viewDoc(this: vscode.ExtensionContext) {
       "Can't find word range from your active editor selection.",
       this
     );
-    return ;
+    return;
   }
 
   let endpoint = '';
-  const lowerSymbol = symbol.toLowerCase()
+  const lowerSymbol = symbol.toLowerCase();
   const isRailsSymbol = RAILS.hasWord(lowerSymbol);
   const isRubySymbol = RUBY.hasWord(lowerSymbol);
-  console.log(`symbol:${lowerSymbol} isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`);
+  console.log(
+    `symbol:${lowerSymbol} isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`
+  );
   if (symbol && (isRailsSymbol || isRubySymbol)) {
     endpoint = symbol.replace('::', '/');
-  }else{
+  } else {
     showSide(
       'symbol not found',
       `symbol:${symbol} neither ruby nor rails symbol`,
       this
     );
-    return 
+    return;
   }
   console.log(`symbol:${lowerSymbol},endpoint:${endpoint}`);
   if (endpoint === null) {
