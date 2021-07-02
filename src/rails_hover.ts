@@ -12,7 +12,7 @@ import fs from 'fs';
 import SkeemaParser from './skeemaParser';
 import { markdownTable } from './markdown-table';
 import { promisify } from 'util';
-import pathExists from 'path-exists'
+import pathExists from 'path-exists';
 const files = {};
 
 function readFile(
