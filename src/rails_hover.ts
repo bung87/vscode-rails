@@ -12,7 +12,7 @@ import fs from 'fs';
 import SkeemaParser from './skeemaParser';
 import { markdownTable } from './markdown-table';
 import { promisify } from 'util';
-
+import pathExists from 'path-exists'
 const files = {};
 
 function readFile(
@@ -70,7 +70,7 @@ export class RailsHover implements vscode.HoverProvider {
       const tableName = inflection.tableize(symbol);
       const root = vscode.workspace.getWorkspaceFolder(document.uri).uri.fsPath;
       const schemaPath = path.join(root, 'db', 'schema.rb');
-      if (!files[schemaPath] && !fs.statSync(schemaPath)) {
+      if (!files[schemaPath] && !pathExists.sync(schemaPath)) {
         return undefined;
       }
       return _readFile(schemaPath, {}).then((tables) => {

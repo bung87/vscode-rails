@@ -1,4 +1,7 @@
 ## Release Notes
+### 0.17.4  
+
+fix db schema file exists check.  
 
 ### 0.17.3  
 
