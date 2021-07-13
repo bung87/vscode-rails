@@ -668,7 +668,13 @@ export function definitionLocation(
 ): Thenable<RailsDefinitionInformation> {
   console.log('definitionLocation', arguments);
   // let context: vscode.ExtensionContext = this;
+  if(position.line < 0){
+    return Promise.resolve(null);
+  }
   const wordRange = document.getWordRangeAtPosition(position);
+  if(!wordRange){
+    return Promise.resolve(null);
+  }
   const lineText = document.lineAt(position.line).text.trim();
   const lineStartToWord = document
     .getText(
@@ -725,6 +731,9 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
       (definitionInfo) => {
         if (definitionInfo === null || definitionInfo.file === null)
           return null;
+        if (definitionInfo.line < 0){
+          return null
+        }
         const definitionResource = vscode.Uri.file(definitionInfo.file);
         const pos = new vscode.Position(
           definitionInfo.line,

@@ -11,7 +11,7 @@ import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { gitignores } from './utils';
+import { gitignores,LocalBundle } from './utils';
 import parseGitignore from 'gitignore-globs';
 import path from 'path';
 import { RailsHover } from './rails_hover';
@@ -21,6 +21,8 @@ const VIEW_MODE: vscode.DocumentFilter = {
   pattern: '**/views/**',
   scheme: 'file',
 };
+
+
 
 let gitignoreWatcher: vscode.FileSystemWatcher;
 
@@ -135,9 +137,10 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  vscode.workspace.findFiles('Gemfile').then(async (uris: vscode.Uri[]) => {
-    if (uris.length === 1) {
-      const fileAbsPath = uris[0].fsPath;
+  vscode.workspace.findFiles('Gemfile',LocalBundle,vscode.workspace.workspaceFolders.length).then(async (uris: vscode.Uri[]) => {
+    if (uris.length >= 1) {
+      for(const uri of uris){
+        const fileAbsPath = uri.fsPath;
       const fileStream = fs.createReadStream(fileAbsPath);
       const rl = readline.createInterface({
         input: fileStream,
@@ -152,6 +155,8 @@ export function activate(context: vscode.ExtensionContext) {
           break;
         }
       }
+      }
+      
     }
   });
 
@@ -171,13 +176,12 @@ export function activate(context: vscode.ExtensionContext) {
     false,
     false
   );
-  gitignoreWatcher.onDidChange((uri) => {
+  context.subscriptions.push(gitignoreWatcher.onDidChange((uri) => {
     const ws = vscode.workspace.getWorkspaceFolder(uri);
     const wsName = ws.name;
     gitignores[wsName] = parseGitignore(uri.fsPath);
-  });
+  }));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {
-  gitignoreWatcher?.dispose();
 }

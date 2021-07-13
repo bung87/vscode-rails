@@ -12,6 +12,7 @@ import {
 import path from 'path';
 import * as inflection from 'inflection2';
 
+export const LocalBundle = 'vendor/bundle/**'
 export const gitignores = {};
 
 export function dectFileType(filePath: string): FileType {
@@ -74,7 +75,7 @@ export function findFiles(
   const _include = new RelativePattern(ws, toPosixPath(include));
   const _exclude =
     gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
-  return workspace.findFiles(_include, _exclude, maxResults, token);
+  return workspace.findFiles(_include, _exclude + `,${LocalBundle}` , maxResults, token);
 }
 
 /**
