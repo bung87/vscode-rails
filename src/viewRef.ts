@@ -132,7 +132,7 @@ export function definitionLocation(
     position,
     /([A-Za-z\/0-9_-]+)(\.[A-Za-z0-9]+)*/
   );
-  if(!wordRange){
+  if (!wordRange) {
     return Promise.resolve(null);
   }
   const lineText = document.lineAt(position.line).text.trim();

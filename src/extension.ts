@@ -11,7 +11,7 @@ import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { gitignores,LocalBundle } from './utils';
+import { gitignores, LocalBundle } from './utils';
 import parseGitignore from 'gitignore-globs';
 import path from 'path';
 import { RailsHover } from './rails_hover';
@@ -21,8 +21,6 @@ const VIEW_MODE: vscode.DocumentFilter = {
   pattern: '**/views/**',
   scheme: 'file',
 };
-
-
 
 let gitignoreWatcher: vscode.FileSystemWatcher;
 
@@ -137,28 +135,29 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  vscode.workspace.findFiles('Gemfile',LocalBundle,vscode.workspace.workspaceFolders.length).then(async (uris: vscode.Uri[]) => {
-    if (uris.length >= 1) {
-      for(const uri of uris){
-        const fileAbsPath = uri.fsPath;
-      const fileStream = fs.createReadStream(fileAbsPath);
-      const rl = readline.createInterface({
-        input: fileStream,
-        crlfDelay: Infinity,
-      });
-      for await (const lineText of rl) {
-        if (/gem\s+['"]rails['"]/.test(lineText)) {
-          registerViewDefinitionProvider();
-          registerViewDocCommand();
-          registerFormatter(context);
-          console.log('Project Gemfile contains rails');
-          break;
+  vscode.workspace
+    .findFiles('Gemfile', LocalBundle, vscode.workspace.workspaceFolders.length)
+    .then(async (uris: vscode.Uri[]) => {
+      if (uris.length >= 1) {
+        for (const uri of uris) {
+          const fileAbsPath = uri.fsPath;
+          const fileStream = fs.createReadStream(fileAbsPath);
+          const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity,
+          });
+          for await (const lineText of rl) {
+            if (/gem\s+['"]rails['"]/.test(lineText)) {
+              registerViewDefinitionProvider();
+              registerViewDocCommand();
+              registerFormatter(context);
+              console.log('Project Gemfile contains rails');
+              break;
+            }
+          }
         }
       }
-      }
-      
-    }
-  });
+    });
 
   // initial gitignore glob
   vscode.workspace.workspaceFolders.map((f) => {
@@ -176,12 +175,13 @@ export function activate(context: vscode.ExtensionContext) {
     false,
     false
   );
-  context.subscriptions.push(gitignoreWatcher.onDidChange((uri) => {
-    const ws = vscode.workspace.getWorkspaceFolder(uri);
-    const wsName = ws.name;
-    gitignores[wsName] = parseGitignore(uri.fsPath);
-  }));
+  context.subscriptions.push(
+    gitignoreWatcher.onDidChange((uri) => {
+      const ws = vscode.workspace.getWorkspaceFolder(uri);
+      const wsName = ws.name;
+      gitignores[wsName] = parseGitignore(uri.fsPath);
+    })
+  );
 }
 // this method is called when your extension is deactivated
-export function deactivate() {
-}
+export function deactivate() {}
