@@ -199,6 +199,7 @@
     },
     "dependencies": {
         "axios": "^0.21.1",
+        "compact-prefix-tree": "^2.0.2",
         "gitignore-globs": "^0.1.1",
         "inflection2": "^2.0.1",
         "is_js": "^0.9.0",
@@ -206,8 +207,7 @@
         "markdown-table": "^3.0.0",
         "micromatch": "^4.0.2",
         "path-exists": "^4.0.0",
-        "repeat-string": "^1.6.1",
-        "trie-prefix-tree": "^1.5.1"
+        "repeat-string": "^1.6.1"
     },
     "husky": {
         "hooks": {

@@ -8,7 +8,7 @@
 var rp = require('axios').default;
 var fs = require("fs");
 var path = require("path");
-// var Trie = require('dawg-lookup').Trie
+const { CompactPrefixTree } = require("compact-prefix-tree/cjs");
 
 const ROOT = path.dirname(__dirname);
 const DEST = path.join(ROOT, "src", "symbols");
@@ -38,15 +38,11 @@ function gen(key, value) {
                 longSearchIndex = index["longSearchIndex"],
                 uni = longSearchIndex.filter((value, index, self) => self.indexOf(value) === index && value !== ""),
                 _list = typeof MAP[key]["filter"] == "function" ? uni.filter(MAP[key].filter) : uni;
-                console.log("list is array",Array.isArray(_list));
-            let list = JSON.stringify(_list, null, 4);
             let
-                // trie = new Trie(_list),
-                // packed = trie.pack()
-                // import {PTrie} from 'dawg-lookup/lib/ptrie';\n
-                // const packed = '${packed}';\n
-                imports = "import trie from 'trie-prefix-tree';\n",
-                content = `${COMMENT}${imports}const list = ${list};\nexport const ${key.toUpperCase()} = trie(list);\nexport const VERSION = "${value.version}"`;
+                trie = new CompactPrefixTree(_list),
+                serialized = JSON.stringify(trie.T),
+                imports = `const { CompactPrefixTree, getWordsFromTrie } = require("compact-prefix-tree/cjs");\n`,
+                content = `${COMMENT}${imports}const serialized = '${serialized}';\nconst words = getWordsFromTrie(JSON.parse(serialized));\nexport const ${key.toUpperCase()} = new CompactPrefixTree(Array.from(words));\nexport const VERSION = "${value.version}"`;
             // if (key === "rails"){
             //         console.log("actioncontroller::base is word",trie.isWord("actioncontroller::base"))
             //     }

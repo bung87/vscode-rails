@@ -693,8 +693,8 @@ export function definitionLocation(
     lineStartToWord
   )[1];
   if (
-    RAILS.hasWord(symbol.toLowerCase()) ||
-    RUBY.hasWord(symbol.toLowerCase())
+    RAILS.prefix(symbol.toLowerCase()).isProper ||
+    RUBY.prefix(symbol.toLowerCase()).isProper
   ) {
     console.log('rails symbols:' + symbol);
     return Promise.resolve(null);

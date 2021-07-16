@@ -104,8 +104,8 @@ export function viewDoc(this: vscode.ExtensionContext) {
 
   let endpoint = '';
   const lowerSymbol = symbol.toLowerCase();
-  const isRailsSymbol = RAILS.hasWord(lowerSymbol);
-  const isRubySymbol = RUBY.hasWord(lowerSymbol);
+  const isRailsSymbol = RAILS.prefix(lowerSymbol).prefix.length;
+  const isRubySymbol = RUBY.prefix(lowerSymbol).prefix.length;
   console.log(
     `symbol:${lowerSymbol} isRailsSymbol:${isRailsSymbol},isRubySymbol:${isRubySymbol}`
   );
@@ -124,14 +124,15 @@ export function viewDoc(this: vscode.ExtensionContext) {
     return;
   }
   let url = '';
-  if (isRubySymbol) {
+  if (isRailsSymbol > isRubySymbol) {
+    url = `https://api.rubyonrails.org/classes/${endpoint}.html`;
+  }
+  else if (isRubySymbol) {
     url = `https://docs.rubydocs.org/ruby-${VERSION.replace(
       /\./g,
       '-'
     )}/classes/${endpoint}.html`;
-  } else if (isRailsSymbol) {
-    url = `https://api.rubyonrails.org/classes/${endpoint}.html`;
-  } else {
+  }  else {
     showSide(symbol, 'No matched symbol on extension side.', this);
     return;
   }
