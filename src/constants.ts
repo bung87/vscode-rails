@@ -24,7 +24,7 @@ export enum FileType {
   Test,
   Unkown,
 }
-export let FileTypeRelPath = new Map([
+export const FileTypeRelPath = new Map([
   [FileType.Controller, REL_CONTROLLERS],
   [FileType.ControllerConcerns, REL_CONTROLLERS_CONCERNS],
   [FileType.Model, REL_MODELS],

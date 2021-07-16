@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import {
-  FileType,
+  // FileType,
   // FileTypeRelPath,
   // REL_CONTROLLERS,
   // REL_CONTROLLERS_CONCERNS,
@@ -23,8 +23,8 @@ import { RAILS } from './symbols/rails';
 import { findFiles } from './utils';
 
 const missingFilelMsg = 'Missing file: ';
-const couldNotOpenMsg = 'Could Not Open file: ';
-const SYMBOL_END = '[^\\w]';
+// const couldNotOpenMsg = 'Could Not Open file: ';
+// const SYMBOL_END = '[^\\w]';
 const NO_DEFINITION = 'No definition found!';
 
 /**
@@ -101,13 +101,6 @@ export function definitionResolver(
           definitionInformation.file = uris[0].fsPath;
           resolve(definitionInformation);
         } else {
-          // let relativeFileName = vscode.workspace.asRelativePath(
-          //     document.fileName
-          //   ),
-          //   rh = new RailsHelper(relativeFileName, null);
-          // rh.showQuickPick(
-          //   uris.map(uri => vscode.workspace.asRelativePath(uri.path))
-          // );
           reject(NO_DEFINITION);
         }
       },

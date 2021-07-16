@@ -8,7 +8,7 @@
 var rp = require('axios').default;
 var fs = require("fs");
 var path = require("path");
-var Trie = require('dawg-lookup').Trie
+// var Trie = require('dawg-lookup').Trie
 
 const ROOT = path.dirname(__dirname);
 const DEST = path.join(ROOT, "src", "symbols");
