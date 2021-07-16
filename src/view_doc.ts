@@ -126,13 +126,12 @@ export function viewDoc(this: vscode.ExtensionContext) {
   let url = '';
   if (isRailsSymbol > isRubySymbol) {
     url = `https://api.rubyonrails.org/classes/${endpoint}.html`;
-  }
-  else if (isRubySymbol) {
+  } else if (isRubySymbol) {
     url = `https://docs.rubydocs.org/ruby-${VERSION.replace(
       /\./g,
       '-'
     )}/classes/${endpoint}.html`;
-  }  else {
+  } else {
     showSide(symbol, 'No matched symbol on extension side.', this);
     return;
   }
