@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {
-  getSymbol,
-} from './utils';
+import { getSymbol } from './utils';
 import { PATTERNS } from './constants';
 import * as inflection from 'inflection2';
 import fs from 'fs';
@@ -30,13 +28,13 @@ function readFile(
   if (!files[path]) files[path] = {};
   const file = files[path];
 
-  fs.stat(path,  (err, stats) => {
+  fs.stat(path, (err, stats) => {
     if (err) return _fn(err);
     else if (file.mtime >= stats.mtime) {
       return _fn(null, file.content);
     }
 
-    fs.readFile(path, options,  (err, buf) => {
+    fs.readFile(path, options, (err, buf) => {
       if (err) return _fn(err);
       const parser = new SkeemaParser(buf.toString());
       const tables = parser.parse();
