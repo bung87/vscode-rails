@@ -13,17 +13,17 @@
 
 Ruby on Rails support for Visual Studio Code
 
-notice: in order to make this extension work you need  
-- open vscode with root of your project  
-- your project root has `Gemfile` and contains `gem rails`  
+Notice: In order for this extension to work, you must  
+- Open vscode at the root folder of your project. 
+- Have a `Gemfile` containing `gem rails`, at your project root.
 
 ## Features
 
 - Ruby on Rails "Asset Helpers" and "Tag Helpers" snippets.
-- .erb syntax highlights.
+- `.erb` syntax highlighting.
 - Navigation between related files through command.
-- Go to Definition.
-- View path suggestion 、Model's static method suggestion and Model's field suggestion.
+- _Go to Definition_.
+- View path, Model's static method and Model's field suggestions.
 - Open online document to the side through command.
 
 #### [Snippets](snippets)
@@ -49,16 +49,16 @@ notice: in order to make this extension work you need
 ## Configuration  
 formatOnSave:  
 
-`rails.editor.formatOnSave` and `rails.editor.[html.erb].formatOnSave` ,`rails.editor.[css.erb].formatOnSave`, `rails.editor.[scss.erb].formatOnSave`
+`rails.editor.formatOnSave` and `rails.editor.[html.erb].formatOnSave`, `rails.editor.[css.erb].formatOnSave`, `rails.editor.[scss.erb].formatOnSave`
 
 ## Known Issues
 
-This extension is not fully implemented form_helpers of rails edge version ,exclude "select" families,"fields_for".
+The extension is not fully implemented form_helpers of rails edge version, exclude "select" families, "fields_for".
 [Form Helpers](http://edgeguides.rubyonrails.org/form_helpers.html)
 
 ## TODO
 
-- [ ] collect most popular rails version symbols instead just one version  
+- [ ] collect most popular rails version symbols instead of just one version  
 - [ ] performance  
 ## Donate  
 
@@ -68,7 +68,7 @@ This extension is not fully implemented form_helpers of rails edge version ,excl
 
 ## Contribution
 
-This extension made by mine free time,contributions are welcome!
+This extension is made by me during my free time. Contributions are welcome!
 
 ---
 
