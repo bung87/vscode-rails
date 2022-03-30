@@ -1,4 +1,3 @@
-import { FileType, FileTypeRelPath } from './constants';
 import {
   TextDocument,
   RelativePattern,
@@ -11,17 +10,18 @@ import {
 } from 'vscode';
 import path from 'path';
 import * as inflection from 'inflection2';
+import { RailsFileType2Path, RailsFileType } from './rails/file';
 
 export const LocalBundle = 'vendor/bundle/**';
 export const gitignores = {};
 
-export function dectFileType(filePath: string): FileType {
-  for (const [key, value] of FileTypeRelPath) {
+export function dectFileType(filePath: string): RailsFileType {
+  for (const [key, value] of RailsFileType2Path) {
     if (filePath.indexOf(value) >= 0) {
       return key;
     }
   }
-  return FileType.Unkown;
+  return RailsFileType.Unkown;
 }
 
 export function wordsToPath(s) {

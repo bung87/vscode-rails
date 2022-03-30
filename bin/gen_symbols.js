@@ -5,9 +5,9 @@
  about sdoc:https://github.com/zzak/sdoc
 */
 
-var rp = require('axios').default;
-var fs = require("fs");
-var path = require("path");
+const rp = require('axios').default;
+const fs = require("fs");
+const path = require("path");
 const { CompactPrefixTree } = require("compact-prefix-tree/cjs");
 
 const ROOT = path.dirname(__dirname);

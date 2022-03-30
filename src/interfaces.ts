@@ -1,9 +1,9 @@
-import { FileType } from './constants';
+import { RailsFileType } from './rails/file';
 
 export interface RailsDefinitionInformation {
   file: string; // relative glob pattern
   line: number;
-  fileType?: FileType;
+  fileType?: RailsFileType;
   column: number;
   doc?: string;
   name?: string;

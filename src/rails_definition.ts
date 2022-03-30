@@ -11,17 +11,6 @@ import {
 } from './utils';
 import { RailsHelper } from './rails_helper';
 import {
-  FileType,
-  FileTypeRelPath,
-  REL_CONTROLLERS,
-  // REL_CONTROLLERS_CONCERNS,
-  REL_MODELS,
-  // REL_MODELS_CONCERNS,
-  REL_VIEWS,
-  REL_LAYOUTS,
-  // REL_HELPERS,
-  // REL_JAVASCRIPTS,
-  REL_STYLESHEETS,
   PATTERNS,
 } from './constants';
 import { RAILS } from './symbols/rails';
@@ -30,22 +19,14 @@ import * as inflection from 'inflection2';
 import * as readline from 'readline';
 import { RailsDefinitionInformation } from './interfaces';
 import { promisify } from 'util';
+import { getConcernsFilePath, getSymbolPath } from './rails/path';
+import { RailsFileType } from './rails/file';
 
 const missingFilelMsg = 'Missing file: ';
 const couldNotOpenMsg = 'Could Not Open file: ';
 const SYMBOL_END = '[^\\w]';
 
-export function getConcernsFilePath(lineStartToWord, fileT: FileType) {
-  console.log(`getConcernsFilePath`, arguments);
-  const concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ''),
-    seq = concern.split('::').map(wordsToPath);
-  if (seq[0] === 'concerns') delete seq[0];
-  const sub = seq.slice(0, -1).join(path.sep),
-    name = seq[seq.length - 1],
-    fileType = FileTypeRelPath.get(fileT),
-    filePath = path.join(fileType, sub, name + '.rb');
-  return filePath;
-}
+
 
 export function findClassInDocumentCallback(
   name,
@@ -349,41 +330,7 @@ export function controllerDefinitionLocation(
   return promise;
 }
 
-/**
- *
- * @param relpath
- * @param line
- * @param fileType
- * @return relative file path
- */
-export function getSymbolPath(
-  relpath: string,
-  line: string,
-  fileType: FileType
-) {
-  console.log(`getSymbolPath`, arguments);
-  let filePath = '';
-  const [currentClassRaw, parentClassRaw] = line.split('<'),
-    currentClass = currentClassRaw.trim(),
-    parentClass = parentClassRaw.trim(),
-    relPath = FileTypeRelPath.get(fileType);
-  if (currentClass.includes('::') && !parentClass.includes('::')) {
-    return path.join(relPath, wordsToPath(parentClass) + '.rb');
-  }
-  const parent = parentClass.trim(),
-    sameModuleSub = path.dirname(relpath.substring(relPath.length + 1)),
-    seq = parent
-      .split('::')
-      .map(wordsToPath)
-      .filter((v) => v !== ''),
-    sub = !parent.includes('::')
-      ? sameModuleSub
-      : seq.slice(0, -1).join(path.sep),
-    name = seq[seq.length - 1];
-  filePath = path.join(relPath, sub, name + '.rb');
-  console.log(`getSymbolPath return`, filePath);
-  return filePath;
-}
+
 
 /**
  *
@@ -397,7 +344,7 @@ export async function getParentControllerFilePathByDocument(
 ): Promise<string> {
   console.log(`getParentControllerFilePathByDocument`, arguments);
   const relPath = vscode.workspace.asRelativePath(entryDocument.fileName),
-    filePath = getSymbolPath(relPath, line, FileType.Controller);
+    filePath = getSymbolPath(relPath, line, RailsFileType.Controller);
   console.log(`getParentControllerFilePathByDocument returns`, filePath);
   return Promise.resolve(
     findFiles(entryDocument, filePath, null, 1).then(
@@ -493,7 +440,7 @@ export async function findFunctionOrClassByClassNameInFile(
     const filePath = getSymbolPath(
       vscode.workspace.asRelativePath(fileAbsPath),
       parentController,
-      FileType.Controller
+      RailsFileType.Controller
     );
     const fileAbsPath2 = path.join(root, filePath);
     try {
@@ -594,7 +541,7 @@ export function modelDefinitionLocation(
   } else if (PATTERNS.INCLUDE_DECLARATION.test(lineStartToWord)) {
     definitionInformation.file = getConcernsFilePath(
       lineStartToWord,
-      FileType.ModelConcerns
+      RailsFileType.ModelConcerns
     );
   } else if (PATTERNS.CAPITALIZED.test(word)) {
     return getLibOrModelFilePath(document, lineStartToWord, word);
@@ -619,9 +566,9 @@ export function modelDefinitionLocation(
 }
 
 const FileTypeHandlers = new Map([
-  [FileType.Controller, controllerDefinitionLocation],
-  [FileType.Helper, controllerDefinitionLocation],
-  [FileType.Model, modelDefinitionLocation],
+  [RailsFileType.Controller, controllerDefinitionLocation],
+  [RailsFileType.Helper, controllerDefinitionLocation],
+  [RailsFileType.Model, modelDefinitionLocation],
   // [FileType.Unkown, findLocationByWord]
 ]);
 
@@ -700,7 +647,7 @@ export function definitionLocation(
     return Promise.resolve(null);
   }
   const fileType = dectFileType(document.fileName);
-  if (FileType.Unkown === fileType) {
+  if (RailsFileType.Unkown === fileType) {
     return Promise.resolve(null);
   }
   // let exclude;
