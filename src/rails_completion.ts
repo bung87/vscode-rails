@@ -8,9 +8,7 @@ import micromatch from 'micromatch';
 import * as fs from 'fs';
 import * as readline from 'readline';
 
-import {
-  PATTERNS,
-} from './constants';
+import { PATTERNS } from './constants';
 
 import { RailsHelper } from './rails_helper';
 import { RailsDefinitionInformation } from './interfaces';
