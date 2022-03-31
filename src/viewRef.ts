@@ -25,8 +25,8 @@ export function findViews(
   document: vscode.TextDocument,
   position: vscode.Position,
   _path: string,
-  fileType: string = '',
-  viewType: string = 'partial' // partial or template
+  fileType = '',
+  viewType = 'partial' // partial or template
 ) {
   console.log(`findViews`, arguments);
   let filePath;
