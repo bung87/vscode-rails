@@ -10,18 +10,19 @@ import {
 } from 'vscode';
 import path from 'path';
 import * as inflection from 'inflection2';
-import { RailsFileType2Path, RailsFileType } from './rails/file';
+import { Rails } from './rails';
+import { FileType } from './rails/file';
 
 export const LocalBundle = 'vendor/bundle/**';
 export const gitignores = {};
 
-export function dectFileType(filePath: string): RailsFileType {
-  for (const [key, value] of RailsFileType2Path) {
+export function dectFileType(filePath: string): FileType {
+  for (const [key, value] of Rails.FileType2Path) {
     if (filePath.indexOf(value) >= 0) {
       return key;
     }
   }
-  return RailsFileType.Unkown;
+  return FileType.Unkown;
 }
 
 export function wordsToPath(s) {
