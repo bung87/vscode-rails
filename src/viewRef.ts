@@ -3,10 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import {
-  PATTERNS,
-  VIEWS_PATTERNS,
-} from './constants';
+import { PATTERNS, VIEWS_PATTERNS } from './constants';
 import { RailsDefinitionInformation } from './interfaces';
 import { RAILS } from './symbols/rails';
 import { findFiles } from './utils';

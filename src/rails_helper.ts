@@ -1,19 +1,10 @@
 'use strict';
 import * as vscode from 'vscode';
 import { dirname, join, basename } from 'path';
-import {
-  FileType,
-  FileTypeRelPath,
-  REL_CONTROLLERS,
-  REL_MODELS,
-  REL_VIEWS,
-  REL_LAYOUTS,
-  REL_HELPERS,
-  REL_JAVASCRIPTS,
-  REL_STYLESHEETS,
-} from './constants';
 import * as inflection from 'inflection2';
 import { findFiles, dectFileType, flatten } from './utils';
+import { Rails } from './rails';
+import { FileType } from './rails/file';
 
 export class RailsHelper {
   private fileName: string;
@@ -36,28 +27,28 @@ export class RailsHelper {
   }
 
   private patterns = [
-    join(REL_CONTROLLERS, 'PTN', '*'),
-    join(REL_CONTROLLERS, 'PTN*'),
-    join(REL_MODELS, 'SINGULARIZE', '*'),
-    join(REL_MODELS, 'SINGULARIZE*'),
+    join(Rails.Controllers, 'PTN', '*'),
+    join(Rails.Controllers, 'PTN*'),
+    join(Rails.Models, 'SINGULARIZE', '*'),
+    join(Rails.Models, 'SINGULARIZE*'),
 
-    join(REL_MODELS, 'BASENAME_SINGULARIZE', '*'),
-    join(REL_MODELS, 'BASENAME_SINGULARIZE*'),
+    join(Rails.Models, 'BASENAME_SINGULARIZE', '*'),
+    join(Rails.Models, 'BASENAME_SINGULARIZE*'),
 
-    join(REL_VIEWS, 'PTN', '*'),
-    join(REL_VIEWS, 'PTN*'),
+    join(Rails.Views, 'PTN', '*'),
+    join(Rails.Views, 'PTN*'),
 
-    join(REL_LAYOUTS, 'PTN', '*'),
-    join(REL_LAYOUTS, 'PTN*'),
+    join(Rails.Layouts, 'PTN', '*'),
+    join(Rails.Layouts, 'PTN*'),
 
-    join(REL_HELPERS, 'PTN', '*'),
-    join(REL_HELPERS, 'PTN*'),
+    join(Rails.Helpers, 'PTN', '*'),
+    join(Rails.Helpers, 'PTN*'),
 
-    join(REL_JAVASCRIPTS, 'PTN', '*'),
-    join(REL_JAVASCRIPTS, 'PTN*'),
+    join(Rails.Javascripts, 'PTN', '*'),
+    join(Rails.Javascripts, 'PTN*'),
 
-    join(REL_STYLESHEETS, 'PTN', '*'),
-    join(REL_STYLESHEETS, 'PTN*'),
+    join(Rails.Stylesheets, 'PTN', '*'),
+    join(Rails.Stylesheets, 'PTN*'),
   ];
 
   public searchPaths() {
@@ -80,7 +71,7 @@ export class RailsHelper {
     this.filePatten = null;
     this.targetFile = null;
     const fileType = dectFileType(filePath),
-      prefix = filePath.substring(FileTypeRelPath.get(fileType).length + 1);
+      prefix = filePath.substring(Rails.FileType2Path.get(fileType).length + 1);
     switch (fileType) {
       case FileType.Controller:
         this.filePatten = join(

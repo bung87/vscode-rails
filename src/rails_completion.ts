@@ -9,19 +9,13 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 
 import {
-  FileType,
   PATTERNS,
-  // REL_CONTROLLERS,
-  // REL_MODELS,
-  REL_VIEWS,
-  REL_LAYOUTS,
-  // REL_HELPERS,
-  // REL_JAVASCRIPTS,
-  // REL_STYLESHEETS,
 } from './constants';
 
 import { RailsHelper } from './rails_helper';
 import { RailsDefinitionInformation } from './interfaces';
+import { FileType } from './rails/file';
+import { Rails } from './rails';
 
 const QUERY_METHODS = [
   'find_by',
@@ -285,8 +279,8 @@ export class RailsCompletionItemProvider
                   rh = new RailsHelper(document, relativeFileName, null);
                 const paths = rh.searchPaths().filter((v: string) => {
                   return (
-                    v.startsWith(REL_LAYOUTS) === false &&
-                    v.startsWith(REL_VIEWS) === true
+                    v.startsWith(Rails.Layouts) === false &&
+                    v.startsWith(Rails.Views) === true
                   );
                 });
                 console.log(`paths:${paths}`);
@@ -320,8 +314,8 @@ export class RailsCompletionItemProvider
                   rh = new RailsHelper(document, relativeFileName, null);
                 const paths = rh.searchPaths().filter((v: string) => {
                   return (
-                    v.startsWith(REL_LAYOUTS) === false &&
-                    v.startsWith(REL_VIEWS) === true
+                    v.startsWith(Rails.Layouts) === false &&
+                    v.startsWith(Rails.Views) === true
                   );
                 });
 
@@ -329,7 +323,7 @@ export class RailsCompletionItemProvider
                   const templates = list
                     .map((v) =>
                       path.basename(
-                        v.substring(REL_VIEWS.length + 1).split('.')[0]
+                        v.substring(Rails.Views.length + 1).split('.')[0]
                       )
                     )
                     .filter((v) => path.basename(v).startsWith('_') === false);
@@ -349,8 +343,8 @@ export class RailsCompletionItemProvider
                 if (TriggerCharacter.quote === triggerCharacter) {
                   const views = await findFiles(
                     document,
-                    path.join(REL_VIEWS, '**'),
-                    REL_LAYOUTS
+                    path.join(Rails.Views, '**'),
+                    Rails.Layouts
                   ).then((res) => {
                     return res
                       .filter((v) => {
@@ -364,7 +358,7 @@ export class RailsCompletionItemProvider
                       .map((i) => {
                         const name = vscode.workspace
                             .asRelativePath(i)
-                            .substring(REL_VIEWS.length + 1)
+                            .substring(Rails.Views.length + 1)
                             .split('.')[0],
                           item = new vscode.CompletionItem(name);
                         item.insertText =
@@ -383,13 +377,13 @@ export class RailsCompletionItemProvider
               {
                 const views = await findFiles(
                   document,
-                  path.join(REL_LAYOUTS, '**'),
+                  path.join(Rails.Layouts, '**'),
                   null
                 ).then((res) => {
                   return res.map((i) => {
                     const name = vscode.workspace
                         .asRelativePath(i)
-                        .substring(REL_LAYOUTS.length + 1)
+                        .substring(Rails.Layouts.length + 1)
                         .split('.')[0],
                       item = new vscode.CompletionItem(name);
                     item.insertText =
