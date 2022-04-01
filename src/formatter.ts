@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as vscode from 'vscode';
-import * as jsbeautify from 'js-beautify';
+import jsbeautify from 'js-beautify';
 
 export function format(document: vscode.TextDocument, range: vscode.Range) {
   if (range === null) {
@@ -23,14 +25,16 @@ export function format(document: vscode.TextDocument, range: vscode.Range) {
 
   return result;
 }
-
-function beatify(documentContent: string, languageId): string {
-  let beatiFunc = null;
+type BeatiFunc = typeof jsbeautify.css| typeof jsbeautify.js| typeof jsbeautify.html
+function beatify(documentContent: string, languageId: string): string {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  let beatiFunc:BeatiFunc  = null;
 
   switch (languageId) {
     case 'scss.erb':
       languageId = 'css';
       beatiFunc = jsbeautify.css;
+      break;
     case 'css.erb':
       beatiFunc = jsbeautify.css;
       break;
@@ -50,7 +54,7 @@ function beatify(documentContent: string, languageId): string {
       break;
   }
   if (!beatiFunc) return;
-  let tabSize = null;
+  let tabSize: number| null  = null;
   const beutifyOptions = {};
   const prefix = languageId.split('.')[0];
   const config = vscode.workspace.getConfiguration('');
@@ -70,7 +74,7 @@ export class Formatter {
   public beautify() {
     // Create as needed
     const window = vscode.window;
-    let range;
+    let range:vscode.Range;
     // Get the current text editor
     const activeEditor = window.activeTextEditor;
     if (!activeEditor) {
@@ -107,7 +111,7 @@ export class Formatter {
     }
   }
 
-  public registerBeautify(range) {
+  public registerBeautify(range:vscode.Range) {
     // Create as needed
     const window = vscode.window;
 
@@ -136,7 +140,9 @@ export class Formatter {
     try {
       confPrefixFormatOnSave =
         conf[`[${prefix}`][`erb]`]['editor.formatOnSave'];
-    } catch (e) {}
+    } catch (e) {
+      // omit
+    }
     if (confPrefixFormatOnSave === false) {
       return;
     }
@@ -183,5 +189,5 @@ export class Formatter {
 }
 
 function showMesage(msg: string) {
-  vscode.window.showInformationMessage(msg);
+  void vscode.window.showInformationMessage(msg);
 }

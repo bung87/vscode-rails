@@ -184,6 +184,7 @@
         "@rollup/plugin-commonjs": "^13.0.0",
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^8.0.1",
+        "@types/js-beautify": "^1.13.3",
         "@types/node": "^13.9.1",
         "@types/vscode": "^1.43.0",
         "@typescript-eslint/eslint-plugin": "^5.17.0",
