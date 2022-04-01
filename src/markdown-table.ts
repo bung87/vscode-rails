@@ -6,7 +6,7 @@ interface MarkdownTableOptions{
   delimiterStart: boolean
   delimiterEnd: boolean
   alignDelimiters: boolean
-  stringLength: (value: string) => number
+  stringLength?: (value: string) => number
 }
 /**
  * Create a table from a matrix of strings.
@@ -21,9 +21,6 @@ export function markdownTable(table: string[][], options: MarkdownTableOptions =
   delimiterStart: false,
   delimiterEnd: false,
   alignDelimiters: false,
-  stringLength: function (value: string): number {
-    throw new Error('Function not implemented.');
-  }
 }):string {
   const align = (options.align || []).concat();
   const stringLength = options.stringLength || defaultStringLength;
