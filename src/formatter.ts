@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import * as vscode from 'vscode';
+import  vscode from 'vscode';
 import jsbeautify from 'js-beautify';
 
 export function format(document: vscode.TextDocument, range: vscode.Range) {

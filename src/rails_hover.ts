@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import * as vscode from 'vscode';
-import * as path from 'path';
+import  vscode from 'vscode';
+import  path from 'path';
 import { getSymbol } from './utils';
 import { PATTERNS } from './constants';
-import * as inflection from 'inflection2';
+import  inflection from 'inflection2';
 import fs from 'fs';
 import SkeemaParser from './skeemaParser';
 import { markdownTable } from './markdown-table';

@@ -1,7 +1,7 @@
 'use strict';
-import * as vscode from 'vscode';
+import  vscode from 'vscode';
 import { dirname, join, basename } from 'path';
-import * as inflection from 'inflection2';
+import  inflection from 'inflection2';
 import { findFiles, dectFileType, flatten } from './utils';
 import { Rails } from './rails';
 import { FileType } from './rails/file';

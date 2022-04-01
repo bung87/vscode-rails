@@ -9,7 +9,7 @@ import {
   Uri,
 } from 'vscode';
 import path from 'path';
-import * as inflection from 'inflection2';
+import  inflection from 'inflection2';
 import { Rails } from './rails';
 import { FileType } from './rails/file';
 

@@ -2,8 +2,8 @@ import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import typescript from 'rollup-plugin-typescript2'
 import json from '@rollup/plugin-json'
-import * as pkg from './package.json'
-import * as path from 'path'
+import  pkg from './package.json'
+import  path from 'path'
 
 export default {
   input: `src/${path.parse(pkg.main).name}.ts`,

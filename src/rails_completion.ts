@@ -1,7 +1,7 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import * as path from 'path';
+import  vscode from 'vscode';
+import  path from 'path';
 import { dectFileType, findFiles } from './utils';
 import { definitionLocation } from './rails_definition';
 import micromatch from 'micromatch';
@@ -15,39 +15,6 @@ import { RailsDefinitionInformation } from './interfaces';
 import { FileType } from './rails/file';
 import { Rails } from './rails';
 
-const QUERY_METHODS = [
-  'find_by',
-  'first',
-  'last',
-  'take',
-  'find',
-  'find_each',
-  'find_in_batches',
-  'create_with',
-  'distinct',
-  'eager_load',
-  'extending',
-  'from',
-  'group',
-  'having',
-  'includes',
-  'joins',
-  'left_outer_joins',
-  'limit',
-  'lock',
-  'none',
-  'offset',
-  'order',
-  'preload',
-  'readonly',
-  'references',
-  'reorder',
-  'reverse_order',
-  'select',
-  'where',
-  'all',
-];
-
 export enum TriggerCharacter {
   dot,
   quote,
@@ -57,7 +24,7 @@ export enum TriggerCharacter {
 export function modelQueryInterface(): vscode.CompletionItem[] {
   const suggestions: vscode.CompletionItem[] = [];
 
-  QUERY_METHODS.forEach((value) => {
+  Rails.queryMethods.forEach((value) => {
     const item = new vscode.CompletionItem(value);
     item.insertText = value;
     item.kind = vscode.CompletionItemKind.Method;

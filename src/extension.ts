@@ -2,15 +2,15 @@
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import  vscode from 'vscode';
 import { RailsHelper } from './rails_helper';
 import { RailsDefinitionProvider } from './rails_definition';
 import { RailsCompletionItemProvider } from './rails_completion';
 import { ViewDefinitionProvider } from './viewRef';
 import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
-import * as fs from 'fs';
-import * as readline from 'readline';
+import  fs from 'fs';
+import  readline from 'readline';
 import { gitignores, LocalBundle } from './utils';
 import parseGitignore from 'gitignore-globs';
 import path from 'path';
