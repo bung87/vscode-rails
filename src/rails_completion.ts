@@ -5,8 +5,8 @@ import * as path from 'path';
 import { dectFileType, findFiles } from './utils';
 import { definitionLocation } from './rails_definition';
 import micromatch from 'micromatch';
-import * as fs from 'fs';
-import * as readline from 'readline';
+import fs from 'fs';
+import readline from 'readline';
 
 import { PATTERNS } from './constants';
 
@@ -67,7 +67,7 @@ export function modelQueryInterface(): vscode.CompletionItem[] {
 }
 
 async function getCols(
-  fileAbsPath,
+  fileAbsPath:string,
   position: vscode.Position,
   triggerCharacter: TriggerCharacter,
   prefix?: string
@@ -78,7 +78,7 @@ async function getCols(
     input: fileStream,
     crlfDelay: Infinity,
   });
-  const cols = [];
+  const cols:vscode.CompletionItem[] = [];
   for await (const lineText of rl) {
     if (/^#\s+([a-z0-9_]+)/.test(lineText)) {
       const col = /^#\s+([a-z0-9_]+)/.exec(lineText)[1];
@@ -93,8 +93,8 @@ async function getCols(
   return cols;
 }
 
-async function getMethods(fileAbsPath): Promise<vscode.CompletionItem[]> {
-  const methods = [];
+async function getMethods(fileAbsPath:string): Promise<vscode.CompletionItem[]> {
+  const methods:vscode.CompletionItem[] = [];
   let markAsStart = false,
     markAsEnd = false;
   const fileStream = fs.createReadStream(fileAbsPath);
@@ -148,7 +148,6 @@ export class RailsCompletionItemProvider
   ): Promise<vscode.CompletionItem[]> {
     return new Promise<vscode.CompletionItem[]>(async (resolve, reject) => {
       const suggestions: vscode.CompletionItem[] = [];
-      const filename = document.fileName;
       const lineText = document.lineAt(position.line).text;
       const lineTillCurrentPosition = lineText.substr(0, position.character);
       console.log(`lineTillCurrentPosition:${lineTillCurrentPosition}`);

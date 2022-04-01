@@ -14,7 +14,7 @@ import { Rails } from './rails';
 import { FileType } from './rails/file';
 
 export const LocalBundle = 'vendor/bundle/**';
-export const gitignores = {};
+export const gitignores:Record<string,string> = {};
 
 export function dectFileType(filePath: string): FileType {
   for (const [key, value] of Rails.FileType2Path) {
@@ -25,7 +25,7 @@ export function dectFileType(filePath: string): FileType {
   return FileType.Unkown;
 }
 
-export function wordsToPath(s) {
+export function wordsToPath(s:string) {
   return inflection.underscore(
     s.replace(/[A-Z]{2,}(?![a-z])/, (s) => {
       return inflection.titleize(s);
@@ -49,8 +49,9 @@ export function isPositionInString(
   return doubleQuotesCnt % 2 === 1;
 }
 
-export function flatten(arr) {
+export function flatten(arr:unknown[]) {
   return arr.reduce((flat, toFlatten) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return flat.concat(
       Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
     );
