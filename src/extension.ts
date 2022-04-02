@@ -12,7 +12,8 @@ import { Formatter } from './formatter';
 import fs from 'fs';
 import readline from 'readline';
 import { gitignores, LocalBundle } from './utils';
-import parseGitignore from 'gitignore-globs';
+// import parseGitignore from 'gitignore-globs';
+import { globifyGitIgnoreFile } from "globify-gitignore"
 import path from 'path';
 import { RailsHover } from './rails_hover';
 
@@ -57,7 +58,7 @@ function registerFormatter(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('erb.formatting', () => {
-      formatter.beautify();
+      void formatter.beautify();
     })
   );
 
@@ -135,7 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  vscode.workspace
+  void vscode.workspace
     .findFiles('Gemfile', LocalBundle, vscode.workspace.workspaceFolders.length)
     .then(async (uris: vscode.Uri[]) => {
       if (uris.length >= 1) {
@@ -165,7 +166,9 @@ export function activate(context: vscode.ExtensionContext) {
     const wsName = ws.name;
     const file = path.join(ws.uri.fsPath, '.gitignore');
     if (fs.existsSync(file)) {
-      gitignores[wsName] = parseGitignore(file);
+      void globifyGitIgnoreFile(ws.uri.fsPath).then( globs => {
+        gitignores[wsName] = globs
+      })
     }
   });
 
@@ -179,7 +182,10 @@ export function activate(context: vscode.ExtensionContext) {
     gitignoreWatcher.onDidChange((uri) => {
       const ws = vscode.workspace.getWorkspaceFolder(uri);
       const wsName = ws.name;
-      gitignores[wsName] = parseGitignore(uri.fsPath);
+      const dirname = path.dirname(uri.fsPath)
+      void globifyGitIgnoreFile(dirname).then( globs => {
+        gitignores[wsName] = globs
+      })
     })
   );
 }

@@ -14,7 +14,7 @@ import { Rails } from './rails';
 import { FileType } from './rails/file';
 
 export const LocalBundle = 'vendor/bundle/**';
-export const gitignores: Record<string, string> = {};
+export const gitignores: Record<string, string[]> = {};
 
 export function dectFileType(filePath: string): FileType {
   for (const [key, value] of Rails.FileType2Path) {
