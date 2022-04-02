@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import  vscode from 'vscode';
+import vscode from 'vscode';
 import jsbeautify from 'js-beautify';
 
 export function format(document: vscode.TextDocument, range: vscode.Range) {
@@ -25,10 +25,13 @@ export function format(document: vscode.TextDocument, range: vscode.Range) {
 
   return result;
 }
-type BeatiFunc = typeof jsbeautify.css| typeof jsbeautify.js| typeof jsbeautify.html
+type BeatiFunc =
+  | typeof jsbeautify.css
+  | typeof jsbeautify.js
+  | typeof jsbeautify.html;
 function beatify(documentContent: string, languageId: string): string {
   // eslint-disable-next-line @typescript-eslint/ban-types
-  let beatiFunc:BeatiFunc  = null;
+  let beatiFunc: BeatiFunc = null;
 
   switch (languageId) {
     case 'scss.erb':
@@ -54,7 +57,7 @@ function beatify(documentContent: string, languageId: string): string {
       break;
   }
   if (!beatiFunc) return;
-  let tabSize: number| null  = null;
+  let tabSize: number | null = null;
   const beutifyOptions = {};
   const prefix = languageId.split('.')[0];
   const config = vscode.workspace.getConfiguration('');
@@ -74,7 +77,7 @@ export class Formatter {
   public beautify() {
     // Create as needed
     const window = vscode.window;
-    let range:vscode.Range;
+    let range: vscode.Range;
     // Get the current text editor
     const activeEditor = window.activeTextEditor;
     if (!activeEditor) {
@@ -111,7 +114,7 @@ export class Formatter {
     }
   }
 
-  public registerBeautify(range:vscode.Range) {
+  public registerBeautify(range: vscode.Range) {
     // Create as needed
     const window = vscode.window;
 

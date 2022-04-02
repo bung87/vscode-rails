@@ -1,12 +1,12 @@
 import repeat from 'repeat-string';
 
-interface MarkdownTableOptions{
-  align:string|string[]
-  padding: boolean
-  delimiterStart: boolean
-  delimiterEnd: boolean
-  alignDelimiters: boolean
-  stringLength?: (value: string) => number
+interface MarkdownTableOptions {
+  align: string | string[];
+  padding: boolean;
+  delimiterStart: boolean;
+  delimiterEnd: boolean;
+  alignDelimiters: boolean;
+  stringLength?: (value: string) => number;
 }
 /**
  * Create a table from a matrix of strings.
@@ -15,40 +15,43 @@ interface MarkdownTableOptions{
  * @param {MarkdownTableOptions} [options]
  * @returns {string}
  */
-export function markdownTable(table: string[][], options: MarkdownTableOptions = {
-  align: '',
-  padding: false,
-  delimiterStart: false,
-  delimiterEnd: false,
-  alignDelimiters: false,
-}):string {
+export function markdownTable(
+  table: string[][],
+  options: MarkdownTableOptions = {
+    align: '',
+    padding: false,
+    delimiterStart: false,
+    delimiterEnd: false,
+    alignDelimiters: false,
+  }
+): string {
   const align = (options.align || []).concat();
   const stringLength = options.stringLength || defaultStringLength;
   /** @type {number[]} Character codes as symbols for alignment per column. */
-  const alignments:number[] = [];
+  const alignments: number[] = [];
   let rowIndex = -1;
   /** @type {string[][]} Cells per row. */
-  const cellMatrix:string[][] = [];
+  const cellMatrix: string[][] = [];
   /** @type {number[][]} Sizes of each cell per row. */
-  const sizeMatrix:number[][] = [];
-  const longestCellByColumn:number[] = [];
+  const sizeMatrix: number[][] = [];
+  const longestCellByColumn: number[] = [];
   let mostCellsPerRow = 0;
   /** @type {number} */
-  let columnIndex:number;
+  let columnIndex: number;
   /** @type {string[]} Cells of current row */
   let row: string[];
   /** @type {number[]} Sizes of current row */
-  let sizes:number[];
+  let sizes: number[];
   /** @type {number} Sizes of current cell */
-  let size:number;
+  let size: number;
   /** @type {string} Current cell */
-  let cell:string;
-  let lines:string[] = [];
+  let cell: string;
+  let lines: string[] = [];
   /** @type {string[]} Chunks of current line. */
-  let line:string[];
-  let before:string;
-  let after:string;
-  let code:number;
+  let line: string[];
+  let before: string;
+  let after: string;
+  let code: number;
 
   // This is a superfluous loop if we don’t align delimiters, but otherwise we’d
   // do superfluous work when aligning, so optimize for aligning.
@@ -119,7 +122,7 @@ export function markdownTable(table: string[][], options: MarkdownTableOptions =
 
     // There *must* be at least one hyphen-minus in each alignment cell.
     size =
-    options.alignDelimiters === false
+      options.alignDelimiters === false
         ? 1
         : Math.max(
             1,
@@ -224,16 +227,15 @@ export function markdownTable(table: string[][], options: MarkdownTableOptions =
   return lines.join('\n');
 }
 
-function serialize(value:string|null|undefined) {
+function serialize(value: string | null | undefined) {
   return value === null || value === undefined ? '' : String(value);
 }
-
 
 function defaultStringLength(value: string) {
   return value.length;
 }
 
-function toAlignment(value:string) {
+function toAlignment(value: string) {
   const code = typeof value === 'string' ? value.charCodeAt(0) : 0;
 
   return code === 67 /* `C` */ || code === 99 /* `c` */

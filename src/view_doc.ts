@@ -1,5 +1,5 @@
-import  vscode from 'vscode';
-import  path from 'path';
+import vscode from 'vscode';
+import path from 'path';
 import axios, { AxiosRequestConfig } from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';

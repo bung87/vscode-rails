@@ -1,8 +1,8 @@
 'use strict';
 
-import  vscode from 'vscode';
-import  path from 'path';
-import  fs from 'fs';
+import vscode from 'vscode';
+import path from 'path';
+import fs from 'fs';
 import {
   dectFileType,
   findFiles,
@@ -13,8 +13,8 @@ import { RailsHelper } from './rails_helper';
 import { PATTERNS } from './constants';
 import { RAILS } from './symbols/rails';
 import { RUBY } from './symbols/ruby';
-import  inflection from 'inflection2';
-import  readline from 'readline';
+import inflection from 'inflection2';
+import readline from 'readline';
 import { RailsDefinitionInformation } from './interfaces';
 import { promisify } from 'util';
 import { getConcernsFilePath, getSymbolPath } from './rails/path';

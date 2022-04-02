@@ -1,7 +1,7 @@
 'use strict';
 
-import  vscode from 'vscode';
-import  path from 'path';
+import vscode from 'vscode';
+import path from 'path';
 
 import { PATTERNS, VIEWS_PATTERNS } from './constants';
 import { RailsDefinitionInformation } from './interfaces';

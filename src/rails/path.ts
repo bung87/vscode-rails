@@ -50,7 +50,7 @@ export function getSymbolPath(
   return filePath;
 }
 
-export function getConcernsFilePath(lineStartToWord:string, fileT: FileType) {
+export function getConcernsFilePath(lineStartToWord: string, fileT: FileType) {
   console.log(`getConcernsFilePath`, arguments);
   const concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ''),
     seq = concern.split('::').map(wordsToPath);
