@@ -4,6 +4,7 @@
         "target": "esnext",
         "outDir": "dist",
         "resolveJsonModule":true,
+        "strictBindCallApply": true,
         "lib": [
             "esnext"
         ],
