@@ -25,7 +25,7 @@ export class CompactPrefixTree {
    * Add a word to the trie
    */
   add(word: string) {
-    if (typeof word !== "string") {
+    if (typeof word !== 'string') {
       throw new TypeError(`Expected string, got ${typeof word}`);
     }
     if (!word.length) return;
@@ -69,22 +69,22 @@ export function add(word: string, T: Trie | null): void {
       if (T[prefix] === null) {
         // if one word is a pure subset of another word,
         // the prefix should also point to the subset
-        T[prefix] = { };
+        T[prefix] = {};
       }
       return add(word.substr(l + 1), T[prefix]);
     }
   }
 
-  if (T === null) throw new Error("Unexpected error.");
+  if (T === null) throw new Error('Unexpected error.');
 
   // no prefix found. insert word and check for prefix collision
   const siblings = Object.keys(T);
   l = word.length;
 
-  const hasSiblings = siblings.some(sibling => {
+  const hasSiblings = siblings.some((sibling) => {
     let s = 0;
     while (s < l && sibling[s] == word[s]) s++;
-    const commonPrefix = s < l && s > 1 ? sibling.substr(0, s) : "";
+    const commonPrefix = s < l && s > 1 ? sibling.substr(0, s) : '';
 
     if (commonPrefix) {
       // rearrange the trie to move word with prefix collision
@@ -111,10 +111,10 @@ export function add(word: string, T: Trie | null): void {
  */
 export function getPrefix(word: string, T: Trie | null) {
   const len = word.length;
-  let prefix = "";
+  let prefix = '';
   let i = 0;
   while (T !== null && i < len) {
-    let key = "";
+    let key = '';
     while (!T.hasOwnProperty(key) && i < len) {
       key += word[i++];
     }
@@ -130,7 +130,7 @@ export function getPrefix(word: string, T: Trie | null) {
  */
 export function getWordsFromTrie(T: Trie) {
   const words = new Set<string>();
-  _getWords(T, words, "");
+  _getWords(T, words, '');
   return words;
 }
 

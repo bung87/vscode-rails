@@ -9,7 +9,7 @@ import fs from 'fs';
 import readline from 'readline';
 import { gitignores, LocalBundle } from './utils';
 // import parseGitignore from 'gitignore-globs';
-import { globifyGitIgnoreFile } from "globify-gitignore"
+import { globifyGitIgnoreFile } from 'globify-gitignore';
 import path from 'path';
 import { RailsHover } from './rails_hover';
 
@@ -162,9 +162,9 @@ export function activate(context: vscode.ExtensionContext) {
     const wsName = ws.name;
     const file = path.join(ws.uri.fsPath, '.gitignore');
     if (fs.existsSync(file)) {
-      void globifyGitIgnoreFile(ws.uri.fsPath).then( globs => {
-        gitignores[wsName] = globs
-      })
+      void globifyGitIgnoreFile(ws.uri.fsPath).then((globs) => {
+        gitignores[wsName] = globs;
+      });
     }
   });
 
@@ -178,10 +178,10 @@ export function activate(context: vscode.ExtensionContext) {
     gitignoreWatcher.onDidChange((uri) => {
       const ws = vscode.workspace.getWorkspaceFolder(uri);
       const wsName = ws.name;
-      const dirname = path.dirname(uri.fsPath)
-      void globifyGitIgnoreFile(dirname).then( globs => {
-        gitignores[wsName] = globs
-      })
+      const dirname = path.dirname(uri.fsPath);
+      void globifyGitIgnoreFile(dirname).then((globs) => {
+        gitignores[wsName] = globs;
+      });
     })
   );
 }

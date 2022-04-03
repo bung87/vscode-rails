@@ -173,6 +173,7 @@ export class RailsCompletionItemProvider
     console.log(wordAtPosition, currentWord, character);
     if (triggerCharacter === TriggerCharacter.dot) {
       let info: RailsDefinitionInformation, fileType: FileType;
+      let items: vscode.CompletionItem[];
       try {
         info = await definitionLocation(document, position2);
         fileType = dectFileType(info.file);
@@ -183,15 +184,17 @@ export class RailsCompletionItemProvider
       switch (fileType) {
         case FileType.Model: // model static methods
           suggestions.push(...modelQueryInterface());
-          const methods = await getMethods(info.file);
-          suggestions.push(...methods);
-          const cols = await getCols(
-            info.file,
-            position,
-            triggerCharacter,
-            'find_by_'
-          );
-          suggestions.push(...cols);
+          {
+            const methods = await getMethods(info.file);
+            const cols = await getCols(
+              info.file,
+              position,
+              triggerCharacter,
+              'find_by_'
+            );
+            items = methods.concat(cols);
+          }
+          suggestions.push(...items);
           break;
       }
     } else if (
@@ -216,8 +219,10 @@ export class RailsCompletionItemProvider
         }
         switch (fileType) {
           case FileType.Model: // model field suggestion
-            const cols = await getCols(info.file, position, triggerCharacter);
-            suggestions.push(...cols);
+            {
+              const cols = await getCols(info.file, position, triggerCharacter);
+              suggestions.push(...cols);
+            }
             break;
         }
       } else if (
@@ -230,6 +235,7 @@ export class RailsCompletionItemProvider
         const matches = lineTillCurrentPosition.match(/([a-z]+)/g),
           id = matches.pop();
         console.log('render type:' + id);
+        let items: vscode.CompletionItem[];
         switch (id) {
           case 'partial': // @todo if it is not controller related partial
             {
@@ -243,14 +249,14 @@ export class RailsCompletionItemProvider
                   v.startsWith(Rails.Views) === true
                 );
               });
-              console.log(`paths:${paths}`);
-              const items = await rh.generateList(paths).then((list) => {
+              console.log(`paths:${paths.toString()}`);
+              items = await rh.generateList(paths).then((list) => {
                 const partials = list
                   .map((v) => path.parse(v).name.split('.')[0])
                   .filter((v) => {
                     return v.startsWith('_');
                   });
-                console.log(`partials:${partials}`);
+                console.log(`partials:${partials.toString()}`);
                 const items = partials.map((v: string) => {
                   const name = v.substring(1);
                   const item = new vscode.CompletionItem(name);
@@ -279,7 +285,7 @@ export class RailsCompletionItemProvider
                 );
               });
 
-              const items = await rh.generateList(paths).then((list) => {
+              items = await rh.generateList(paths).then((list) => {
                 const templates = list
                   .map((v) =>
                     path.basename(
@@ -301,7 +307,7 @@ export class RailsCompletionItemProvider
               });
               suggestions.push(...items);
               if (TriggerCharacter.quote === triggerCharacter) {
-                const views = await findFiles(
+                items = await findFiles(
                   document,
                   path.join(Rails.Views, '**'),
                   Rails.Layouts
@@ -311,7 +317,7 @@ export class RailsCompletionItemProvider
                       const p = vscode.workspace.asRelativePath(v);
                       return (
                         paths.some((v2) => {
-                          return !micromatch(p, v2);
+                          return !micromatch([p], v2);
                         }) || path.basename(p).startsWith('_')
                       );
                     })
@@ -329,13 +335,13 @@ export class RailsCompletionItemProvider
                       return item;
                     });
                 });
-                suggestions.push(...views);
+                suggestions.push(...items);
               }
             }
             break;
           case 'layout':
             {
-              const views = await findFiles(
+              items = await findFiles(
                 document,
                 path.join(Rails.Layouts, '**'),
                 null
@@ -354,7 +360,7 @@ export class RailsCompletionItemProvider
                   return item;
                 });
               });
-              suggestions.push(...views);
+              suggestions.push(...items);
             }
             break;
         }

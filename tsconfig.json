@@ -13,8 +13,9 @@
         "allowSyntheticDefaultImports":true,
         "esModuleInterop":true
     },
-    
+
     "exclude": [
+        "bin",
         "node_modules",
         ".vscode-test",
         "test",

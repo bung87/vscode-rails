@@ -2,7 +2,7 @@
 import vscode from 'vscode';
 import { dirname, join, basename } from 'path';
 import inflection from 'inflection2';
-import { findFiles, dectFileType, flatten } from './utils';
+import { findFiles, dectFileType, flatten, flattenDeep } from './utils';
 import { Rails } from './rails';
 import { FileType } from './rails/file';
 
@@ -51,8 +51,8 @@ export class RailsHelper {
     join(Rails.Stylesheets, 'PTN*'),
   ];
 
-  public searchPaths() {
-    const res = [];
+  public searchPaths(): string[] {
+    const res: string[] = [];
     this.patterns.forEach((e) => {
       let p = e.replace('PTN', this.filePatten.toString());
       p = p.replace(
@@ -67,7 +67,7 @@ export class RailsHelper {
     });
     return res;
   }
-  private initPatten(filePath) {
+  private initPatten(filePath: string) {
     this.filePatten = null;
     this.targetFile = null;
     const fileType = dectFileType(filePath),
@@ -86,8 +86,10 @@ export class RailsHelper {
         }
         break;
       case FileType.Model:
-        const filePatten = join(prefix, this.fileName.replace(/\.rb$/, ''));
-        this.filePatten = inflection.pluralize(filePatten.toString());
+        {
+          const filePatten = join(prefix, this.fileName.replace(/\.rb$/, ''));
+          this.filePatten = inflection.pluralize(filePatten.toString());
+        }
         break;
       case FileType.Layout:
         this.filePatten = join(
@@ -143,7 +145,7 @@ export class RailsHelper {
         .filter((v) => this.relativeFileName !== v);
     });
     return Promise.all(ap).then((lists) => {
-      return flatten(lists);
+      return flattenDeep(lists);
     });
   }
 

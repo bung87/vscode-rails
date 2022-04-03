@@ -49,13 +49,14 @@ export function isPositionInString(
   return doubleQuotesCnt % 2 === 1;
 }
 
-export function flatten(arr: unknown[]) {
-  return arr.reduce((flat, toFlatten) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return flat.concat(
-      Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
-    );
-  }, []);
+export function flatten<T>(arr: T[][]): T[] {
+  return ([] as T[]).concat(...arr);
+}
+
+type NestedArray<T> = Array<NestedArray<T> | T>;
+
+export function flattenDeep<T>(input: NestedArray<T>): T[] {
+  return flatten(input.map((x) => (Array.isArray(x) ? flattenDeep(x) : [x])));
 }
 
 export function toPosixPath(s: string): string {
