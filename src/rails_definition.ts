@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 'use strict';
 
 import vscode from 'vscode';
@@ -7,7 +8,6 @@ import {
   dectFileType,
   findFiles,
   getSubPathBySymbol,
-  wordsToPath,
 } from './utils';
 import { NavigationHelper } from './navigation/navigation_helper';
 import { PATTERNS } from './constants';
