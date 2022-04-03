@@ -7,7 +7,7 @@
     "icon": "rails.png",
     "engines": {
         "vscode": "^1.43.0",
-        "node": ">=7.10.1"
+        "node": ">=15.0.0"
     },
     "galleryBanner": {
         "color": "#c52f24",
