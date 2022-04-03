@@ -203,6 +203,7 @@
         "axios": "^0.21.3",
         "compact-prefix-tree": "^2.0.2",
         "globify-gitignore": "^0.2.1",
+        "has-own-prop": "^3.1.0",
         "inflection2": "^2.0.1",
         "is_js": "^0.9.0",
         "js-beautify": "^1.14.1",

@@ -5,8 +5,8 @@ import { getSymbol } from './utils';
 import { PATTERNS } from './constants';
 import inflection from 'inflection2';
 import fs from 'fs';
-import SkeemaParser from './skeemaParser';
-import { markdownTable } from './markdown-table';
+import SkeemaParser from './thirdparty/skeemaParser';
+import { markdownTable } from './thirdparty/markdown-table';
 import { promisify } from 'util';
 import pathExists from 'path-exists';
 const files: Record<

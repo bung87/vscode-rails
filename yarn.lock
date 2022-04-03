@@ -853,6 +853,11 @@ has-flag@^4.0.0:
   resolved "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz#944771fd9c81c81265c4d6941860da06bb59479b"
   integrity sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
 
+has-own-prop@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmmirror.com/has-own-prop/-/has-own-prop-3.1.0.tgz#efe2f84b8b2f62ffadc19a4a45cbfeee757f9b78"
+  integrity sha512-SmePZSzKBvCRxpjiG9tCzlTPoXEgaKP4n5MqsYC1E7ys+D95vrZhrV3gFlPUHj1AtJDtO9KVHn4XRrtUqSfJ2w==
+
 http-proxy-agent@^2.1.0:
   version "2.1.0"
   resolved "https://r.cnpmjs.org/http-proxy-agent/download/http-proxy-agent-2.1.0.tgz#e4821beef5b2142a2026bd73926fe537631c5405"
