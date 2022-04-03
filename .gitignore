@@ -3,3 +3,4 @@ out
 node_modules
 dist/
 yarn-error.log
+bin/gen_symbols.js
