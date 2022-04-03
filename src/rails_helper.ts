@@ -2,14 +2,14 @@
 import vscode from 'vscode';
 import { dirname, join, basename } from 'path';
 import inflection from 'inflection2';
-import { findFiles, dectFileType, flatten, flattenDeep } from './utils';
+import { findFiles, dectFileType, flattenDeep } from './utils';
 import { Rails } from './rails';
 import { FileType } from './rails/file';
 
 export class RailsHelper {
   private fileName: string;
   private filePatten: string;
-  private relativeFileName;
+  private relativeFileName:string;
   private line: string; // @TODO detect by current line
   private targetFile: string;
   private document: vscode.TextDocument;
@@ -149,17 +149,17 @@ export class RailsHelper {
     });
   }
 
-  public showQuickPick(items: any) {
+  public showQuickPick(items: string[] | Thenable<string[]>) {
     const p = vscode.window.showQuickPick(items, {
       placeHolder: 'Select File',
       matchOnDetail: true,
     });
-    p.then((value) => {
+    void p.then((value) => {
       if (!value) return;
       const rootPath = vscode.workspace.getWorkspaceFolder(this.document.uri)
         .uri.path;
       const fn = vscode.Uri.parse('file://' + join(rootPath, value));
-      vscode.workspace.openTextDocument(fn).then((doc) => {
+      void vscode.workspace.openTextDocument(fn).then((doc) => {
         return vscode.window.showTextDocument(doc);
       });
     });
@@ -168,11 +168,11 @@ export class RailsHelper {
   public showFileList() {
     if (this.filePatten != null) {
       const paths = this.searchPaths().slice();
-      this.generateList(paths).then((v) => {
+      void this.generateList(paths).then((v) => {
         this.showQuickPick(v);
       });
     } else if (this.targetFile != null) {
-      this.generateList([this.targetFile]).then((v) => {
+      void this.generateList([this.targetFile]).then((v) => {
         this.showQuickPick(v);
       });
     }
