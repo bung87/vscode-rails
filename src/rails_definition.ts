@@ -4,11 +4,7 @@
 import vscode from 'vscode';
 import path from 'path';
 import fs from 'fs';
-import {
-  dectFileType,
-  findFiles,
-  getSubPathBySymbol,
-} from './utils';
+import { dectFileType, findFiles, getSubPathBySymbol } from './utils';
 import { NavigationHelper } from './navigation/navigation_helper';
 import { PATTERNS } from './constants';
 import { RAILS } from './symbols/rails';
@@ -69,8 +65,9 @@ export async function getLibFilePath(
   let findInLibUris: vscode.Uri[] = [];
   try {
     findInLibUris = await findFiles(document, filePathInLib, null, 1);
-    // tslint:disable-next-line: no-empty
-  } catch (e) {}
+  } catch (e) {
+    // omit
+  }
 
   if (filePathInLib) {
     if (findInLibUris.length > 0) {
@@ -97,7 +94,9 @@ export async function getModelFilePath(
   let uris: vscode.Uri[];
   try {
     uris = await findFiles(document, filePathInModels, null, 1);
-  } catch (e) {}
+  } catch (e) {
+    // omit
+  }
   if (!uris.length) {
     return Promise.reject();
   }
@@ -538,14 +537,14 @@ const FileTypeHandlers = new Map([
 export function definitionResolver(
   document: vscode.TextDocument,
   definitionInformation: RailsDefinitionInformation,
-  exclude: vscode.GlobPattern = null,
+  exclude: string = null,
   maxNum: number = null
 ) {
   return (resolve: (a: any) => void, reject: (reason?: any) => void) => {
     const findPath = path.isAbsolute(definitionInformation.file)
       ? vscode.workspace.asRelativePath(definitionInformation.file)
       : definitionInformation.file;
-    findFiles(document, findPath).then(
+    findFiles(document, findPath, exclude, maxNum).then(
       (uris: vscode.Uri[]) => {
         if (!uris.length) {
           return reject(missingFilelMsg + definitionInformation.file);
@@ -554,9 +553,7 @@ export function definitionResolver(
           return resolve(definitionInformation);
         } else {
           const rh = new NavigationHelper(document);
-          rh.showQuickPick(
-            uris.map((uri) => vscode.workspace.asRelativePath(uri))
-          );
+          rh.showQuickPick(uris);
           return resolve(null);
         }
       },

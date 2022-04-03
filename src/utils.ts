@@ -4,7 +4,6 @@ import {
   workspace,
   Position,
   CancellationToken,
-  GlobPattern,
   Range,
   Uri,
 } from 'vscode';
@@ -69,7 +68,7 @@ export function toPosixPath(s: string): string {
 export function findFiles(
   document: TextDocument,
   include: string,
-  exclude?: GlobPattern | null,
+  exclude?: string,
   maxResults?: number,
   token?: CancellationToken
 ): Thenable<Uri[]> {
@@ -77,10 +76,10 @@ export function findFiles(
   const name = ws.name;
   const _include = new RelativePattern(ws, toPosixPath(include));
   const _exclude =
-    gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
+    gitignores[name] && exclude ? gitignores[name].concat(exclude) : [exclude];
   return workspace.findFiles(
     _include,
-    _exclude + `,${LocalBundle}`,
+    _exclude.concat(LocalBundle).join(','),
     maxResults,
     token
   );

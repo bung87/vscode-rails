@@ -239,8 +239,7 @@ export class RailsCompletionItemProvider
         switch (id) {
           case 'partial': // @todo if it is not controller related partial
             {
-              const
-                rh = new NavigationHelper(document);
+              const rh = new NavigationHelper(document);
               const paths = rh.searchPaths().filter((v: string) => {
                 return (
                   v.startsWith(Rails.Layouts) === false &&
