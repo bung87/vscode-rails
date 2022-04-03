@@ -16,10 +16,12 @@ export class NavigationHelper {
   private document: vscode.TextDocument;
   public constructor(
     document: vscode.TextDocument,
-    relativeFileName: string,
-    line: string
+    line?: string
   ) {
     this.document = document;
+    const relativeFileName = vscode.workspace.asRelativePath(
+      document.fileName
+    )
     this.relativeFileName = relativeFileName;
     this.fileName = basename(relativeFileName);
     const filePath = dirname(relativeFileName);
@@ -125,15 +127,15 @@ export class NavigationHelper {
   }
 
   public showQuickPick(items: string[] | Thenable<string[]>) {
-    const p = vscode.window.showQuickPick(items, {
+    void vscode.window.showQuickPick(items, {
       placeHolder: 'Select File',
       matchOnDetail: true,
-    });
-    void p.then((value) => {
+    }).then((value) => {
       if (!value) return;
       const rootPath = vscode.workspace.getWorkspaceFolder(this.document.uri)
         .uri.path;
-      const fn = vscode.Uri.parse('file://' + join(rootPath, value));
+
+      const fn = vscode.Uri.file(join(rootPath, value));
       void vscode.workspace.openTextDocument(fn).then((doc) => {
         return vscode.window.showTextDocument(doc);
       });

@@ -26,17 +26,12 @@ function railsNavigation() {
     return;
   }
 
-  const relativeFileName = vscode.workspace.asRelativePath(
-    vscode.window.activeTextEditor.document.fileName
-  );
-
   const line = vscode.window.activeTextEditor.document
     .lineAt(vscode.window.activeTextEditor.selection.active.line)
     .text.trim();
 
   const rh = new NavigationHelper(
     vscode.window.activeTextEditor.document,
-    relativeFileName,
     line
   );
   rh.showFileList();

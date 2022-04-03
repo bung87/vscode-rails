@@ -239,10 +239,8 @@ export class RailsCompletionItemProvider
         switch (id) {
           case 'partial': // @todo if it is not controller related partial
             {
-              const relativeFileName = vscode.workspace.asRelativePath(
-                  document.fileName
-                ),
-                rh = new NavigationHelper(document, relativeFileName, null);
+              const
+                rh = new NavigationHelper(document);
               const paths = rh.searchPaths().filter((v: string) => {
                 return (
                   v.startsWith(Rails.Layouts) === false &&
@@ -274,10 +272,7 @@ export class RailsCompletionItemProvider
             break;
           case 'template': // @todo if it is base application controller or helper suggest all views
             {
-              const relativeFileName = vscode.workspace.asRelativePath(
-                  document.fileName
-                ),
-                rh = new NavigationHelper(document, relativeFileName, null);
+              const rh = new NavigationHelper(document);
               const paths = rh.searchPaths().filter((v: string) => {
                 return (
                   v.startsWith(Rails.Layouts) === false &&

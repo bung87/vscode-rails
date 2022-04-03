@@ -553,10 +553,7 @@ export function definitionResolver(
           definitionInformation.file = uris[0].fsPath;
           return resolve(definitionInformation);
         } else {
-          const relativeFileName = vscode.workspace.asRelativePath(
-              document.fileName
-            ),
-            rh = new NavigationHelper(document, relativeFileName, null);
+          const rh = new NavigationHelper(document);
           rh.showQuickPick(
             uris.map((uri) => vscode.workspace.asRelativePath(uri))
           );
