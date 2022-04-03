@@ -11,7 +11,7 @@ import readline from 'readline';
 
 import { PATTERNS } from './constants';
 
-import { RailsHelper } from './rails_helper';
+import { NavigationHelper } from './navigation/navigation_helper';
 import { RailsDefinitionInformation } from './interfaces';
 import { FileType } from './rails/file';
 import { Rails } from './rails';
@@ -242,7 +242,7 @@ export class RailsCompletionItemProvider
               const relativeFileName = vscode.workspace.asRelativePath(
                   document.fileName
                 ),
-                rh = new RailsHelper(document, relativeFileName, null);
+                rh = new NavigationHelper(document, relativeFileName, null);
               const paths = rh.searchPaths().filter((v: string) => {
                 return (
                   v.startsWith(Rails.Layouts) === false &&
@@ -277,7 +277,7 @@ export class RailsCompletionItemProvider
               const relativeFileName = vscode.workspace.asRelativePath(
                   document.fileName
                 ),
-                rh = new RailsHelper(document, relativeFileName, null);
+                rh = new NavigationHelper(document, relativeFileName, null);
               const paths = rh.searchPaths().filter((v: string) => {
                 return (
                   v.startsWith(Rails.Layouts) === false &&

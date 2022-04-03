@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { RailsHelper } from './rails_helper';
+import { NavigationHelper } from './navigation/navigation_helper';
 import { RailsDefinitionProvider } from './rails_definition';
 import { RailsCompletionItemProvider } from './rails_completion';
 import { ViewDefinitionProvider } from './viewRef';
@@ -34,7 +34,7 @@ function railsNavigation() {
     .lineAt(vscode.window.activeTextEditor.selection.active.line)
     .text.trim();
 
-  const rh = new RailsHelper(
+  const rh = new NavigationHelper(
     vscode.window.activeTextEditor.document,
     relativeFileName,
     line

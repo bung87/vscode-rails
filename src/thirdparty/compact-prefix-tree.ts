@@ -64,7 +64,7 @@ export function add(word: string, T: Trie | null): void {
   // search for existing prefixes
   while (l--) {
     const prefix = word.substr(0, l + 1);
-    if (T !== null && hasOwnProperty(T,prefix)) {
+    if (T !== null && hasOwnProperty(T, prefix)) {
       // found prefix, move into subtrie
       if (T[prefix] === null) {
         // if one word is a pure subset of another word,
@@ -115,10 +115,10 @@ export function getPrefix(word: string, T: Trie | null) {
   let i = 0;
   while (T !== null && i < len) {
     let key = '';
-    while (!hasOwnProperty(T,key) && i < len) {
+    while (!hasOwnProperty(T, key) && i < len) {
       key += word[i++];
     }
-    if (!hasOwnProperty(T,key)) break;
+    if (!hasOwnProperty(T, key)) break;
     prefix += key;
     T = T[key] || null;
   }
@@ -142,7 +142,7 @@ function _getWords(T: Trie | null, words: Set<string>, prefix: string) {
   for (const pre of Object.keys(T)) {
     const word = prefix + pre;
     words.add(word);
-    if (hasOwnProperty(T,pre) && T[pre] !== null) {
+    if (hasOwnProperty(T, pre) && T[pre] !== null) {
       words.delete(word);
       _getWords(T[pre], words, word);
     }

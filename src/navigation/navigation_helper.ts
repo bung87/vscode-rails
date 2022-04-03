@@ -2,14 +2,15 @@
 import vscode from 'vscode';
 import { dirname, join, basename } from 'path';
 import inflection from 'inflection2';
-import { findFiles, dectFileType, flattenDeep } from './utils';
-import { Rails } from './rails';
-import { FileType } from './rails/file';
+import { findFiles, dectFileType, flattenDeep } from '../utils';
+import { Rails } from '../rails';
+import { FileType } from '../rails/file';
+import { SearchPatterns } from './search_pattern';
 
-export class RailsHelper {
+export class NavigationHelper {
   private fileName: string;
   private filePatten: string;
-  private relativeFileName:string;
+  private relativeFileName: string;
   private line: string; // @TODO detect by current line
   private targetFile: string;
   private document: vscode.TextDocument;
@@ -26,34 +27,9 @@ export class RailsHelper {
     this.initPatten(filePath);
   }
 
-  private patterns = [
-    join(Rails.Controllers, 'PTN', '*'),
-    join(Rails.Controllers, 'PTN*'),
-    join(Rails.Models, 'SINGULARIZE', '*'),
-    join(Rails.Models, 'SINGULARIZE*'),
-
-    join(Rails.Models, 'BASENAME_SINGULARIZE', '*'),
-    join(Rails.Models, 'BASENAME_SINGULARIZE*'),
-
-    join(Rails.Views, 'PTN', '*'),
-    join(Rails.Views, 'PTN*'),
-
-    join(Rails.Layouts, 'PTN', '*'),
-    join(Rails.Layouts, 'PTN*'),
-
-    join(Rails.Helpers, 'PTN', '*'),
-    join(Rails.Helpers, 'PTN*'),
-
-    join(Rails.Javascripts, 'PTN', '*'),
-    join(Rails.Javascripts, 'PTN*'),
-
-    join(Rails.Stylesheets, 'PTN', '*'),
-    join(Rails.Stylesheets, 'PTN*'),
-  ];
-
   public searchPaths(): string[] {
     const res: string[] = [];
-    this.patterns.forEach((e) => {
+    SearchPatterns.forEach((e) => {
       let p = e.replace('PTN', this.filePatten.toString());
       p = p.replace(
         'BASENAME_SINGULARIZE',
@@ -135,18 +111,17 @@ export class RailsHelper {
     }
   }
 
-  public generateList(arr: string[]) {
+  public async generateList(arr: string[]) {
     const ap = arr.map(async (cur) => {
-      const res = await findFiles(this.document, cur.toString(), null);
+      const res = await findFiles(this.document, cur, null);
       return res
         .map((i) => {
           return vscode.workspace.asRelativePath(i);
         })
         .filter((v) => this.relativeFileName !== v);
     });
-    return Promise.all(ap).then((lists) => {
-      return flattenDeep(lists);
-    });
+    const lists = await Promise.all(ap);
+    return flattenDeep(lists);
   }
 
   public showQuickPick(items: string[] | Thenable<string[]>) {

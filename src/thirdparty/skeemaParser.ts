@@ -7,8 +7,8 @@ export default class SkeemaParser {
   skipTimestamps: boolean;
   skipActiveStorage: boolean;
   table: string;
-  result: Record<string,Record<string, string | string[]>>;
-  constructor(schema:string, skipTimestamps = true, skipActiveStorage = true) {
+  result: Record<string, Record<string, string | string[]>>;
+  constructor(schema: string, skipTimestamps = true, skipActiveStorage = true) {
     this.schema = schema;
     this.skipTimestamps = skipTimestamps;
     this.skipActiveStorage = skipActiveStorage;

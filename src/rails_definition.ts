@@ -9,7 +9,7 @@ import {
   getSubPathBySymbol,
   wordsToPath,
 } from './utils';
-import { RailsHelper } from './rails_helper';
+import { NavigationHelper } from './navigation/navigation_helper';
 import { PATTERNS } from './constants';
 import { RAILS } from './symbols/rails';
 import { RUBY } from './symbols/ruby';
@@ -74,12 +74,11 @@ export async function getLibFilePath(
 
   if (filePathInLib) {
     if (findInLibUris.length > 0) {
-        return vscode.workspace
-          .openTextDocument(findInLibUris[0])
-          .then(findClassInDocumentCallback.bind(null, demodulized), () => {
-            return Promise.reject(couldNotOpenMsg + filePathInLib);
-          });
-
+      return vscode.workspace
+        .openTextDocument(findInLibUris[0])
+        .then(findClassInDocumentCallback.bind(null, demodulized), () => {
+          return Promise.reject(couldNotOpenMsg + filePathInLib);
+        });
     } else {
       if (libPath) {
         return findFunctionOrClassByClassNameInFile(libPath, reg);
@@ -120,8 +119,10 @@ export async function getLibOrModelFilePath(
   console.log(`symbol:${symbol}`);
   const [name, sub] = getSubPathBySymbol(symbol),
     demodulized = inflection.demodulize(symbol);
-  return Promise.any([getLibFilePath(document, demodulized, name, sub),getModelFilePath(document, demodulized, name, sub)])
-
+  return Promise.any([
+    getLibFilePath(document, demodulized, name, sub),
+    getModelFilePath(document, demodulized, name, sub),
+  ]);
 }
 
 export async function findLocationByWord(
@@ -555,7 +556,7 @@ export function definitionResolver(
           const relativeFileName = vscode.workspace.asRelativePath(
               document.fileName
             ),
-            rh = new RailsHelper(document, relativeFileName, null);
+            rh = new NavigationHelper(document, relativeFileName, null);
           rh.showQuickPick(
             uris.map((uri) => vscode.workspace.asRelativePath(uri))
           );
