@@ -26,8 +26,8 @@ const couldNotOpenMsg = 'Could Not Open file: ';
 const SYMBOL_END = '[^\\w]';
 
 export function findClassInDocumentCallback(
-  name,
-  document
+  name: string,
+  document: vscode.TextDocument
 ): Promise<RailsDefinitionInformation> {
   const line = document
       .getText()
@@ -183,7 +183,7 @@ export function findViews(
   lineStartToWord: string
 ) {
   console.log(`findViews`, arguments);
-  let filePath;
+  let filePath: string;
   const lineText = document.lineAt(position.line).text.trim(),
     match1 = lineStartToWord.match(PATTERNS.RENDER_MATCH),
     match1id = match1[match1.length - 1],
@@ -341,18 +341,13 @@ export async function getParentControllerFilePathByDocument(
   const relPath = vscode.workspace.asRelativePath(entryDocument.fileName),
     filePath = getSymbolPath(relPath, line, FileType.Controller);
   console.log(`getParentControllerFilePathByDocument returns`, filePath);
-  return Promise.resolve(
-    findFiles(entryDocument, filePath, null, 1).then(
-      (uris) => {
-        if (uris.length !== 0) {
-          return filePath;
-        } else {
-          return '';
-        }
-      },
-      (e) => e
-    )
-  );
+  return findFiles(entryDocument, filePath, null, 1).then((uris) => {
+    if (uris.length !== 0) {
+      return filePath;
+    } else {
+      return '';
+    }
+  });
 }
 
 export async function getFunctionOrClassInfoInFile(
@@ -573,17 +568,17 @@ export function definitionResolver(
   exclude: vscode.GlobPattern = null,
   maxNum: number = null
 ) {
-  return (resolve, reject) => {
+  return (resolve: (a: any) => void, reject: (reason?: any) => void) => {
     const findPath = path.isAbsolute(definitionInformation.file)
       ? vscode.workspace.asRelativePath(definitionInformation.file)
       : definitionInformation.file;
     findFiles(document, findPath).then(
       (uris: vscode.Uri[]) => {
         if (!uris.length) {
-          reject(missingFilelMsg + definitionInformation.file);
+          return reject(missingFilelMsg + definitionInformation.file);
         } else if (uris.length === 1) {
           definitionInformation.file = uris[0].fsPath;
-          resolve(definitionInformation);
+          return resolve(definitionInformation);
         } else {
           const relativeFileName = vscode.workspace.asRelativePath(
               document.fileName
@@ -592,11 +587,11 @@ export function definitionResolver(
           rh.showQuickPick(
             uris.map((uri) => vscode.workspace.asRelativePath(uri))
           );
-          resolve(null);
+          return resolve(null);
         }
       },
       () => {
-        reject(missingFilelMsg + definitionInformation.file);
+        return reject(missingFilelMsg + definitionInformation.file);
       }
     );
   };
@@ -654,7 +649,7 @@ export function definitionLocation(
 }
 
 export class RailsDefinitionProvider implements vscode.DefinitionProvider {
-  private goConfig = null;
+  private goConfig: vscode.WorkspaceConfiguration = null;
   //   private context: vscode.ExtensionContext;
   constructor(
     // context: vscode.ExtensionContext,
@@ -668,7 +663,7 @@ export class RailsDefinitionProvider implements vscode.DefinitionProvider {
     document: vscode.TextDocument,
     position: vscode.Position,
     token: vscode.CancellationToken
-  ): Thenable<vscode.Location> {
+  ) {
     return definitionLocation(document, position, this.goConfig, token).then(
       (definitionInfo) => {
         if (definitionInfo === null || definitionInfo.file === null)

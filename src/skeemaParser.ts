@@ -7,7 +7,7 @@ export default class SkeemaParser {
   skipTimestamps: boolean;
   skipActiveStorage: boolean;
   table: string;
-  result: {};
+  result: Record<string, unknown>;
   constructor(schema, skipTimestamps = true, skipActiveStorage = true) {
     this.schema = schema;
     this.skipTimestamps = skipTimestamps;
@@ -30,17 +30,17 @@ export default class SkeemaParser {
     return this.result;
   };
 
-  isSchemaDotRbFile = (allLines) => {
+  isSchemaDotRbFile = (allLines: string[]) => {
     return Boolean(
       allLines.find((line) => line.trim().match(/ActiveRecord::Schema/))
     );
   };
 
-  processLine = (line) => {
+  processLine = (line: string) => {
     this.table ? this.parseTableLine(line) : this.findNewTable(line);
   };
 
-  parseTableLine = (line) => {
+  parseTableLine = (line: string) => {
     if (line.trim().match(/^end$/)) {
       return this.endTable();
     }
@@ -60,15 +60,15 @@ export default class SkeemaParser {
     }
   };
 
-  findNewTable = (line) => {
+  findNewTable = (line: string) => {
     this.table = this.extractTableName(line);
     if (this.table) {
       this.startTable(this.table);
     }
   };
 
-  extractTableName = (line) => {
-    let tableName;
+  extractTableName = (line: string): string => {
+    let tableName: string;
     if (line.trim().match(/create_table (\S+)/)) {
       tableName = line.split('"')[1];
     }
@@ -76,19 +76,19 @@ export default class SkeemaParser {
       (tableName === 'active_storage_attachments' && this.skipActiveStorage) ||
       (tableName === 'active_storage_blobs' && this.skipActiveStorage)
     ) {
-      return false;
+      return '';
     }
     return tableName;
   };
 
-  extractColumnName = (column) => {
+  extractColumnName = (column: string) => {
     return column.trim().split(' ')[1].split('"')[1];
   };
-  extractColumnType = (column) => {
+  extractColumnType = (column: string) => {
     return column.trim().split(' ')[0].split('.')[1];
   };
 
-  startTable = (tableName) => {
+  startTable = (tableName: string) => {
     this.result[tableName] = {};
   };
 
@@ -96,11 +96,11 @@ export default class SkeemaParser {
     this.table = '';
   };
 
-  addColumn = (type, name) => {
+  addColumn = (type: string, name: string) => {
     this.result[this.table][name] = type;
   };
 
-  addIndex = (type, name) => {
+  addIndex = (type: string, name: string) => {
     if (!this.result[this.table][type]) {
       this.result[this.table][type] = [];
     }
