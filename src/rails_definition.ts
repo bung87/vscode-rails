@@ -67,7 +67,6 @@ export async function getLibFilePath(
     `name:${name} demodulized:${demodulized} funcOrClass:${funcOrClass}`
   );
   let findInLibUris: vscode.Uri[] = [];
-  let findInLib: RailsDefinitionInformation = null;
   try {
     findInLibUris = await findFiles(document, filePathInLib, null, 1);
     // tslint:disable-next-line: no-empty
@@ -75,29 +74,17 @@ export async function getLibFilePath(
 
   if (filePathInLib) {
     if (findInLibUris.length > 0) {
-      try {
-        findInLib = await vscode.workspace
+        return vscode.workspace
           .openTextDocument(findInLibUris[0])
           .then(findClassInDocumentCallback.bind(null, demodulized), () => {
             return Promise.reject(couldNotOpenMsg + filePathInLib);
           });
-      } catch (e) {
-        return Promise.reject(couldNotOpenMsg + filePathInLib);
-      }
+
     } else {
       if (libPath) {
-        try {
-          findInLib = await findFunctionOrClassByClassNameInFile(libPath, reg);
-          // tslint:disable-next-line: no-empty
-        } catch (e) {}
+        return findFunctionOrClassByClassNameInFile(libPath, reg);
       }
     }
-  }
-
-  if (findInLib) {
-    return findInLib;
-  } else {
-    return Promise.reject();
   }
 }
 
@@ -133,23 +120,8 @@ export async function getLibOrModelFilePath(
   console.log(`symbol:${symbol}`);
   const [name, sub] = getSubPathBySymbol(symbol),
     demodulized = inflection.demodulize(symbol);
-  let result = null;
-  try {
-    result = await getLibFilePath(document, demodulized, name, sub);
-  } catch (e) {}
-  if (result) {
-    return result;
-  }
+  return Promise.any([getLibFilePath(document, demodulized, name, sub),getModelFilePath(document, demodulized, name, sub)])
 
-  try {
-    result = await getModelFilePath(document, demodulized, name, sub);
-  } catch (e) {}
-  if (result) {
-    return result;
-  }
-  if (!result) {
-    return Promise.reject();
-  }
 }
 
 export async function findLocationByWord(
