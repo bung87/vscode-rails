@@ -32,22 +32,6 @@ export function wordsToPath(s: string) {
   );
 }
 
-export function isPositionInString(
-  document: TextDocument,
-  position: Position
-): boolean {
-  const lineText = document.lineAt(position.line).text;
-  const lineTillCurrentPosition = lineText.substr(0, position.character);
-
-  // Count the number of double quotes in the line till current position. Ignore escaped double quotes
-  let doubleQuotesCnt = (lineTillCurrentPosition.match(/\"/g) || []).length;
-  const escapedDoubleQuotesCnt = (lineTillCurrentPosition.match(/\\\"/g) || [])
-    .length;
-
-  doubleQuotesCnt -= escapedDoubleQuotesCnt;
-  return doubleQuotesCnt % 2 === 1;
-}
-
 export function flatten<T>(arr: T[][]): T[] {
   return ([] as T[]).concat(...arr);
 }

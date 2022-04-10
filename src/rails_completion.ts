@@ -139,10 +139,6 @@ export class RailsCompletionItemProvider
         triggerCharacter = TriggerCharacter.colon;
     }
     console.log(`triggerCharacter:${triggerCharacter}`);
-    // let inString = isPositionInString(document, position);
-    // if (!inString && lineTillCurrentPosition.endsWith('\"')) {
-    //     return resolve([]);
-    // }
 
     // get current word
     let position2 = new vscode.Position(position.line, position.character - 1);
