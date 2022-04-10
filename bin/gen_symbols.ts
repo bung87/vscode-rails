@@ -39,7 +39,7 @@ function gen(key, value) {
             let
                 trie = new CompactPrefixTree(_list),
                 serialized = JSON.stringify(trie.T),
-                imports = `import { CompactPrefixTree, getWordsFromTrie } from 'compact-prefix-tree' ;\n`,
+                imports = `import { CompactPrefixTree, getWordsFromTrie } from '../thirdparty/compact-prefix-tree' ;\n`,
                 content = `${COMMENT}${imports}const serialized = '${serialized}';\nconst words = getWordsFromTrie(JSON.parse(serialized));\nexport const ${key.toUpperCase()} = new CompactPrefixTree(Array.from(words));\nexport const VERSION = "${value.version}"`;
             // if (key === "rails"){
             //         console.log("actioncontroller::base is word",trie.isWord("actioncontroller::base"))

@@ -7,9 +7,9 @@ import { Rails } from '../rails';
 import { FileType } from '../rails/file';
 import { SearchPatterns } from './search_pattern';
 
-function searchPaths(filePattern: string): string[] {
+function searchPaths(filePattern: string , filter = (v:string) => true): string[] {
   const res: string[] = [];
-  SearchPatterns.forEach((e) => {
+  SearchPatterns.filter(filter).forEach((e) => {
     let p = e.replace('PTN', filePattern);
     p = p.replace(
       'BASENAME_SINGULARIZE',
@@ -129,6 +129,14 @@ export class NavigationHelper {
           return vscode.window.showTextDocument(doc);
         });
       });
+  }
+
+  public async relatedFiles(filter = (v:string) => true): Promise<vscode.Uri[]>{
+    if (this.filePattern != null) {
+      const paths = searchPaths(this.filePattern, filter).slice();
+      return this.generateList(paths)
+    }
+    return []
   }
 
   public showFileList() {

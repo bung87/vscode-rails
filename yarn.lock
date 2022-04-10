@@ -152,10 +152,10 @@
   resolved "https://r.cnpmjs.org/@types/node/download/@types/node-14.0.13.tgz#ee1128e881b874c371374c1f72201893616417c9"
   integrity sha1-7hEo6IG4dMNxN0wfciAYk2FkF8k=
 
-"@types/node@^13.9.1":
-  version "13.13.12"
-  resolved "https://r.cnpmjs.org/@types/node/download/@types/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
-  integrity sha1-nHLoZTgKfcmZmeoO8g/JY1tQPSA=
+"@types/node@^15":
+  version "15.14.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.14.9.tgz#bc43c990c3c9be7281868bbc7b8fdd6e2b57adfa"
+  integrity sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -848,10 +848,10 @@ has-flag@^4.0.0:
   resolved "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz#944771fd9c81c81265c4d6941860da06bb59479b"
   integrity sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
 
-has-own-prop@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.npmmirror.com/has-own-prop/-/has-own-prop-3.1.0.tgz#efe2f84b8b2f62ffadc19a4a45cbfeee757f9b78"
-  integrity sha512-SmePZSzKBvCRxpjiG9tCzlTPoXEgaKP4n5MqsYC1E7ys+D95vrZhrV3gFlPUHj1AtJDtO9KVHn4XRrtUqSfJ2w==
+has-own-prop@2:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/has-own-prop/-/has-own-prop-2.0.0.tgz#f0f95d58f65804f5d218db32563bb85b8e0417af"
+  integrity sha512-Pq0h+hvsVm6dDEa8x82GnLSYHOzNDt7f0ddFa3FqcQlgzEiptPqL+XrOJNavjOzSYiYWIrgeVYYgGlLmnxwilQ==
 
 http-proxy-agent@^2.1.0:
   version "2.1.0"

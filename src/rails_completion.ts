@@ -1,16 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-'use strict';
-
 import vscode from 'vscode';
-import path from 'path';
-import { dectFileType, findFiles } from './utils';
-import { definitionLocation } from './rails_definition';
+import path, { posix } from 'path';
 import micromatch from 'micromatch';
 import fs from 'fs';
 import readline from 'readline';
-
+import { dectFileType, findFiles, toPosixPath } from './utils';
+import { definitionLocation } from './rails_definition';
 import { PATTERNS } from './constants';
-
 import { NavigationHelper } from './navigation/navigation_helper';
 import { RailsDefinitionInformation } from './interfaces';
 import { FileType } from './rails/file';
@@ -236,50 +232,36 @@ export class RailsCompletionItemProvider
           case 'partial': // @todo if it is not controller related partial
             {
               const rh = new NavigationHelper(document);
-              const paths = rh.searchPaths().filter((v: string) => {
-                return (
-                  v.startsWith(Rails.Layouts) === false &&
-                  v.startsWith(Rails.Views) === true
-                );
-              });
-              console.log(`paths:${paths.toString()}`);
-              items = await rh.generateList(paths).then((list) => {
-                const partials = list
-                  .map((v) => path.parse(v).name.split('.')[0])
-                  .filter((v) => {
-                    return v.startsWith('_');
-                  });
-                console.log(`partials:${partials.toString()}`);
-                const items = partials.map((v: string) => {
-                  const name = v.substring(1);
-                  const item = new vscode.CompletionItem(name);
-                  item.insertText =
-                    triggerCharacter === TriggerCharacter.colon
-                      ? " '" + name + "'"
-                      : name;
-                  item.kind = vscode.CompletionItemKind.File;
-                  return item;
+              const uris = await rh.relatedFiles((v:string) => v.startsWith(Rails.Views))
+              const partials = uris
+                .map((v) => path.parse(v.path).name.split('.')[0])
+                .filter((v) => {
+                  return v.startsWith('_');
                 });
-                return items;
+              console.log(`partials:${partials.toString()}`);
+                items = partials.map((v: string) => {
+                const name = v.substring(1);
+                const item = new vscode.CompletionItem(name);
+                item.insertText =
+                  triggerCharacter === TriggerCharacter.colon
+                    ? " '" + name + "'"
+                    : name;
+                item.kind = vscode.CompletionItemKind.File;
+                return item;
               });
+              
               suggestions.push(...items);
             }
             break;
           case 'template': // @todo if it is base application controller or helper suggest all views
             {
               const rh = new NavigationHelper(document);
-              const paths = rh.searchPaths().filter((v: string) => {
-                return (
-                  v.startsWith(Rails.Layouts) === false &&
-                  v.startsWith(Rails.Views) === true
-                );
-              });
+              const uris = await rh.relatedFiles((v:string) => v.startsWith(Rails.Views))
 
-              items = await rh.generateList(paths).then((list) => {
-                const templates = list
+                const templates = uris
                   .map((v) =>
                     path.basename(
-                      v.substring(Rails.Views.length + 1).split('.')[0]
+                      v.path.substring(Rails.Views.length + 1).split('.')[0]
                     )
                   )
                   .filter((v) => path.basename(v).startsWith('_') === false);
@@ -293,20 +275,18 @@ export class RailsCompletionItemProvider
                   item.kind = vscode.CompletionItemKind.File;
                   return item;
                 });
-                return items;
-              });
               suggestions.push(...items);
               if (TriggerCharacter.quote === triggerCharacter) {
-                items = await findFiles(
+                const items = await findFiles(
                   document,
-                  path.join(Rails.Views, '**'),
+                  posix.join(Rails.Views, '**'),
                   Rails.Layouts
                 ).then((res) => {
                   return res
                     .filter((v) => {
                       const p = vscode.workspace.asRelativePath(v);
                       return (
-                        paths.some((v2) => {
+                        uris.map( u => toPosixPath(u.path)).some((v2) => {
                           return !micromatch([p], v2);
                         }) || path.basename(p).startsWith('_')
                       );

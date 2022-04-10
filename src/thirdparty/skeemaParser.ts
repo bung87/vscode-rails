@@ -20,7 +20,7 @@ export default class SkeemaParser {
     const allLines = this.schema.split(/\r\n|\n/);
     if (!this.isSchemaDotRbFile(allLines)) {
       console.error('Not a "schema.rb" file');
-      return false;
+      throw new Error('Not a "schema.rb" file')
     }
 
     allLines.forEach((line) => {

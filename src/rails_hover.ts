@@ -25,7 +25,7 @@ function readFile(
   } = {},
   fn: (
     err: NodeJS.ErrnoException,
-    data?: Record<string, Record<string, any>>
+    data?: Record<string, Record<string, string| string[]>>
   ) => void
 ) {
   let _fn = fn;
