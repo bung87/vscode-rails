@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
+import vscode from 'vscode';
+import path from 'path';
 import axios, { AxiosRequestConfig } from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
@@ -7,7 +7,7 @@ import { getSymbol } from './utils';
 // Track currently webview panel
 // var currentPanel: vscode.WebviewPanel | undefined = undefined;
 
-function injectBase(html, base) {
+function injectBase(html: string, base: string) {
   const policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src vscode-resource: http:; script-src vscode-resource: http: 'unsafe-inline' ; style-src vscode-resource: http: 'unsafe-inline';">`;
   const _base = path.dirname(base) + '/';
   // Remove any <base> elements inside <head>

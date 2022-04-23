@@ -1,14 +1,21 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import vscode from 'vscode';
+import path from 'path';
 import { getSymbol } from './utils';
 import { PATTERNS } from './constants';
-import * as inflection from 'inflection2';
+import inflection from 'inflection2';
 import fs from 'fs';
-import SkeemaParser from './skeemaParser';
-import { markdownTable } from './markdown-table';
+import SkeemaParser from './thirdparty/skeemaParser';
+import { markdownTable } from './thirdparty/markdown-table';
 import { promisify } from 'util';
 import pathExists from 'path-exists';
-const files = {};
+const files: Record<
+  string,
+  {
+    mtime: Date;
+    content: Record<string, any>;
+  }
+> = {};
 
 function readFile(
   path: string,
@@ -16,7 +23,10 @@ function readFile(
     encoding?: null;
     flag?: string;
   } = {},
-  fn: (err: NodeJS.ErrnoException, data?: {}) => void
+  fn: (
+    err: NodeJS.ErrnoException,
+    data?: Record<string, Record<string, string| string[]>>
+  ) => void
 ) {
   let _fn = fn;
   if (2 === arguments.length) {
@@ -24,7 +34,7 @@ function readFile(
     _fn = options;
     options = {};
   }
-
+  // @ts-ignore
   if (!files[path]) files[path] = {};
   const file = files[path];
 

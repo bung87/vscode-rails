@@ -1,22 +1,22 @@
-import { FileType, FileTypeRelPath } from './constants';
 import {
   TextDocument,
   RelativePattern,
   workspace,
   Position,
   CancellationToken,
-  GlobPattern,
   Range,
   Uri,
 } from 'vscode';
 import path from 'path';
-import * as inflection from 'inflection2';
+import inflection from 'inflection2';
+import { Rails } from './rails';
+import { FileType } from './rails/file';
 
 export const LocalBundle = 'vendor/bundle/**';
-export const gitignores = {};
+export const gitignores: Record<string, string[]> = {};
 
 export function dectFileType(filePath: string): FileType {
-  for (const [key, value] of FileTypeRelPath) {
+  for (const [key, value] of Rails.FileType2Path) {
     if (filePath.indexOf(value) >= 0) {
       return key;
     }
@@ -24,7 +24,7 @@ export function dectFileType(filePath: string): FileType {
   return FileType.Unkown;
 }
 
-export function wordsToPath(s) {
+export function wordsToPath(s: string) {
   return inflection.underscore(
     s.replace(/[A-Z]{2,}(?![a-z])/, (s) => {
       return inflection.titleize(s);
@@ -32,28 +32,14 @@ export function wordsToPath(s) {
   );
 }
 
-export function isPositionInString(
-  document: TextDocument,
-  position: Position
-): boolean {
-  const lineText = document.lineAt(position.line).text;
-  const lineTillCurrentPosition = lineText.substr(0, position.character);
-
-  // Count the number of double quotes in the line till current position. Ignore escaped double quotes
-  let doubleQuotesCnt = (lineTillCurrentPosition.match(/\"/g) || []).length;
-  const escapedDoubleQuotesCnt = (lineTillCurrentPosition.match(/\\\"/g) || [])
-    .length;
-
-  doubleQuotesCnt -= escapedDoubleQuotesCnt;
-  return doubleQuotesCnt % 2 === 1;
+export function flatten<T>(arr: T[][]): T[] {
+  return ([] as T[]).concat(...arr);
 }
 
-export function flatten(arr) {
-  return arr.reduce((flat, toFlatten) => {
-    return flat.concat(
-      Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
-    );
-  }, []);
+type NestedArray<T> = Array<NestedArray<T> | T>;
+
+export function flattenDeep<T>(input: NestedArray<T>): T[] {
+  return flatten(input.map((x) => (Array.isArray(x) ? flattenDeep(x) : [x])));
 }
 
 export function toPosixPath(s: string): string {
@@ -66,7 +52,7 @@ export function toPosixPath(s: string): string {
 export function findFiles(
   document: TextDocument,
   include: string,
-  exclude?: GlobPattern | null,
+  exclude?: string,
   maxResults?: number,
   token?: CancellationToken
 ): Thenable<Uri[]> {
@@ -74,10 +60,10 @@ export function findFiles(
   const name = ws.name;
   const _include = new RelativePattern(ws, toPosixPath(include));
   const _exclude =
-    gitignores[name] && exclude ? gitignores[name].concat(exclude) : exclude;
+    gitignores[name] && exclude ? gitignores[name].concat(exclude) : [exclude];
   return workspace.findFiles(
     _include,
-    _exclude + `,${LocalBundle}`,
+    _exclude.concat(LocalBundle).join(','),
     maxResults,
     token
   );

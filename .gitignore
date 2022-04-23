@@ -1,6 +1,6 @@
 .DS_Store
 out
 node_modules
-rails/
 dist/
 yarn-error.log
+bin/gen_symbols.js

@@ -1,26 +1,13 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import * as path from 'path';
+import vscode from 'vscode';
+import path from 'path';
 
-import {
-  // FileType,
-  // FileTypeRelPath,
-  // REL_CONTROLLERS,
-  // REL_CONTROLLERS_CONCERNS,
-  // REL_MODELS,
-  // REL_MODELS_CONCERNS,
-  REL_VIEWS,
-  // REL_LAYOUTS,
-  // REL_HELPERS,
-  // REL_JAVASCRIPTS,
-  // REL_STYLESHEETS,
-  PATTERNS,
-  VIEWS_PATTERNS,
-} from './constants';
+import { PATTERNS, VIEWS_PATTERNS } from './constants';
 import { RailsDefinitionInformation } from './interfaces';
 import { RAILS } from './symbols/rails';
 import { findFiles } from './utils';
+import { Rails } from './rails';
 
 const missingFilelMsg = 'Missing file: ';
 // const couldNotOpenMsg = 'Could Not Open file: ';
@@ -38,8 +25,8 @@ export function findViews(
   document: vscode.TextDocument,
   position: vscode.Position,
   _path: string,
-  fileType: string = '',
-  viewType: string = 'partial' // partial or template
+  fileType = '',
+  viewType = 'partial' // partial or template
 ) {
   console.log(`findViews`, arguments);
   let filePath;
@@ -59,11 +46,11 @@ export function findViews(
     filePath = path.join(dir, `${_underscore}${_path}${fileType}.*`);
     definitionInformation.file = filePath;
   } else if (ext) {
-    filePath = path.join(REL_VIEWS, _path);
+    filePath = path.join(Rails.Views, _path);
     definitionInformation.file = filePath;
   } else if (isViewsRelativePath) {
     filePath = path.join(
-      REL_VIEWS,
+      Rails.Views,
       path.dirname(_path),
       `${_underscore}${path.basename(_path)}${fileType}.*`
     );

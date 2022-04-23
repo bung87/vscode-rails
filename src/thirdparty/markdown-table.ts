@@ -1,16 +1,13 @@
 import repeat from 'repeat-string';
 
-/**
- * @typedef MarkdownTableOptions
- * @property {string|string[]} [align]
- * @property {boolean} [padding=true]
- * @property {boolean} [delimiterStart=true]
- * @property {boolean} [delimiterStart=true]
- * @property {boolean} [delimiterEnd=true]
- * @property {boolean} [alignDelimiters=true]
- * @property {(value: string) => number} [stringLength]
- */
-
+interface MarkdownTableOptions {
+  align: string | string[];
+  padding: boolean;
+  delimiterStart: boolean;
+  delimiterEnd: boolean;
+  alignDelimiters: boolean;
+  stringLength?: (value: string) => number;
+}
 /**
  * Create a table from a matrix of strings.
  *
@@ -18,40 +15,43 @@ import repeat from 'repeat-string';
  * @param {MarkdownTableOptions} [options]
  * @returns {string}
  */
-export function markdownTable(table: string[][], options?: any) {
-  const settings = options || {};
-  const align = (settings.align || []).concat();
-  const stringLength = settings.stringLength || defaultStringLength;
+export function markdownTable(
+  table: string[][],
+  options: MarkdownTableOptions = {
+    align: '',
+    padding: false,
+    delimiterStart: false,
+    delimiterEnd: false,
+    alignDelimiters: false,
+  }
+): string {
+  const align = (options.align || []).concat();
+  const stringLength = options.stringLength || defaultStringLength;
   /** @type {number[]} Character codes as symbols for alignment per column. */
-  const alignments = [];
+  const alignments: number[] = [];
   let rowIndex = -1;
   /** @type {string[][]} Cells per row. */
-  const cellMatrix = [];
+  const cellMatrix: string[][] = [];
   /** @type {number[][]} Sizes of each cell per row. */
-  const sizeMatrix = [];
-  /** @type {number[]} */
-  const longestCellByColumn = [];
+  const sizeMatrix: number[][] = [];
+  const longestCellByColumn: number[] = [];
   let mostCellsPerRow = 0;
   /** @type {number} */
-  let columnIndex;
+  let columnIndex: number;
   /** @type {string[]} Cells of current row */
-  let row;
+  let row: string[];
   /** @type {number[]} Sizes of current row */
-  let sizes;
+  let sizes: number[];
   /** @type {number} Sizes of current cell */
-  let size;
+  let size: number;
   /** @type {string} Current cell */
-  let cell;
-  /** @type {string[]} */
-  let lines;
+  let cell: string;
+  let lines: string[] = [];
   /** @type {string[]} Chunks of current line. */
-  let line;
-  /** @type {string} */
-  let before;
-  /** @type {string} */
-  let after;
-  /** @type {number} */
-  let code;
+  let line: string[];
+  let before: string;
+  let after: string;
+  let code: number;
 
   // This is a superfluous loop if we don’t align delimiters, but otherwise we’d
   // do superfluous work when aligning, so optimize for aligning.
@@ -67,7 +67,7 @@ export function markdownTable(table: string[][], options?: any) {
     while (++columnIndex < table[rowIndex].length) {
       cell = serialize(table[rowIndex][columnIndex]);
 
-      if (settings.alignDelimiters !== false) {
+      if (options.alignDelimiters !== false) {
         size = stringLength(cell);
         sizes[columnIndex] = size;
 
@@ -122,7 +122,7 @@ export function markdownTable(table: string[][], options?: any) {
 
     // There *must* be at least one hyphen-minus in each alignment cell.
     size =
-      settings.alignDelimiters === false
+      options.alignDelimiters === false
         ? 1
         : Math.max(
             1,
@@ -131,7 +131,7 @@ export function markdownTable(table: string[][], options?: any) {
 
     cell = before + repeat('-', size) + after;
 
-    if (settings.alignDelimiters !== false) {
+    if (options.alignDelimiters !== false) {
       size = before.length + size + after.length;
 
       if (size > longestCellByColumn[columnIndex]) {
@@ -162,7 +162,7 @@ export function markdownTable(table: string[][], options?: any) {
       before = '';
       after = '';
 
-      if (settings.alignDelimiters !== false) {
+      if (options.alignDelimiters !== false) {
         size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
         code = alignments[columnIndex];
 
@@ -181,36 +181,36 @@ export function markdownTable(table: string[][], options?: any) {
         }
       }
 
-      if (settings.delimiterStart !== false && !columnIndex) {
+      if (options.delimiterStart !== false && !columnIndex) {
         line.push('|');
       }
 
       if (
-        settings.padding !== false &&
+        options.padding !== false &&
         // Don’t add the opening space if we’re not aligning and the cell is
         // empty: there will be a closing space.
-        !(settings.alignDelimiters === false && cell === '') &&
-        (settings.delimiterStart !== false || columnIndex)
+        !(options.alignDelimiters === false && cell === '') &&
+        (options.delimiterStart !== false || columnIndex)
       ) {
         line.push(' ');
       }
 
-      if (settings.alignDelimiters !== false) {
+      if (options.alignDelimiters !== false) {
         line.push(before);
       }
 
       line.push(cell);
 
-      if (settings.alignDelimiters !== false) {
+      if (options.alignDelimiters !== false) {
         line.push(after);
       }
 
-      if (settings.padding !== false) {
+      if (options.padding !== false) {
         line.push(' ');
       }
 
       if (
-        settings.delimiterEnd !== false ||
+        options.delimiterEnd !== false ||
         columnIndex !== mostCellsPerRow - 1
       ) {
         line.push('|');
@@ -218,7 +218,7 @@ export function markdownTable(table: string[][], options?: any) {
     }
 
     lines.push(
-      settings.delimiterEnd === false
+      options.delimiterEnd === false
         ? line.join('').replace(/ +$/, '')
         : line.join('')
     );
@@ -227,27 +227,15 @@ export function markdownTable(table: string[][], options?: any) {
   return lines.join('\n');
 }
 
-/**
- * @param {string|null|undefined} [value]
- * @returns {string}
- */
-function serialize(value) {
+function serialize(value: string | null | undefined) {
   return value === null || value === undefined ? '' : String(value);
 }
 
-/**
- * @param {string} value
- * @returns {number}
- */
-function defaultStringLength(value) {
+function defaultStringLength(value: string) {
   return value.length;
 }
 
-/**
- * @param {string} value
- * @returns {number}
- */
-function toAlignment(value) {
+function toAlignment(value: string) {
   const code = typeof value === 'string' ? value.charCodeAt(0) : 0;
 
   return code === 67 /* `C` */ || code === 99 /* `c` */

@@ -4,6 +4,7 @@
         "target": "esnext",
         "outDir": "dist",
         "resolveJsonModule":true,
+        "strictBindCallApply": true,
         "lib": [
             "esnext"
         ],
@@ -13,8 +14,9 @@
         "allowSyntheticDefaultImports":true,
         "esModuleInterop":true
     },
-    
+
     "exclude": [
+        "bin",
         "node_modules",
         ".vscode-test",
         "test",

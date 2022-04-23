@@ -1,18 +1,15 @@
-'use strict';
-
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { RailsHelper } from './rails_helper';
+import vscode from 'vscode';
+import { NavigationHelper } from './navigation/navigation_helper';
 import { RailsDefinitionProvider } from './rails_definition';
 import { RailsCompletionItemProvider } from './rails_completion';
 import { ViewDefinitionProvider } from './viewRef';
 import { viewDoc } from './view_doc';
 import { Formatter } from './formatter';
-import * as fs from 'fs';
-import * as readline from 'readline';
+import fs from 'fs';
+import readline from 'readline';
 import { gitignores, LocalBundle } from './utils';
-import parseGitignore from 'gitignore-globs';
+// import parseGitignore from 'gitignore-globs';
+import { globifyGitIgnoreFile } from 'globify-gitignore';
 import path from 'path';
 import { RailsHover } from './rails_hover';
 
@@ -29,17 +26,12 @@ function railsNavigation() {
     return;
   }
 
-  const relativeFileName = vscode.workspace.asRelativePath(
-    vscode.window.activeTextEditor.document.fileName
-  );
-
   const line = vscode.window.activeTextEditor.document
     .lineAt(vscode.window.activeTextEditor.selection.active.line)
     .text.trim();
 
-  const rh = new RailsHelper(
+  const rh = new NavigationHelper(
     vscode.window.activeTextEditor.document,
-    relativeFileName,
     line
   );
   rh.showFileList();
@@ -57,7 +49,7 @@ function registerFormatter(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('erb.formatting', () => {
-      formatter.beautify();
+      void formatter.beautify();
     })
   );
 
@@ -67,7 +59,7 @@ function registerFormatter(context: vscode.ExtensionContext) {
     })
   );
 
-  function registerDocType(type) {
+  function registerDocType(type: string) {
     // context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(type, {
     //   provideDocumentFormattingEdits: (document, options, token) => {
     //     return formatter.registerBeautify(null)
@@ -135,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  vscode.workspace
+  void vscode.workspace
     .findFiles('Gemfile', LocalBundle, vscode.workspace.workspaceFolders.length)
     .then(async (uris: vscode.Uri[]) => {
       if (uris.length >= 1) {
@@ -165,7 +157,9 @@ export function activate(context: vscode.ExtensionContext) {
     const wsName = ws.name;
     const file = path.join(ws.uri.fsPath, '.gitignore');
     if (fs.existsSync(file)) {
-      gitignores[wsName] = parseGitignore(file);
+      void globifyGitIgnoreFile(ws.uri.fsPath).then((globs) => {
+        gitignores[wsName] = globs;
+      });
     }
   });
 
@@ -179,9 +173,12 @@ export function activate(context: vscode.ExtensionContext) {
     gitignoreWatcher.onDidChange((uri) => {
       const ws = vscode.workspace.getWorkspaceFolder(uri);
       const wsName = ws.name;
-      gitignores[wsName] = parseGitignore(uri.fsPath);
+      const dirname = path.dirname(uri.fsPath);
+      void globifyGitIgnoreFile(dirname).then((globs) => {
+        gitignores[wsName] = globs;
+      });
     })
   );
 }
 // this method is called when your extension is deactivated
-export function deactivate() {}
+// export function deactivate() {}
