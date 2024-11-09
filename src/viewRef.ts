@@ -28,7 +28,6 @@ export function findViews(
   fileType = '',
   viewType = 'partial' // partial or template
 ) {
-  console.log(`findViews`, arguments);
   let filePath;
   const isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
     isViewsRelativePath = _path.indexOf('/') !== -1,
@@ -75,7 +74,6 @@ export function definitionResolver(
   exclude: vscode.GlobPattern = null,
   maxNum: number = null
 ) {
-  console.log(`definitionResolver`, arguments);
   return (resolve, reject) => {
     findFiles(
       document,

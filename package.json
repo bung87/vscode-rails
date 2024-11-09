@@ -184,6 +184,7 @@
         "@rollup/plugin-commonjs": "^13.0.0",
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^8.0.1",
+        "@rollup/plugin-terser": "^0.4.4",
         "@types/js-beautify": "^1.13.3",
         "@types/micromatch": "^4.0.2",
         "@types/node": "^15",

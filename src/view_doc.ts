@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 import path from 'path';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { RAILS } from './symbols/rails';
 import { RUBY, VERSION } from './symbols/ruby';
 import { getSymbol } from './utils';
@@ -9,19 +9,18 @@ import { getSymbol } from './utils';
 
 function injectBase(html: string, base: string) {
   const policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src vscode-resource: http:; script-src vscode-resource: http: 'unsafe-inline' ; style-src vscode-resource: http: 'unsafe-inline';">`;
-  const _base = path.dirname(base) + '/';
+  const _base = `${path.dirname(base)}/`;
   // Remove any <base> elements inside <head>
-  let _html = html.replace(
+  const _html = html.replace(
     /(<[^>/]*head[^>]*>)[\s\S]*?(<[^>/]*base[^>]*>)[\s\S]*?(<[^>]*head[^>]*>)/gim,
     '$1 $3'
   );
 
   // Add <base> just before </head>
-  _html = _html.replace(
+  return _html.replace(
     /<head>/gim,
     `<head><base href="${_base}">\n${policy}\n<style> body{margin:20px;}</style>`
   );
-  return _html;
 }
 
 const CancelToken = axios.CancelToken;
@@ -30,7 +29,7 @@ const source = CancelToken.source();
 function showSide(
   symbol: string,
   html: string,
-  context: vscode.ExtensionContext
+  _context: vscode.ExtensionContext
 ) {
   // const columnToShowIn = vscode.window.activeTextEditor
   //   ? vscode.window.activeTextEditor.viewColumn
@@ -69,7 +68,7 @@ function doRequest(
   _url: string,
   symbol: string
 ) {
-  const request = axios({
+  axios({
     url: _url,
     timeout: 5e3,
     cancelToken: source.token,
@@ -83,7 +82,7 @@ function doRequest(
         showSide(symbol, html, this);
       }
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.error(err);
       showSide(symbol, err.toString(), this);
     });
