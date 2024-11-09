@@ -201,7 +201,6 @@
     },
     "dependencies": {
         "axios": "^1.6.0",
-        "compact-prefix-tree": "^2.0.2",
         "globify-gitignore": "^0.2.1",
         "has-own-prop": "^2",
         "inflection2": "^2.0.1",

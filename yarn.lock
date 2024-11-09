@@ -711,13 +711,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compact-prefix-tree@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "compact-prefix-tree@npm:2.0.2"
-  checksum: 10c0/38d362b3eb9a7efb55a0b43a0b4e14497a76cfb33e158df084d4653e1ebec02f9aeda8d6dc1ba2e5d4a610234058df809d934dbb109afa36c9665f8f41dd6158
-  languageName: node
-  linkType: hard
-
 "concat-map@npm:0.0.1":
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
@@ -2264,7 +2257,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^5.17.0"
     "@typescript-eslint/parser": "npm:^5.17.0"
     axios: "npm:^1.6.0"
-    compact-prefix-tree: "npm:^2.0.2"
     eslint: "npm:^8.12.0"
     globify-gitignore: "npm:^0.2.1"
     has-own-prop: "npm:^2"
