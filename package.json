@@ -171,7 +171,7 @@
         "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "lintFormat": "yarn lint && yarn format",
-        "vscode:prepublish": "yarn lintFormat && yarn dist",
+        "vscode:prepublish": "yarn dist",
         "compile": "yarn dist",
         "watchbundled": "rollup -c -w rollup.config.js",
         "watch": "tsc -p . -w "
