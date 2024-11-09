@@ -192,7 +192,6 @@
         "@typescript-eslint/eslint-plugin": "^5.17.0",
         "@typescript-eslint/parser": "^5.17.0",
         "eslint": "^8.12.0",
-        "husky": "^4.3.6",
         "prettier": "^2.0.5",
         "rollup": "^2.70.1",
         "rollup-plugin-typescript2": "^0.27.1",
