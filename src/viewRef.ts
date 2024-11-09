@@ -28,16 +28,16 @@ export function findViews(
   fileType = '',
   viewType = 'partial' // partial or template
 ) {
-  let filePath;
-  const isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path),
-    isViewsRelativePath = _path.indexOf('/') !== -1,
-    ext = path.parse(_path).ext,
-    _underscore = viewType.endsWith('partial') ? '_' : '', // viewType could be "json.partial"
-    definitionInformation: RailsDefinitionInformation = {
-      file: null,
-      line: 0,
-      column: 0,
-    };
+  let filePath: string;
+  const isSameDirPartial = /^[a-zA-Z0-9_-]+$/.test(_path);
+  const isViewsRelativePath = _path.indexOf('/') !== -1;
+  const ext = path.parse(_path).ext;
+  const _underscore = viewType.endsWith('partial') ? '_' : ''; // viewType could be "json.partial"
+  const definitionInformation: RailsDefinitionInformation = {
+    file: null,
+    line: 0,
+    column: 0,
+  };
 
   if (isSameDirPartial) {
     const fileName = vscode.workspace.asRelativePath(document.fileName),
@@ -105,10 +105,9 @@ export function definitionLocation(
   goConfig?: vscode.WorkspaceConfiguration,
   token?: vscode.CancellationToken
 ): Thenable<RailsDefinitionInformation> {
-  console.log(`definitionLocation`, arguments);
   const wordRange = document.getWordRangeAtPosition(
     position,
-    /([A-Za-z\/0-9_-]+)(\.[A-Za-z0-9]+)*/
+    /([A-Za-z/0-9_-]+)(\.[A-Za-z0-9]+)*/
   );
   if (!wordRange) {
     return Promise.resolve(null);

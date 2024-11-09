@@ -26,7 +26,6 @@ export function getSymbolPath(
   line: string,
   fileType: FileType
 ) {
-  console.log(`getSymbolPath`, arguments);
   let filePath = '';
   const [currentClassRaw, parentClassRaw] = line.split('<'),
     currentClass = currentClassRaw.trim(),
@@ -51,7 +50,6 @@ export function getSymbolPath(
 }
 
 export function getConcernsFilePath(lineStartToWord: string, fileT: FileType) {
-  console.log(`getConcernsFilePath`, arguments);
   const concern = lineStartToWord.replace(PATTERNS.INCLUDE_DECLARATION, ''),
     seq = concern.split('::').map(wordsToPath);
   if (seq[0] === 'concerns') delete seq[0];
