@@ -2,6 +2,9 @@
 
 [![Join the chat at https://gitter.im/vscode-rails/Lobby](https://badges.gitter.im/vscode-rails/Lobby.svg)](https://gitter.im/vscode-rails/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 
+> [!IMPORTANT]
+> This extension is deprecated. Instead, we recommend using the `Shopify.ruby-lsp` VS Code Extension,
+> which will enable [a Rails addon automatically](https://shopify.github.io/ruby-lsp/rails-add-on.html).
 
 Ruby on Rails support for Visual Studio Code
 
