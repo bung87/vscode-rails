@@ -87,10 +87,11 @@ export function getSymbol(
   const lineStartToWord = document
     .getText(new Range(new Position(position.line, 0), wordRange.end))
     .trim();
-  const r = new RegExp('(((::)?[A-Za-z]+)*(::)?' + word + ')').exec(
+  const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const r = new RegExp(`(((::)?[A-Za-z]+)*(::)?${escapedWord})`).exec(
     lineStartToWord
   );
-  if (r.length >= 2) {
+  if (r && r.length >= 2) {
     return r[1];
   }
 }
