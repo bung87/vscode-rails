@@ -206,7 +206,7 @@
         "has-own-prop": "^2",
         "inflection2": "^2.0.1",
         "is_js": "^0.9.0",
-        "js-beautify": "^1.14.1",
+        "js-beautify": "^1.14.10",
         "micromatch": "^4.0.5",
         "path-exists": "^4.0.0",
         "repeat-string": "^1.6.1"
